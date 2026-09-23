@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { CategoryRow } from "@/lib/services/categories"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog"
+import { Modal } from "@/components/ui/Modal"
 import { Input } from "@/components/ui/Input"
 import { Button } from "@/components/ui/Button"
-import { Label } from "@/components/ui/Label"
 
 interface CategoryFormModalProps {
   isOpen: boolean
@@ -68,21 +67,20 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit Category' : 'Add Category'}</DialogTitle>
-        </DialogHeader>
-
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title={initialData ? 'Edit Category' : 'Add Category'}
+    >
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           {error && (
-            <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
+            <div className="bg-red-500/10 text-red-500 p-3 rounded-md text-sm">
               {error}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
+            <label htmlFor="name" className="text-sm font-medium">Name *</label>
             <Input 
               id="name" 
               value={name} 
@@ -93,7 +91,7 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="slug">Slug *</Label>
+            <label htmlFor="slug" className="text-sm font-medium">Slug *</label>
             <Input 
               id="slug" 
               value={slug} 
@@ -104,7 +102,7 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <label htmlFor="description" className="text-sm font-medium">Description</label>
             <Input 
               id="description" 
               value={description} 
@@ -114,7 +112,7 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL</Label>
+            <label htmlFor="image_url" className="text-sm font-medium">Image URL</label>
             <Input 
               id="image_url" 
               type="url"
@@ -133,7 +131,6 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </Modal>
   )
 }

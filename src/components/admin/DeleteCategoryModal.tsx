@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { CategoryRow } from "@/lib/services/categories"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/Dialog"
+import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import { AlertTriangle } from "lucide-react"
 
@@ -36,20 +36,23 @@ export function DeleteCategoryModal({ isOpen, onClose, onConfirm, category }: De
   if (!category) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-destructive">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title="Delete Category"
+    >
+        <div className="space-y-4 pt-2">
+          <div className="flex items-center gap-2 text-red-500 font-medium">
             <AlertTriangle className="h-5 w-5" />
-            Delete Category
-          </DialogTitle>
-          <DialogDescription>
+            <span>Warning</span>
+          </div>
+          <p className="text-sm text-slate-600">
             Are you sure you want to delete <strong>{category.name}</strong>? This action cannot be undone.
-          </DialogDescription>
-        </DialogHeader>
+          </p>
+        </div>
 
         {error && (
-          <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm mt-4">
+          <div className="bg-red-500/10 text-red-500 p-3 rounded-md text-sm mt-4">
             {error}
           </div>
         )}
@@ -62,7 +65,6 @@ export function DeleteCategoryModal({ isOpen, onClose, onConfirm, category }: De
             {loading ? "Deleting..." : "Delete"}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+    </Modal>
   )
 }
