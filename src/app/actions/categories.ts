@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { getCategories, createCategory, updateCategory, deleteCategory, CategoryRow, CategoryInsert, CategoryUpdate } from '@/lib/services/categories'
 import { categorySchema } from '@/lib/validations'
+import { requireAuth } from '@/lib/auth'
 
 export async function fetchCategoriesAction(): Promise<{ data?: CategoryRow[], error?: string }> {
   try {
@@ -15,6 +16,7 @@ export async function fetchCategoriesAction(): Promise<{ data?: CategoryRow[], e
 
 export async function createCategoryAction(data: CategoryInsert): Promise<{ error?: string }> {
   try {
+    await requireAuth()
     const parsedData = categorySchema.parse(data)
     await createCategory(parsedData)
     revalidatePath('/admin/categories')
@@ -30,6 +32,7 @@ export async function createCategoryAction(data: CategoryInsert): Promise<{ erro
 
 export async function updateCategoryAction(id: string, data: CategoryUpdate): Promise<{ error?: string }> {
   try {
+    await requireAuth()
     const parsedData = categorySchema.parse(data)
     await updateCategory(id, parsedData)
     revalidatePath('/admin/categories')
@@ -45,6 +48,7 @@ export async function updateCategoryAction(id: string, data: CategoryUpdate): Pr
 
 export async function deleteCategoryAction(id: string): Promise<{ error?: string }> {
   try {
+    await requireAuth()
     await deleteCategory(id)
     revalidatePath('/admin/categories')
     revalidatePath('/')

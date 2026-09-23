@@ -11,11 +11,14 @@ import {
   LogOut,
   Menu,
   X,
-  Wrench
+  Wrench,
+  Tags
 } from "lucide-react"
+import { logout } from "@/app/actions/auth"
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Categories', href: '/admin/categories', icon: Tags },
   { name: 'Companies', href: '/admin/companies', icon: Building2 },
   { name: 'Models', href: '/admin/models', icon: Car },
   { name: 'Parts', href: '/admin/parts', icon: Settings },
@@ -71,13 +74,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="border-t border-border/40 p-4">
-          <Link
-            href="/"
-            className="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors"
-          >
-            <LogOut className="mr-3 h-5 w-5 shrink-0 text-muted-foreground group-hover:text-foreground" />
-            Logout
-          </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="w-full group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors"
+            >
+              <LogOut className="mr-3 h-5 w-5 shrink-0 text-muted-foreground group-hover:text-foreground" />
+              Logout
+            </button>
+          </form>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 'use server'
 
+import { requireAuth } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { getCompanies, createCompany, updateCompany, deleteCompany, CompanyRow, CompanyInsert, CompanyUpdate } from '@/lib/services/companies'
 import { getModels } from '@/lib/services/models'
@@ -16,6 +17,7 @@ export async function fetchCompaniesAction(): Promise<{ data?: CompanyRow[], err
 
 export async function createCompanyAction(data: CompanyInsert): Promise<{ error?: string }> {
   try {
+    await requireAuth()
     const parsedData = companySchema.parse(data)
     await createCompany(parsedData)
     revalidatePath('/admin/companies')
@@ -30,6 +32,7 @@ export async function createCompanyAction(data: CompanyInsert): Promise<{ error?
 
 export async function updateCompanyAction(id: string, data: CompanyUpdate): Promise<{ error?: string }> {
   try {
+    await requireAuth()
     const parsedData = companySchema.parse(data)
     await updateCompany(id, parsedData)
     revalidatePath('/admin/companies')
@@ -49,6 +52,7 @@ export async function deleteCompanyAction(id: string): Promise<{ error?: string 
       return { error: `Cannot delete company. It currently has ${models.length} associated model(s).` }
     }
 
+    await requireAuth()
     await deleteCompany(id)
     revalidatePath('/admin/companies')
     return {}

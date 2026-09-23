@@ -1,5 +1,6 @@
 'use server'
 
+import { requireAuth } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { getModels, createModel, updateModel, deleteModel, ModelRow, ModelInsert, ModelUpdate } from '@/lib/services/models'
 import { getParts } from '@/lib/services/parts'
@@ -41,6 +42,7 @@ export async function deleteModelAction(id: string): Promise<{ error?: string }>
       return { error: `Cannot delete model. It currently has ${parts.length} associated part(s).` }
     }
 
+    await requireAuth()
     await deleteModel(id)
     revalidatePath('/admin/models')
     return {}

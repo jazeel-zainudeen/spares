@@ -1,5 +1,6 @@
 'use server'
 
+import { requireAuth } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { getParts, createPart, updatePart, deletePart, PartRow, PartInsert, PartUpdate } from '@/lib/services/parts'
 import { partSchema } from '@/lib/validations'
@@ -23,6 +24,7 @@ export async function fetchPartsAction(modelId?: string): Promise<{ data?: PartR
 
 export async function createPartAction(part: PartInsert): Promise<{ error?: string }> {
   try {
+    await requireAuth()
     const parsedData = partSchema.parse(part)
     await createPart(parsedData)
     revalidatePath('/admin/parts')
@@ -37,6 +39,7 @@ export async function createPartAction(part: PartInsert): Promise<{ error?: stri
 
 export async function updatePartAction(id: string, updates: PartUpdate): Promise<{ error?: string }> {
   try {
+    await requireAuth()
     const parsedData = partSchema.parse(updates)
     await updatePart(id, parsedData)
     revalidatePath('/admin/parts')
@@ -56,6 +59,7 @@ export async function deletePartAction(id: string, cloudinaryPublicId?: string |
       await cloudinary.uploader.destroy(cloudinaryPublicId)
     }
 
+    await requireAuth()
     await deletePart(id)
     revalidatePath('/admin/parts')
     return {}
