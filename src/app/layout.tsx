@@ -10,6 +10,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Spare Parts Catalog",
   description: "Premium spare parts management system",
+  manifest: "/manifest.json",
+  themeColor: "#64748b",
 };
 
 export default function RootLayout({
