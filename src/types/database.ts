@@ -9,6 +9,35 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description: string | null
+          image_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          description?: string | null
+          image_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          description?: string | null
+          image_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       car_companies: {
         Row: {
           id: string
@@ -64,6 +93,7 @@ export interface Database {
       parts: {
         Row: {
           id: string
+          category_id: string | null
           model_id: string
           ref_number: string
           oem_number: string | null
@@ -76,6 +106,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          category_id?: string | null
           model_id: string
           ref_number: string
           oem_number?: string | null
@@ -88,6 +119,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          category_id?: string | null
           model_id?: string
           ref_number?: string
           oem_number?: string | null

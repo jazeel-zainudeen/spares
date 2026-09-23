@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { Search, ArrowRight, ShieldCheck, Clock, Truck } from "lucide-react";
+import { Search, ArrowRight, ShieldCheck, Clock, Truck, Settings, Image as ImageIcon } from "lucide-react";
+import { getCategories } from "@/lib/services/categories";
 
-export default function Home() {
+export default async function Home() {
+  const categories = await getCategories();
+  
   return (
     <div className="flex-1">
       {/* Hero Section */}
@@ -23,7 +26,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <Link 
-                href="/catalog" 
+                href="/spare-parts" 
                 className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Browse Catalog
@@ -91,6 +94,53 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="container mx-auto px-4 relative">
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Browse by Category</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Select a part category to narrow down your search and find exactly what fits your vehicle.
+            </p>
+          </div>
+          
+          {categories.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {categories.map((category) => (
+                <Link 
+                  key={category.id} 
+                  href={`/spare-parts/${category.slug}`}
+                  className="group relative glass p-6 rounded-3xl transition-all duration-300 hover:bg-white/10 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 overflow-hidden flex flex-col items-center text-center space-y-4"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  
+                  <div className="h-20 w-20 bg-white/5 rounded-2xl flex items-center justify-center relative overflow-hidden z-10 p-2 group-hover:scale-110 transition-transform duration-500">
+                    {category.image_url ? (
+                      <img src={category.image_url} alt={category.name} className="h-full w-full object-contain" />
+                    ) : (
+                      <Settings className="h-10 w-10 text-muted-foreground/50" />
+                    )}
+                  </div>
+                  
+                  <div className="space-y-1 relative z-10">
+                    <h3 className="font-semibold text-lg">{category.name}</h3>
+                    {category.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {category.description}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground glass rounded-3xl">
+              No categories available at the moment.
+            </div>
+          )}
         </div>
       </section>
     </div>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
 import { PartRow } from "@/lib/services/parts"
+import { CategoryRow } from "@/lib/services/categories"
 import { CompanyRow } from "@/lib/services/companies"
 import { ModelRow } from "@/lib/services/models"
 import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload"
@@ -15,11 +16,13 @@ interface PartFormModalProps {
   onClose: () => void
   onSave: (data: any) => Promise<void>
   initialData?: PartRow | null
+  categories: CategoryRow[]
   companies: CompanyRow[]
   models: ModelRow[]
 }
 
-export function PartFormModal({ isOpen, onClose, onSave, initialData, companies, models }: PartFormModalProps) {
+export function PartFormModal({ isOpen, onClose, onSave, initialData, categories, companies, models }: PartFormModalProps) {
+  const [categoryId, setCategoryId] = useState("")
   const [companyId, setCompanyId] = useState("")
   const [modelId, setModelId] = useState("")
   const [refNumber, setRefNumber] = useState("")
@@ -37,8 +40,8 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, companies,
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
-        // Find company id based on model id
         const model = models.find(m => m.id === initialData.model_id)
+        setCategoryId(initialData.category_id || "")
         setCompanyId(model?.company_id || "")
         setModelId(initialData.model_id)
         setRefNumber(initialData.ref_number)
@@ -48,6 +51,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, companies,
         setImageUrl(initialData.image_url || "")
         setPublicId(initialData.cloudinary_public_id || "")
       } else {
+        setCategoryId("")
         setCompanyId("")
         setModelId("")
         setRefNumber("")
@@ -75,6 +79,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, companies,
     setError("")
     try {
       await onSave({
+        category_id: categoryId || null,
         model_id: modelId,
         ref_number: refNumber,
         oem_number: oemNumber || null,
@@ -96,6 +101,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, companies,
     setModelId("") // reset model when company changes
   }
 
+  const categoryOptions = categories.map(c => ({ label: c.name, value: c.id }))
   const companyOptions = companies.map(c => ({ label: c.name, value: c.id }))
   const modelOptions = availableModels.map(m => ({ label: m.name, value: m.id }))
 
@@ -104,6 +110,16 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, companies,
       <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
         {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
         
+        <div className="space-y-2">
+          <label className="text-sm font-medium leading-none">Category</label>
+          <Select 
+            options={[{ label: "Select Category...", value: "" }, ...categoryOptions]}
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium leading-none">Company</label>

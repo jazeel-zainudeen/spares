@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { getParts, createPart, updatePart, deletePart, PartRow, PartInsert, PartUpdate } from '@/lib/services/parts'
+import { partSchema } from '@/lib/validations'
 import { v2 as cloudinary } from 'cloudinary'
 
 // Configure Cloudinary
@@ -22,20 +23,28 @@ export async function fetchPartsAction(modelId?: string): Promise<{ data?: PartR
 
 export async function createPartAction(part: PartInsert): Promise<{ error?: string }> {
   try {
-    await createPart(part)
+    const parsedData = partSchema.parse(part)
+    await createPart(parsedData)
     revalidatePath('/admin/parts')
     return {}
   } catch (err: any) {
+    if (err.errors) {
+      return { error: err.errors.map((e: any) => e.message).join(", ") }
+    }
     return { error: err.message || 'Failed to create part' }
   }
 }
 
 export async function updatePartAction(id: string, updates: PartUpdate): Promise<{ error?: string }> {
   try {
-    await updatePart(id, updates)
+    const parsedData = partSchema.parse(updates)
+    await updatePart(id, parsedData)
     revalidatePath('/admin/parts')
     return {}
   } catch (err: any) {
+    if (err.errors) {
+      return { error: err.errors.map((e: any) => e.message).join(", ") }
+    }
     return { error: err.message || 'Failed to update part' }
   }
 }

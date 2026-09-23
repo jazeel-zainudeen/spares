@@ -7,7 +7,7 @@ export type PartUpdate = Database['public']['Tables']['parts']['Update']
 
 export async function getParts(modelId?: string) {
   const supabase = await createClient()
-  let query = supabase.from('parts').select('*, car_models(name, car_companies(name))')
+  let query = supabase.from('parts').select('*, categories(name, slug), car_models(name, car_companies(name))')
   
   if (modelId) {
     query = query.eq('model_id', modelId)
@@ -19,9 +19,13 @@ export async function getParts(modelId?: string) {
   return data as any
 }
 
-export async function getPublicParts(options?: { companySlug?: string, modelSlug?: string, search?: string }) {
+export async function getPublicParts(options?: { categorySlug?: string, companySlug?: string, modelSlug?: string, search?: string }) {
   const supabase = await createClient()
-  let query = supabase.from('parts').select('*, car_models!inner(name, slug, car_companies!inner(name, slug))')
+  let query = supabase.from('parts').select('*, categories!inner(name, slug), car_models!inner(name, slug, car_companies!inner(name, slug))')
+
+  if (options?.categorySlug) {
+    query = query.eq('categories.slug', options.categorySlug)
+  }
 
   if (options?.companySlug) {
     query = query.eq('car_models.car_companies.slug', options.companySlug)
@@ -46,7 +50,7 @@ export async function getPartById(id: string) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('parts')
-    .select('*, car_models(name, car_companies(name))')
+    .select('*, categories(name, slug), car_models(name, slug, car_companies(name, slug))')
     .eq('id', id)
     .single()
 

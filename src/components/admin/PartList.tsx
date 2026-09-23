@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { PartRow } from "@/lib/services/parts"
+import { CategoryRow } from "@/lib/services/categories"
 import { CompanyRow } from "@/lib/services/companies"
 import { ModelRow } from "@/lib/services/models"
 import { Table } from "@/components/ui/Table"
@@ -13,9 +14,10 @@ import { PartFormModal } from "./PartFormModal"
 import { DeletePartModal } from "./DeletePartModal"
 import { createPartAction, updatePartAction, deletePartAction } from "@/app/actions/parts"
 
-export function PartList({ initialParts, companies, models }: { initialParts: any[], companies: CompanyRow[], models: ModelRow[] }) {
+export function PartList({ initialParts, categories, companies, models }: { initialParts: any[], categories: CategoryRow[], companies: CompanyRow[], models: ModelRow[] }) {
   const [parts, setParts] = useState<any[]>(initialParts)
   const [search, setSearch] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("")
   const [companyFilter, setCompanyFilter] = useState("")
   const [modelFilter, setModelFilter] = useState("")
   
@@ -29,6 +31,11 @@ export function PartList({ initialParts, companies, models }: { initialParts: an
     const searchString = `${p.item} ${p.ref_number} ${p.oem_number || ''}`.toLowerCase()
     const matchesSearch = searchString.includes(search.toLowerCase())
     
+    let matchesCategory = true
+    if (categoryFilter) {
+      matchesCategory = p.categories?.id === categoryFilter
+    }
+
     let matchesCompany = true
     if (companyFilter) {
       matchesCompany = p.car_models?.car_companies?.name === companies.find(c => c.id === companyFilter)?.name
@@ -36,7 +43,7 @@ export function PartList({ initialParts, companies, models }: { initialParts: an
     
     const matchesModel = modelFilter ? p.model_id === modelFilter : true
     
-    return matchesSearch && matchesCompany && matchesModel
+    return matchesSearch && matchesCategory && matchesCompany && matchesModel
   })
 
   const availableModelsForFilter = models.filter(m => companyFilter ? m.company_id === companyFilter : true)
@@ -79,6 +86,11 @@ export function PartList({ initialParts, companies, models }: { initialParts: an
     setModelFilter("") // reset model filter
   }
 
+  const handleCategoryFilterChange = (val: string) => {
+    setCategoryFilter(val)
+  }
+
+  const categoryOptions = categories.map(c => ({ label: c.name, value: c.id }))
   const companyOptions = companies.map(c => ({ label: c.name, value: c.id }))
   const modelOptions = availableModelsForFilter.map(m => ({ label: m.name, value: m.id }))
 
@@ -101,6 +113,13 @@ export function PartList({ initialParts, companies, models }: { initialParts: an
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
+            />
+          </div>
+          <div className="w-full sm:w-48">
+            <Select
+              options={[{ label: "All Categories", value: "" }, ...categoryOptions]}
+              value={categoryFilter}
+              onChange={(e) => handleCategoryFilterChange(e.target.value)}
             />
           </div>
           <div className="w-full sm:w-48">
@@ -134,6 +153,7 @@ export function PartList({ initialParts, companies, models }: { initialParts: an
                   <th>Item</th>
                   <th>Ref #</th>
                   <th>OEM #</th>
+                  <th>Category</th>
                   <th>Model / Company</th>
                   <th className="text-right">Actions</th>
                 </tr>
@@ -155,6 +175,7 @@ export function PartList({ initialParts, companies, models }: { initialParts: an
                     <td className="font-medium">{part.item}</td>
                     <td className="text-muted-foreground">{part.ref_number}</td>
                     <td className="text-muted-foreground">{part.oem_number || '-'}</td>
+                    <td className="text-muted-foreground">{part.categories?.name || '-'}</td>
                     <td>
                       <div className="text-sm">{part.car_models?.name || 'Unknown'}</div>
                       <div className="text-xs text-muted-foreground">{part.car_models?.car_companies?.name || ''}</div>
@@ -182,6 +203,7 @@ export function PartList({ initialParts, companies, models }: { initialParts: an
         onClose={() => setIsFormOpen(false)} 
         onSave={onSavePart}
         initialData={editingPart}
+        categories={categories}
         companies={companies}
         models={models}
       />
