@@ -16,7 +16,7 @@ export async function getModels(companyId?: string) {
   const { data, error } = await query.order('name')
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function getModelById(id: string) {
@@ -28,7 +28,7 @@ export async function getModelById(id: string) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function createModel(model: ModelInsert) {
@@ -41,7 +41,7 @@ export async function createModel(model: ModelInsert) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function updateModel(id: string, updates: ModelUpdate) {
@@ -55,7 +55,7 @@ export async function updateModel(id: string, updates: ModelUpdate) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function deleteModel(id: string) {

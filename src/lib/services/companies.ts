@@ -13,7 +13,7 @@ export async function getCompanies() {
     .order('name')
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function getCompanyById(id: string) {
@@ -25,7 +25,7 @@ export async function getCompanyById(id: string) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function createCompany(company: CompanyInsert) {
@@ -38,7 +38,7 @@ export async function createCompany(company: CompanyInsert) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function updateCompany(id: string, updates: CompanyUpdate) {
@@ -52,7 +52,7 @@ export async function updateCompany(id: string, updates: CompanyUpdate) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function deleteCompany(id: string) {

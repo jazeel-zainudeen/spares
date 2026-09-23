@@ -16,7 +16,30 @@ export async function getParts(modelId?: string) {
   const { data, error } = await query.order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
+}
+
+export async function getPublicParts(options?: { companySlug?: string, modelSlug?: string, search?: string }) {
+  const supabase = await createClient()
+  let query = supabase.from('parts').select('*, car_models!inner(name, slug, car_companies!inner(name, slug))')
+
+  if (options?.companySlug) {
+    query = query.eq('car_models.car_companies.slug', options.companySlug)
+  }
+  
+  if (options?.modelSlug) {
+    query = query.eq('car_models.slug', options.modelSlug)
+  }
+  
+  if (options?.search) {
+    const term = `%${options.search}%`
+    query = query.or(`item.ilike.${term},ref_number.ilike.${term},oem_number.ilike.${term},description.ilike.${term}`)
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false })
+  
+  if (error) throw new Error(error.message)
+  return data as any
 }
 
 export async function getPartById(id: string) {
@@ -28,7 +51,7 @@ export async function getPartById(id: string) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function createPart(part: PartInsert) {
@@ -41,7 +64,7 @@ export async function createPart(part: PartInsert) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function updatePart(id: string, updates: PartUpdate) {
@@ -55,7 +78,7 @@ export async function updatePart(id: string, updates: PartUpdate) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data
+  return data as any
 }
 
 export async function deletePart(id: string) {
