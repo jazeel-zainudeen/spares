@@ -1,7 +1,24 @@
 import Link from "next/link"
+import Image from "next/image"
 import { getPartById } from "@/lib/services/parts"
 import { Image as ImageIcon, ArrowLeft, CheckCircle2, Factory, Hash, FileText } from "lucide-react"
 import { notFound } from "next/navigation"
+import { Metadata } from "next"
+
+export async function generateMetadata({ params }: { params: { company: string, model: string, part: string } }): Promise<Metadata> {
+  try {
+    const part: any = await getPartById(params.part)
+    return {
+      title: `${part.item} - ${part.car_models.car_companies.name} ${part.car_models.name} Parts`,
+      description: part.description || `Buy ${part.item} for ${part.car_models.car_companies.name} ${part.car_models.name}. Reference: ${part.ref_number}`,
+      openGraph: {
+        images: part.image_url ? [part.image_url] : [],
+      }
+    }
+  } catch (e) {
+    return { title: 'Part Not Found' }
+  }
+}
 
 export default async function PartDetailPage({
   params,
@@ -11,7 +28,6 @@ export default async function PartDetailPage({
   try {
     const part: any = await getPartById(params.part)
     
-    // Verify slugs match for canonical URL structure
     if (part.car_models.slug !== params.model || part.car_models.car_companies.slug !== params.company) {
       notFound()
     }
@@ -36,18 +52,21 @@ export default async function PartDetailPage({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Image Gallery */}
           <div className="space-y-4">
             <div className="aspect-square glass rounded-3xl overflow-hidden flex items-center justify-center p-8 bg-white/5 relative group">
               {part.image_url ? (
-                <img src={part.image_url} alt={part.item} className="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
+                <Image 
+                  src={part.image_url} 
+                  alt={part.item} 
+                  fill
+                  className="object-contain p-8 transition-transform duration-500 group-hover:scale-110" 
+                />
               ) : (
                 <ImageIcon className="h-24 w-24 text-muted-foreground/30" />
               )}
             </div>
           </div>
 
-          {/* Details */}
           <div className="space-y-8">
             <div>
               <div className="flex items-center gap-2 text-primary font-medium mb-2">
