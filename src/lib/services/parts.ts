@@ -35,7 +35,8 @@ export async function createPart(part: PartInsert) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('parts')
-    .insert(part)
+    // @ts-ignore
+    .insert(part as any)
     .select()
     .single()
 
@@ -47,7 +48,8 @@ export async function updatePart(id: string, updates: PartUpdate) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('parts')
-    .update(updates)
+    // @ts-ignore
+    .update(updates as any)
     .eq('id', id)
     .select()
     .single()

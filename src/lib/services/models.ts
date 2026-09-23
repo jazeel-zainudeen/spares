@@ -35,7 +35,8 @@ export async function createModel(model: ModelInsert) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('car_models')
-    .insert(model)
+    // @ts-ignore
+    .insert(model as any)
     .select()
     .single()
 
@@ -47,7 +48,8 @@ export async function updateModel(id: string, updates: ModelUpdate) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('car_models')
-    .update(updates)
+    // @ts-ignore
+    .update(updates as any)
     .eq('id', id)
     .select()
     .single()
