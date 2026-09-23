@@ -1,22 +1,37 @@
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { getPublicParts } from "@/lib/services/parts"
 import { fetchCompaniesAction } from "@/app/actions/companies"
+import { fetchCategoriesAction } from "@/app/actions/categories"
 import { SearchBar } from "@/components/public/SearchBar"
 import { Image as ImageIcon, ChevronRight } from "lucide-react"
 
-export default async function CatalogPage({
+export default async function CategoryPage({
+  params,
   searchParams,
 }: {
+  params: { category: string }
   searchParams: { search?: string }
 }) {
   const search = searchParams.search || ""
-  const parts = await getPublicParts({ search })
+  
+  const { data: categories = [] } = await fetchCategoriesAction()
+  const currentCategory = categories.find(c => c.slug === params.category)
+  
+  if (!currentCategory) {
+    notFound()
+  }
+
+  const parts = await getPublicParts({ search, categorySlug: params.category })
   const { data: companies = [] } = await fetchCompaniesAction()
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 space-y-6">
-        <h1 className="text-4xl font-bold">Spare Parts Catalog</h1>
+        <h1 className="text-4xl font-bold">{currentCategory.name} Parts</h1>
+        {currentCategory.description && (
+          <p className="text-muted-foreground">{currentCategory.description}</p>
+        )}
         <SearchBar initialValue={search} />
       </div>
 
@@ -24,16 +39,22 @@ export default async function CatalogPage({
         {/* Sidebar */}
         <div className="hidden lg:block space-y-6">
           <div className="glass p-6 rounded-2xl">
-            <h2 className="font-bold text-lg mb-4">Browse by Company</h2>
+            <h2 className="font-bold text-lg mb-4">Browse by Category</h2>
             <ul className="space-y-2">
-              {companies.map(company => (
-                <li key={company.id}>
+              <li className="text-muted-foreground hover:text-primary transition-colors flex items-center justify-between">
+                <Link href="/spare-parts">All Categories</Link>
+                <ChevronRight className="h-4 w-4 opacity-50" />
+              </li>
+              {categories.map(category => (
+                <li key={category.id}>
                   <Link 
-                    href={`/parts/${company.slug}`}
-                    className="text-muted-foreground hover:text-primary transition-colors flex items-center justify-between"
+                    href={`/spare-parts/${category.slug}`}
+                    className={`transition-colors flex items-center justify-between ${
+                      category.slug === params.category ? 'text-primary font-medium' : 'text-muted-foreground hover:text-primary'
+                    }`}
                   >
-                    {company.name}
-                    <ChevronRight className="h-4 w-4 opacity-50" />
+                    {category.name}
+                    {category.slug === params.category && <ChevronRight className="h-4 w-4" />}
                   </Link>
                 </li>
               ))}
@@ -59,7 +80,7 @@ export default async function CatalogPage({
               {parts.map((part: any) => (
                 <Link 
                   key={part.id} 
-                  href={`/parts/${part.car_models.car_companies.slug}/${part.car_models.slug}/${part.id}`}
+                  href={`/spare-parts/${part.categories?.slug || 'uncategorized'}/${part.car_models.car_companies.slug}/${part.car_models.slug}/${part.id}`}
                   className="glass rounded-2xl overflow-hidden group hover:ring-2 hover:ring-primary/50 transition-all"
                 >
                   <div className="aspect-square bg-white/5 relative flex items-center justify-center p-4">
@@ -70,8 +91,13 @@ export default async function CatalogPage({
                     )}
                   </div>
                   <div className="p-4 space-y-2 border-t border-white/5">
-                    <div className="text-xs text-primary font-medium">
-                      {part.car_models.car_companies.name} • {part.car_models.name}
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="text-xs text-primary font-medium">
+                        {part.car_models.car_companies.name} • {part.car_models.name}
+                      </div>
+                      <div className="text-xs text-muted-foreground bg-white/5 px-2 py-1 rounded-full truncate max-w-[100px]">
+                        {part.categories?.name || 'Uncategorized'}
+                      </div>
                     </div>
                     <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
                       {part.item}

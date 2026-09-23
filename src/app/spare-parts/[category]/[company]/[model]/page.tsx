@@ -1,7 +1,9 @@
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { getPublicParts } from "@/lib/services/parts"
 import { getModels } from "@/lib/services/models"
-import { getCompanies } from "@/lib/services/companies"
+import { fetchCompaniesAction } from "@/app/actions/companies"
+import { fetchCategoriesAction } from "@/app/actions/categories"
 import { SearchBar } from "@/components/public/SearchBar"
 import { Image as ImageIcon, ChevronRight, ArrowLeft } from "lucide-react"
 
@@ -9,27 +11,38 @@ export default async function ModelCatalogPage({
   params,
   searchParams,
 }: {
-  params: { company: string, model: string }
+  params: { category: string, company: string, model: string }
   searchParams: { search?: string }
 }) {
   const search = searchParams.search || ""
-  const parts = await getPublicParts({ search, companySlug: params.company, modelSlug: params.model })
+  const parts = await getPublicParts({ search, categorySlug: params.category, companySlug: params.company, modelSlug: params.model })
   
-  const companies = await getCompanies()
-  const currentCompany: any = companies.find((c: any) => c.slug === params.company)
+  const { data: categories = [] } = await fetchCategoriesAction()
+  const currentCategory = categories.find(c => c.slug === params.category)
+
+  const { data: companies = [] } = await fetchCompaniesAction()
+  const currentCompany = companies.find(c => c.slug === params.company)
   
-  const models = currentCompany ? await getModels(currentCompany.id) : []
-  const currentModel: any = models.find((m: any) => m.slug === params.model)
+  if (!currentCategory || !currentCompany) {
+    notFound()
+  }
+
+  const models = await getModels(currentCompany.id)
+  const currentModel = models.find(m => m.slug === params.model)
+
+  if (!currentModel) {
+    notFound()
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 space-y-6">
-        <Link href={`/parts/${params.company}`} className="inline-flex items-center text-muted-foreground hover:text-primary text-sm font-medium transition-colors">
+        <Link href={`/spare-parts/${params.category}/${params.company}`} className="inline-flex items-center text-muted-foreground hover:text-primary text-sm font-medium transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to {currentCompany?.name || 'Company'}
+          Back to {currentCompany.name} {currentCategory.name}
         </Link>
         <h1 className="text-4xl font-bold">
-          {currentCompany?.name} {currentModel?.name || 'Model'} Parts
+          {currentCompany.name} {currentModel.name} {currentCategory.name} Parts
         </h1>
         <SearchBar initialValue={search} />
       </div>
@@ -37,12 +50,16 @@ export default async function ModelCatalogPage({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="hidden lg:block space-y-6">
           <div className="glass p-6 rounded-2xl">
-            <h2 className="font-bold text-lg mb-4">{currentCompany?.name} Models</h2>
+            <h2 className="font-bold text-lg mb-4">{currentCompany.name} Models</h2>
             <ul className="space-y-2">
+              <li className="text-muted-foreground hover:text-primary transition-colors flex items-center justify-between">
+                <Link href={`/spare-parts/${params.category}/${params.company}`}>All {currentCompany.name} Models</Link>
+                <ChevronRight className="h-4 w-4 opacity-50" />
+              </li>
               {models.map((model: any) => (
                 <li key={model.id}>
                   <Link 
-                    href={`/parts/${params.company}/${model.slug}`}
+                    href={`/spare-parts/${params.category}/${params.company}/${model.slug}`}
                     className={`flex items-center justify-between transition-colors ${
                       model.slug === params.model 
                         ? 'text-primary font-medium' 
@@ -50,7 +67,7 @@ export default async function ModelCatalogPage({
                     }`}
                   >
                     {model.name}
-                    <ChevronRight className="h-4 w-4 opacity-50" />
+                    {model.slug === params.model && <ChevronRight className="h-4 w-4" />}
                   </Link>
                 </li>
               ))}
@@ -68,14 +85,14 @@ export default async function ModelCatalogPage({
 
           {parts.length === 0 ? (
             <div className="glass p-12 rounded-2xl text-center text-muted-foreground">
-              No parts found for this model.
+              No {currentCategory.name} parts found for this model.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {parts.map((part: any) => (
                 <Link 
                   key={part.id} 
-                  href={`/parts/${part.car_models.car_companies.slug}/${part.car_models.slug}/${part.id}`}
+                  href={`/spare-parts/${params.category}/${params.company}/${params.model}/${part.id}`}
                   className="glass rounded-2xl overflow-hidden group hover:ring-2 hover:ring-primary/50 transition-all"
                 >
                   <div className="aspect-square bg-white/5 relative flex items-center justify-center p-4">

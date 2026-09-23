@@ -1,6 +1,8 @@
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { getPublicParts } from "@/lib/services/parts"
-import { getCompanies } from "@/lib/services/companies"
+import { fetchCompaniesAction } from "@/app/actions/companies"
+import { fetchCategoriesAction } from "@/app/actions/categories"
 import { SearchBar } from "@/components/public/SearchBar"
 import { Image as ImageIcon, ChevronRight } from "lucide-react"
 
@@ -8,21 +10,34 @@ export default async function CompanyCatalogPage({
   params,
   searchParams,
 }: {
-  params: { company: string }
+  params: { category: string, company: string }
   searchParams: { search?: string }
 }) {
   const search = searchParams.search || ""
-  const parts = await getPublicParts({ search, companySlug: params.company })
   
-  const companies = await getCompanies()
-  const currentCompany: any = companies.find((c: any) => c.slug === params.company)
+  const { data: categories = [] } = await fetchCategoriesAction()
+  const currentCategory = categories.find(c => c.slug === params.category)
+
+  const { data: companies = [] } = await fetchCompaniesAction()
+  const currentCompany = companies.find(c => c.slug === params.company)
+
+  if (!currentCategory || !currentCompany) {
+    notFound()
+  }
+
+  const parts = await getPublicParts({ search, categorySlug: params.category, companySlug: params.company })
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 space-y-6">
-        <h1 className="text-4xl font-bold">
-          {currentCompany ? `${currentCompany.name} Parts` : 'Company Not Found'}
-        </h1>
+        <div className="flex flex-col gap-2">
+          <Link href={`/spare-parts/${currentCategory.slug}`} className="text-muted-foreground hover:text-primary transition-colors text-sm flex items-center gap-1">
+            <ChevronRight className="h-4 w-4 rotate-180" /> Back to {currentCategory.name}
+          </Link>
+          <h1 className="text-4xl font-bold">
+            {currentCompany.name} {currentCategory.name} Parts
+          </h1>
+        </div>
         <SearchBar initialValue={search} />
       </div>
 
@@ -31,10 +46,14 @@ export default async function CompanyCatalogPage({
           <div className="glass p-6 rounded-2xl">
             <h2 className="font-bold text-lg mb-4">Browse by Company</h2>
             <ul className="space-y-2">
+              <li className="text-muted-foreground hover:text-primary transition-colors flex items-center justify-between">
+                <Link href={`/spare-parts/${params.category}`}>All Companies</Link>
+                <ChevronRight className="h-4 w-4 opacity-50" />
+              </li>
               {companies.map((company: any) => (
                 <li key={company.id}>
                   <Link 
-                    href={`/parts/${company.slug}`}
+                    href={`/spare-parts/${params.category}/${company.slug}`}
                     className={`flex items-center justify-between transition-colors ${
                       company.slug === params.company 
                         ? 'text-primary font-medium' 
@@ -42,7 +61,7 @@ export default async function CompanyCatalogPage({
                     }`}
                   >
                     {company.name}
-                    <ChevronRight className="h-4 w-4 opacity-50" />
+                    {company.slug === params.company && <ChevronRight className="h-4 w-4" />}
                   </Link>
                 </li>
               ))}
@@ -60,14 +79,14 @@ export default async function CompanyCatalogPage({
 
           {parts.length === 0 ? (
             <div className="glass p-12 rounded-2xl text-center text-muted-foreground">
-              No parts found for {currentCompany?.name || 'this company'}.
+              No {currentCategory.name} parts found for {currentCompany.name}.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {parts.map((part: any) => (
                 <Link 
                   key={part.id} 
-                  href={`/parts/${part.car_models.car_companies.slug}/${part.car_models.slug}/${part.id}`}
+                  href={`/spare-parts/${params.category}/${params.company}/${part.car_models.slug}/${part.id}`}
                   className="glass rounded-2xl overflow-hidden group hover:ring-2 hover:ring-primary/50 transition-all"
                 >
                   <div className="aspect-square bg-white/5 relative flex items-center justify-center p-4">
