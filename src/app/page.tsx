@@ -6,28 +6,33 @@ export default async function Home() {
   const categories = await getCategories();
   
   return (
-    <div className="flex-1">
+    <div className="flex-1 pt-16">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-24 pb-32">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+      <section className="relative overflow-hidden pt-32 pb-32 flex flex-col justify-center min-h-[85vh]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background" />
         
         <div className="container mx-auto px-4 relative">
-          <div className="max-w-3xl mx-auto text-center space-y-8">
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
+          <div className="max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center">
+            <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse" />
+              v2.0 Catalog Now Live
+            </div>
+
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               The Premium Catalog for <br className="hidden md:block" />
-              <span className="text-primary text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
+              <span className="text-gradient">
                 Automotive Parts
               </span>
             </h1>
             
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Find exactly what you need for any make and model. Our intelligent search and verified supplier network ensure you get the right part, every time.
+            <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              Discover millions of precision-engineered components across top automotive brands. Designed for professionals who demand excellence.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
               <Link 
                 href="/spare-parts" 
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary px-8 font-medium text-white shadow-lg shadow-primary/25 transition-all hover:shadow-primary/40 hover:scale-105 active:scale-95"
               >
                 Browse Catalog
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -35,14 +40,14 @@ export default async function Home() {
               
               <Link 
                 href="/brands" 
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-white/5 border border-white/10 px-8 py-3.5 text-sm font-medium text-foreground backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20"
+                className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-full bg-white/5 border border-white/10 px-8 font-medium text-slate-200 transition-all hover:bg-white/10 hover:border-white/20 hover:text-white"
               >
                 View Supported Brands
               </Link>
             </div>
             
             {/* Quick Search Bar placeholder */}
-            <div className="mt-12 max-w-2xl mx-auto p-2 glass rounded-2xl flex items-center gap-2">
+            <div className="mt-12 w-full max-w-2xl mx-auto p-2 glass rounded-2xl flex items-center gap-2 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
               <div className="flex-1 flex items-center px-4 gap-3 text-muted-foreground">
                 <Search className="h-5 w-5" />
                 <input 
@@ -98,37 +103,37 @@ export default async function Home() {
       </section>
 
       {/* Categories Section */}
-      <section className="py-24 relative overflow-hidden">
+      <section className="py-24 relative overflow-hidden bg-slate-900/20 border-t border-slate-800/50">
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Browse by Category</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gradient-primary">Browse by Category</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto text-lg">
               Select a part category to narrow down your search and find exactly what fits your vehicle.
             </p>
           </div>
           
           {categories.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
               {categories.map((category) => (
                 <Link 
                   key={category.id} 
                   href={`/spare-parts/${category.slug}`}
-                  className="group relative glass p-6 rounded-3xl transition-all duration-300 hover:bg-white/10 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 overflow-hidden flex flex-col items-center text-center space-y-4"
+                  className="group relative glass-card p-6 md:p-8 rounded-[2rem] overflow-hidden flex flex-col items-center text-center space-y-5 transform hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
-                  <div className="h-20 w-20 bg-white/5 rounded-2xl flex items-center justify-center relative overflow-hidden z-10 p-2 group-hover:scale-110 transition-transform duration-500">
+                  <div className="h-24 w-24 bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl flex items-center justify-center relative overflow-hidden z-10 p-4 border border-slate-700/50 group-hover:border-primary/50 group-hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-500">
                     {category.image_url ? (
-                      <img src={category.image_url} alt={category.name} className="h-full w-full object-contain" />
+                      <img src={category.image_url} alt={category.name} className="h-full w-full object-contain group-hover:scale-110 transition-transform duration-500" />
                     ) : (
-                      <Settings className="h-10 w-10 text-muted-foreground/50" />
+                      <Settings className="h-10 w-10 text-slate-400 group-hover:text-primary transition-colors duration-500 animate-float" />
                     )}
                   </div>
                   
-                  <div className="space-y-1 relative z-10">
-                    <h3 className="font-semibold text-lg">{category.name}</h3>
+                  <div className="space-y-2 relative z-10">
+                    <h3 className="font-semibold text-xl text-slate-200 group-hover:text-white transition-colors">{category.name}</h3>
                     {category.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-sm text-slate-400 line-clamp-2">
                         {category.description}
                       </p>
                     )}
@@ -137,7 +142,7 @@ export default async function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground glass rounded-3xl">
+            <div className="text-center py-16 text-slate-500 glass-card rounded-[2rem]">
               No categories available at the moment.
             </div>
           )}
