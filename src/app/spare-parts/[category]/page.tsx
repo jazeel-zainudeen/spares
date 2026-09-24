@@ -32,7 +32,7 @@ export default async function CategoryPage({
           {currentCategory.name} Parts
         </h1>
         {currentCategory.description && (
-          <p className="text-lg text-slate-400 max-w-2xl">{currentCategory.description}</p>
+          <p className="text-lg text-muted-foreground max-w-2xl">{currentCategory.description}</p>
         )}
         <div className="max-w-xl">
           <SearchBar initialValue={search} />
@@ -76,9 +76,9 @@ export default async function CategoryPage({
           </div>
 
           {parts.length === 0 ? (
-            <div className="glass-card p-16 rounded-[2rem] flex flex-col items-center justify-center text-center text-slate-400 border-dashed border-2 border-slate-700/50">
-              <ImageIcon className="h-16 w-16 mb-4 text-slate-600 animate-float" />
-              <h3 className="text-xl font-medium text-slate-300 mb-2">No parts found</h3>
+            <div className="glass-card p-16 rounded-[2rem] flex flex-col items-center justify-center text-center text-muted-foreground border-dashed border-2 border-slate-700/50">
+              <ImageIcon className="h-16 w-16 mb-4 text-muted-foreground animate-float" />
+              <h3 className="text-xl font-medium text-muted-foreground mb-2">No parts found</h3>
               <p>Try adjusting your search criteria or browsing a different category.</p>
             </div>
           ) : (
@@ -95,7 +95,7 @@ export default async function CategoryPage({
                     {part.image_url ? (
                       <img src={part.image_url} alt={part.item} className="max-h-full object-contain drop-shadow-xl transition-transform duration-500 group-hover:scale-110" />
                     ) : (
-                      <ImageIcon className="h-12 w-12 text-slate-600 group-hover:text-primary transition-colors duration-300" />
+                      <ImageIcon className="h-12 w-12 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                     )}
                   </div>
                   
@@ -104,7 +104,7 @@ export default async function CategoryPage({
                       <div className="text-xs text-secondary font-medium tracking-wide uppercase">
                         {part.car_models.car_companies.name} • {part.car_models.name}
                       </div>
-                      <div className="text-[10px] uppercase tracking-wider text-slate-400 bg-slate-800/80 border border-slate-700 px-2 py-1 rounded-full truncate max-w-[100px]">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground bg-slate-800/80 border border-slate-700 px-2 py-1 rounded-full truncate max-w-[100px]">
                         {part.categories?.name || 'Uncategorized'}
                       </div>
                     </div>
@@ -113,13 +113,13 @@ export default async function CategoryPage({
                       {part.item}
                     </h3>
                     
-                    <div className="mt-auto pt-4 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-400">
+                    <div className="mt-auto pt-4 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                       <span className="bg-slate-800/80 border border-slate-700/50 px-2.5 py-1 rounded-lg">
-                        REF: <span className="text-slate-300">{part.ref_number}</span>
+                        REF: <span className="text-muted-foreground">{part.ref_number}</span>
                       </span>
                       {part.oem_number && (
                         <span className="bg-slate-800/80 border border-slate-700/50 px-2.5 py-1 rounded-lg">
-                          OEM: <span className="text-slate-300">{part.oem_number}</span>
+                          OEM: <span className="text-muted-foreground">{part.oem_number}</span>
                         </span>
                       )}
                     </div>

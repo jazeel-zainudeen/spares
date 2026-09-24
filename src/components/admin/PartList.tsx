@@ -163,11 +163,11 @@ export function PartList({ initialParts, categories, companies, models }: { init
                   <tr key={part.id}>
                     <td data-label="Image">
                       {part.image_url ? (
-                        <div className="h-10 w-10 bg-white/5 rounded-md flex items-center justify-center overflow-hidden">
+                        <div className="h-10 w-10 bg-muted rounded-md flex items-center justify-center overflow-hidden">
                           <img src={part.image_url} alt={part.item} className="h-full w-full object-cover" />
                         </div>
                       ) : (
-                        <div className="h-10 w-10 bg-white/5 rounded-md flex items-center justify-center">
+                        <div className="h-10 w-10 bg-muted rounded-md flex items-center justify-center">
                           <ImageIcon className="h-4 w-4 text-muted-foreground" />
                         </div>
                       )}
@@ -182,10 +182,10 @@ export function PartList({ initialParts, categories, companies, models }: { init
                     </td>
                     <td className="text-right" data-label="Actions">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-blue-600" onClick={() => handleEdit(part)}>
+                        <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-blue-600" onClick={() => handleEdit(part)}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(part)}>
+                        <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(part)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { UploadCloud, X, Loader2, Image as ImageIcon } from "lucide-react"
 import { getCloudinarySignature, deleteCloudinaryImageAction } from "@/app/actions/parts"
+import { Box, Flex, Text, Button, IconButton } from "@radix-ui/themes"
 
 interface CloudinaryUploadProps {
   value?: string | null
@@ -20,7 +21,6 @@ export function CloudinaryUpload({ value, publicId, onChange, onRemove, folder }
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Basic validation
     if (!file.type.startsWith("image/")) {
       setError("File must be an image")
       return
@@ -34,10 +34,8 @@ export function CloudinaryUpload({ value, publicId, onChange, onRemove, folder }
     setError("")
 
     try {
-      // 1. Get signature from our secure server action
       const { timestamp, signature, cloudName, apiKey } = await getCloudinarySignature(folder)
 
-      // 2. Upload directly to Cloudinary
       const formData = new FormData()
       formData.append("file", file)
       formData.append("api_key", apiKey!)
@@ -56,7 +54,6 @@ export function CloudinaryUpload({ value, publicId, onChange, onRemove, folder }
         throw new Error(data.error?.message || "Upload failed")
       }
 
-      // If there was an existing image, we should probably delete it from Cloudinary
       if (publicId) {
         await deleteCloudinaryImageAction(publicId)
       }
@@ -83,61 +80,89 @@ export function CloudinaryUpload({ value, publicId, onChange, onRemove, folder }
   }
 
   return (
-    <div className="w-full">
-      {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+    <Box width="100%">
+      {error && <Text color="red" size="2" mb="2">{error}</Text>}
       
       {value ? (
-        <div className="relative group rounded-xl overflow-hidden border border-border/40 bg-white/5 aspect-video flex items-center justify-center">
-          <img src={value} alt="Upload preview" className="max-h-full object-contain" />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
-            <label className="cursor-pointer bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
-              Replace
+        <Box position="relative" className="group" style={{ aspectRatio: '16/9', borderRadius: 'var(--radius-3)', overflow: 'hidden', border: '1px solid var(--gray-a5)', backgroundColor: 'var(--gray-a3)' }}>
+          <Flex align="center" justify="center" height="100%">
+            <img src={value} alt="Upload preview" style={{ maxHeight: '100%', objectFit: 'contain' }} />
+          </Flex>
+          <Flex 
+            position="absolute" 
+            inset="0" 
+            align="center" 
+            justify="center" 
+            gap="4"
+            style={{ 
+              backgroundColor: 'rgba(0,0,0,0.5)', 
+              opacity: 0, 
+              backdropFilter: 'blur(2px)', 
+              transition: 'opacity 0.2s ease'
+            }}
+            className="group-hover:opacity-100"
+          >
+            <label style={{ cursor: 'pointer' }}>
+              <Button asChild size="2" disabled={isUploading}>
+                <span>Replace</span>
+              </Button>
               <input 
                 type="file" 
-                className="hidden" 
+                style={{ display: 'none' }} 
                 accept="image/*" 
                 onChange={handleFileChange}
                 disabled={isUploading}
               />
             </label>
-            <button
-              type="button"
+            <Button
+              color="red"
+              size="2"
               onClick={handleRemove}
               disabled={isUploading}
-              className="bg-destructive text-destructive-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-destructive/90 transition-colors"
             >
               Remove
-            </button>
-          </div>
+            </Button>
+          </Flex>
           {isUploading && (
-            <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
+            <Flex position="absolute" inset="0" align="center" justify="center" style={{ backgroundColor: 'var(--gray-a9)', backdropFilter: 'blur(2px)' }}>
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+            </Flex>
           )}
-        </div>
+        </Box>
       ) : (
-        <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer hover:bg-white/5 border-border/40 transition-colors relative">
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
-            <p className="mb-2 text-sm text-muted-foreground">
-              <span className="font-semibold">Click to upload</span> or drag and drop
-            </p>
-            <p className="text-xs text-muted-foreground">PNG, JPG or WEBP (MAX. 5MB)</p>
-          </div>
+        <label style={{ display: 'block', width: '100%', cursor: 'pointer', position: 'relative' }}>
+          <Flex 
+            direction="column" 
+            align="center" 
+            justify="center" 
+            style={{ 
+              height: '192px', 
+              border: '2px dashed var(--gray-a6)', 
+              borderRadius: 'var(--radius-3)', 
+              transition: 'background-color 0.2s',
+            }}
+            className="hover:bg-gray-a3"
+          >
+            <UploadCloud className="w-10 h-10 mb-3" style={{ color: 'var(--gray-a9)' }} />
+            <Text size="2" color="gray" mb="2">
+              <Text weight="bold">Click to upload</Text> or drag and drop
+            </Text>
+            <Text size="1" color="gray">PNG, JPG or WEBP (MAX. 5MB)</Text>
+          </Flex>
           <input 
             type="file" 
-            className="hidden" 
+            style={{ display: 'none' }} 
             accept="image/*" 
             onChange={handleFileChange}
             disabled={isUploading}
           />
           {isUploading && (
-            <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-xl backdrop-blur-sm">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
+            <Flex position="absolute" inset="0" align="center" justify="center" style={{ backgroundColor: 'var(--gray-a9)', borderRadius: 'var(--radius-3)', backdropFilter: 'blur(2px)' }}>
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+            </Flex>
           )}
         </label>
       )}
-    </div>
+    </Box>
   )
 }

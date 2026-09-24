@@ -1,34 +1,64 @@
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { Button as RadixButton, IconButton } from "@radix-ui/themes"
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'destructive' | 'outline' | 'ghost'
+  variant?: 'default' | 'destructive' | 'outline' | 'ghost' | 'secondary' | 'link'
   size?: 'default' | 'sm' | 'lg' | 'icon' | 'icon-sm'
+  asChild?: boolean
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', size = 'default', ...props }, ref) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = 'default', size = 'default', asChild, ...props }, ref) => {
+    let radixVariant: "solid" | "soft" | "outline" | "ghost" | "surface" = "solid"
+    let color: "blue" | "red" | "gray" | undefined = undefined
+
+    if (variant === 'destructive') {
+      radixVariant = 'solid'
+      color = 'red'
+    } else if (variant === 'outline') {
+      radixVariant = 'outline'
+      color = 'gray'
+    } else if (variant === 'ghost') {
+      radixVariant = 'ghost'
+      color = 'gray'
+    } else if (variant === 'secondary') {
+      radixVariant = 'soft'
+      color = 'gray'
+    } else if (variant === 'link') {
+      radixVariant = 'ghost'
+    }
+
+    let radixSize: "1" | "2" | "3" | "4" = "2"
+    if (size === 'sm' || size === 'icon-sm') radixSize = "1"
+    if (size === 'lg') radixSize = "3"
+
+    if (size === 'icon' || size === 'icon-sm') {
+      return (
+        <IconButton
+          ref={ref}
+          variant={radixVariant}
+          color={color}
+          size={radixSize}
+          className={className}
+          asChild={asChild}
+          {...(props as any)}
+        />
+      )
+    }
+
     return (
-      <button
+      <RadixButton
         ref={ref}
-        className={cn(
-          "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-          {
-            'bg-primary text-primary-foreground shadow hover:bg-primary/90': variant === 'default',
-            'bg-red-500 text-white shadow-sm hover:bg-red-500/90': variant === 'destructive',
-            'border border-border/50 bg-transparent hover:bg-slate-100 hover:text-foreground': variant === 'outline',
-            'hover:bg-slate-100 text-foreground': variant === 'ghost',
-            'h-9 px-4 py-2': size === 'default',
-            'h-8 rounded-md px-3 text-xs': size === 'sm',
-            'h-10 rounded-md px-8': size === 'lg',
-            'h-9 w-9': size === 'icon',
-            'h-8 w-8': size === 'icon-sm',
-          },
-          className
-        )}
-        {...props}
+        variant={radixVariant}
+        color={color}
+        size={radixSize}
+        className={className}
+        asChild={asChild}
+        {...(props as any)}
       />
     )
   }
 )
 Button.displayName = "Button"
+
+export { Button }

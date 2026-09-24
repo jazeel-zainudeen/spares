@@ -8,7 +8,7 @@ export default function SparePartsLayout({
 }) {
   return (
     <div className="flex-1 flex flex-col min-h-screen">
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-border bg-white">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 transition-transform hover:scale-105 active:scale-95">
             <div className="bg-primary/10 p-1.5 rounded-lg">
@@ -21,14 +21,14 @@ export default function SparePartsLayout({
           <div className="flex items-center gap-4">
             <Link 
               href="/" 
-              className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1"
+              className="text-sm font-medium text-muted-foreground hover:text-slate-900 transition-colors flex items-center gap-1"
             >
               <Home className="h-4 w-4" />
               <span>Search</span>
             </Link>
             <Link 
               href="/admin" 
-              className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1"
+              className="text-sm font-medium text-muted-foreground hover:text-slate-900 transition-colors flex items-center gap-1"
             >
               <ShieldCheck className="h-4 w-4" />
               <span>Admin</span>

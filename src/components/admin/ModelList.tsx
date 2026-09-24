@@ -120,10 +120,10 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                   <td data-label="Company">{model.car_companies?.name || 'Unknown'}</td>
                   <td className="text-right" data-label="Actions">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-blue-600" onClick={() => handleEdit(model)}>
+                      <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-blue-600" onClick={() => handleEdit(model)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(model)}>
+                      <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(model)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

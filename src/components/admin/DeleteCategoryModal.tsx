@@ -46,7 +46,7 @@ export function DeleteCategoryModal({ isOpen, onClose, onConfirm, category }: De
             <AlertTriangle className="h-5 w-5" />
             <span>Warning</span>
           </div>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             Are you sure you want to delete <strong>{category.name}</strong>? This action cannot be undone.
           </p>
         </div>

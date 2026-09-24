@@ -28,7 +28,7 @@ export default async function ModelCatalogPage({
   }
 
   const models = await getModels(currentCompany.id)
-  const currentModel = models.find(m => m.slug === params.model)
+  const currentModel = models.find((m: any) => m.slug === params.model)
 
   if (!currentModel) {
     notFound()

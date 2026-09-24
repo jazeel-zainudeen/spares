@@ -1,28 +1,19 @@
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { Popover, TextField, ScrollArea, Box, Flex, Text } from "@radix-ui/themes"
 import { ChevronDown, Search, Check } from "lucide-react"
 
-export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange' | 'value'> {
+export interface SelectProps {
   options: { value: string; label: string }[]
   value?: string
   onChange?: (e: any) => void
+  disabled?: boolean
+  className?: string
 }
 
 export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
-  ({ className, options, value, onChange, disabled, ...props }, ref) => {
+  ({ className, options, value, onChange, disabled }, ref) => {
     const [isOpen, setIsOpen] = React.useState(false)
     const [search, setSearch] = React.useState("")
-    const containerRef = React.useRef<HTMLDivElement>(null)
-
-    React.useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-          setIsOpen(false)
-        }
-      }
-      document.addEventListener("mousedown", handleClickOutside)
-      return () => document.removeEventListener("mousedown", handleClickOutside)
-    }, [])
 
     const filteredOptions = options.filter(opt => 
       opt.label.toLowerCase().includes(search.toLowerCase())
@@ -39,61 +30,71 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     }
 
     return (
-      <div className="relative w-full text-left" ref={containerRef}>
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={cn(
-            "flex h-9 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
-            className
-          )}
-        >
-          <span className="truncate">{selectedOption?.label || "Select an option"}</span>
-          <ChevronDown className="h-4 w-4 opacity-50" />
-        </button>
-        
-        {isOpen && (
-          <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-slate-200/60 bg-white/90 backdrop-blur-xl py-1 text-base shadow-xl focus:outline-none sm:text-sm">
-            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-xl px-2 pb-2 pt-1 border-b border-slate-100/50">
-              <div className="relative">
-                <Search className="absolute left-2 top-1.5 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  className="w-full rounded-sm border border-slate-200 py-1 pl-8 pr-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary bg-transparent text-foreground"
-                  placeholder="Search..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-            </div>
-            {filteredOptions.length === 0 ? (
-              <div className="relative cursor-default select-none px-4 py-2 text-sm text-slate-500">
-                No results found.
-              </div>
-            ) : (
-              filteredOptions.map((opt) => (
-                <div
-                  key={opt.value}
-                  className={cn(
-                    "relative cursor-pointer select-none py-2 pl-8 pr-4 text-sm hover:bg-slate-100",
-                    value === opt.value ? "bg-slate-50 text-slate-900 font-medium" : "text-slate-700"
-                  )}
-                  onClick={() => handleSelect(opt.value)}
-                >
-                  <span className="block truncate">{opt.label}</span>
-                  {value === opt.value && (
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-primary">
-                      <Check className="h-4 w-4" />
-                    </span>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        )}
-      </div>
+      <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+        <Popover.Trigger disabled={disabled}>
+          <button
+            type="button"
+            disabled={disabled}
+            className={`flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className || ''}`}
+          >
+            <span className="truncate">{selectedOption?.label || "Select an option"}</span>
+            <ChevronDown className="h-4 w-4 opacity-50" />
+          </button>
+        </Popover.Trigger>
+        <Popover.Content width="100%" style={{ padding: 0 }} size="1">
+          <Box p="2" style={{ borderBottom: '1px solid var(--gray-a4)' }}>
+            <TextField.Root
+              size="1"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            >
+              <TextField.Slot>
+                <Search height="14" width="14" />
+              </TextField.Slot>
+            </TextField.Root>
+          </Box>
+          <ScrollArea type="auto" scrollbars="vertical" style={{ maxHeight: 200 }}>
+            <Flex direction="column" p="1">
+              {filteredOptions.length === 0 ? (
+                <Box p="2">
+                  <Text size="2" color="gray">No results found.</Text>
+                </Box>
+              ) : (
+                filteredOptions.map((opt) => (
+                  <Box
+                    key={opt.value}
+                    onClick={() => handleSelect(opt.value)}
+                    style={{
+                      padding: '6px 24px 6px 24px',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      borderRadius: 'var(--radius-1)',
+                      backgroundColor: value === opt.value ? 'var(--accent-a3)' : 'transparent',
+                      color: value === opt.value ? 'var(--accent-11)' : 'var(--gray-12)'
+                    }}
+                    onMouseEnter={(e) => {
+                       if (value !== opt.value) e.currentTarget.style.backgroundColor = 'var(--gray-a3)'
+                    }}
+                    onMouseLeave={(e) => {
+                       if (value !== opt.value) e.currentTarget.style.backgroundColor = 'transparent'
+                    }}
+                  >
+                    <Text size="2" style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                      {opt.label}
+                    </Text>
+                    {value === opt.value && (
+                      <Box position="absolute" style={{ left: 6, top: '50%', transform: 'translateY(-50%)', color: 'var(--accent-11)' }}>
+                        <Check height="14" width="14" />
+                      </Box>
+                    )}
+                  </Box>
+                ))
+              )}
+            </Flex>
+          </ScrollArea>
+        </Popover.Content>
+      </Popover.Root>
     )
   }
 )

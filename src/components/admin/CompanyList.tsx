@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { CompanyRow } from "@/lib/services/companies"
-import { Table } from "@/components/ui/Table"
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { CompanyFormModal } from "./CompanyFormModal"
 import { DeleteCompanyModal } from "./DeleteCompanyModal"
 import { createCompanyAction, updateCompanyAction, deleteCompanyAction } from "@/app/actions/companies"
+import { Flex, Box, Heading, Text, Card, TextField } from "@radix-ui/themes"
 
 export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow[] }) {
   const [companies, setCompanies] = useState<CompanyRow[]>(initialCompanies)
@@ -48,7 +49,6 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
     } else {
       const res = await createCompanyAction(data)
       if (res.error) throw new Error(res.error)
-      // Since it's a server action, it will revalidate the page. We can just wait for the refresh or optimistic update
       window.location.reload()
     }
   }
@@ -60,72 +60,76 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Companies</h1>
+    <Flex direction="column" gap="6">
+      <Flex direction={{ initial: 'column', sm: 'row' }} align={{ sm: 'center' }} justify="between" gap="4">
+        <Heading size="8" style={{ letterSpacing: '-0.02em' }}>Companies</Heading>
         <Button onClick={handleAdd}>
           <Plus className="h-4 w-4 mr-2" />
           Add Company
         </Button>
-      </div>
+      </Flex>
 
-      <div className="glass p-6 rounded-3xl">
-        <div className="flex items-center space-x-2 mb-6">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search companies..." 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-        </div>
+      <Card size="3" variant="surface">
+        <Box mb="5">
+          <TextField.Root 
+            placeholder="Search companies..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            size="2"
+            style={{ maxWidth: '300px' }}
+          >
+            <TextField.Slot>
+              <Search height="16" width="16" color="var(--gray-a10)" />
+            </TextField.Slot>
+          </TextField.Root>
+        </Box>
 
         {filteredCompanies.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            {search ? "No companies found matching your search." : "No companies added yet."}
-          </div>
+          <Box py="8" style={{ textAlign: 'center' }}>
+            <Text color="gray">
+              {search ? "No companies found matching your search." : "No companies added yet."}
+            </Text>
+          </Box>
         ) : (
           <Table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Slug</th>
-                <th>Logo</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Slug</TableHead>
+                <TableHead>Logo</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filteredCompanies.map(company => (
-                <tr key={company.id}>
-                  <td className="font-medium" data-label="Name">{company.name}</td>
-                  <td className="text-muted-foreground" data-label="Slug">{company.slug}</td>
-                  <td data-label="Logo">
+                <TableRow key={company.id}>
+                  <TableCell className="font-medium">{company.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{company.slug}</TableCell>
+                  <TableCell>
                     {company.logo_url ? (
-                      <div className="h-8 w-16 bg-white/5 rounded flex items-center justify-center overflow-hidden">
-                        <img src={company.logo_url} alt={company.name} className="h-full object-contain" />
-                      </div>
+                      <Box style={{ height: '32px', width: '64px', backgroundColor: 'var(--gray-a3)', borderRadius: 'var(--radius-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                        <img src={company.logo_url} alt={company.name} style={{ height: '100%', objectFit: 'contain' }} />
+                      </Box>
                     ) : (
-                      <span className="text-xs text-muted-foreground">No logo</span>
+                      <Text size="1" color="gray">No logo</Text>
                     )}
-                  </td>
-                  <td className="text-right" data-label="Actions">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-blue-600" onClick={() => handleEdit(company)}>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Flex justify="end" gap="2">
+                      <Button variant="ghost" size="icon-sm" color="gray" onClick={() => handleEdit(company)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(company)}>
+                      <Button variant="ghost" size="icon-sm" color="red" onClick={() => handleDelete(company)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                    </div>
-                  </td>
-                </tr>
+                    </Flex>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
+            </TableBody>
           </Table>
         )}
-      </div>
+      </Card>
 
       <CompanyFormModal 
         isOpen={isFormOpen} 
@@ -140,6 +144,6 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
         onConfirm={onConfirmDelete}
         company={deletingCompany}
       />
-    </div>
+    </Flex>
   )
 }

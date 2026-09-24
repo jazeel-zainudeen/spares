@@ -13,13 +13,13 @@ export function Navbar() {
         </Link>
         
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <Link href="/catalog" className="text-slate-300 transition-all hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+          <Link href="/catalog" className="text-muted-foreground transition-all hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
             Catalog
           </Link>
-          <Link href="/brands" className="text-slate-300 transition-all hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+          <Link href="/brands" className="text-muted-foreground transition-all hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
             Brands
           </Link>
-          <Link href="/admin" className="text-slate-300 transition-all hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+          <Link href="/admin" className="text-muted-foreground transition-all hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
             Admin
           </Link>
         </nav>
@@ -27,7 +27,7 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <Link 
             href="/login" 
-            className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-white"
           >
             Log in
           </Link>

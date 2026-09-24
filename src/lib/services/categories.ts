@@ -32,6 +32,7 @@ export async function createCategory(category: CategoryInsert) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('categories')
+    // @ts-ignore
     .insert(category)
     .select()
     .single()
@@ -44,6 +45,7 @@ export async function updateCategory(id: string, category: CategoryUpdate) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('categories')
+    // @ts-ignore
     .update(category)
     .eq('id', id)
     .select()

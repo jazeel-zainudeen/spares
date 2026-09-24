@@ -74,12 +74,12 @@ export function AdvancedSearchBar() {
       <form onSubmit={handleSearch} className="flex flex-col gap-4">
         {/* Main Search Input */}
         <div className="flex items-center gap-2 p-2 glass-card rounded-full focus-within:ring-2 focus-within:ring-primary/50 shadow-sm">
-          <div className="flex-1 flex items-center px-4 gap-3 text-slate-500">
+          <div className="flex-1 flex items-center px-4 gap-3 text-muted-foreground">
             <Search className="h-6 w-6" />
             <input 
               type="text" 
               placeholder="Search by part number, name, or description..." 
-              className="bg-transparent border-none outline-none w-full text-foreground placeholder:text-slate-400 h-12 text-lg"
+              className="bg-transparent border-none outline-none w-full text-foreground placeholder:text-muted-foreground h-12 text-lg"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -95,14 +95,14 @@ export function AdvancedSearchBar() {
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
           <Select 
-            className="bg-white/80 backdrop-blur-md border border-slate-200/60 hover:border-slate-300/80 hover:bg-white/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+            className="bg-background/80 backdrop-blur-md border border-border/60 hover:border-slate-300/80 hover:bg-background/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             options={[{ label: "All Categories", value: "" }, ...categories.map(c => ({ label: c.name, value: c.slug }))]}
           />
 
           <Select 
-            className="bg-white/80 backdrop-blur-md border border-slate-200/60 hover:border-slate-300/80 hover:bg-white/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+            className="bg-background/80 backdrop-blur-md border border-border/60 hover:border-slate-300/80 hover:bg-background/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
             value={company}
             onChange={(e) => {
               setCompany(e.target.value)
@@ -112,7 +112,7 @@ export function AdvancedSearchBar() {
           />
 
           <Select 
-            className="bg-white/80 backdrop-blur-md border border-slate-200/60 hover:border-slate-300/80 hover:bg-white/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:opacity-50"
+            className="bg-background/80 backdrop-blur-md border border-border/60 hover:border-slate-300/80 hover:bg-background/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:opacity-50"
             value={model}
             onChange={(e) => setModel(e.target.value)}
             disabled={!company}
