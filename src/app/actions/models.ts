@@ -14,9 +14,21 @@ export async function fetchModelsAction(companyId?: string): Promise<{ data?: Mo
   }
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '') || 'model'
+}
+
 export async function createModelAction(model: ModelInsert): Promise<{ error?: string }> {
   try {
-    await createModel(model)
+    const payload = {
+      ...model,
+      slug: model.slug || slugify(model.name),
+    }
+    await createModel(payload)
     try { updateTag('models') } catch {}
     revalidatePath('/admin/models')
     revalidatePath('/models')
@@ -29,7 +41,11 @@ export async function createModelAction(model: ModelInsert): Promise<{ error?: s
 
 export async function updateModelAction(id: string, updates: ModelUpdate): Promise<{ error?: string }> {
   try {
-    await updateModel(id, updates)
+    const payload = {
+      ...updates,
+      slug: updates.slug || (updates.name ? slugify(updates.name) : undefined),
+    }
+    await updateModel(id, payload)
     try { updateTag('models') } catch {}
     revalidatePath('/admin/models')
     revalidatePath('/models')

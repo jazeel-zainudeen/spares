@@ -30,8 +30,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
   const [deletingModel, setDeletingModel] = useState<ModelRow | null>(null)
 
   const filteredModels = models.filter(m => {
-    const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase()) ||
-                          m.slug.toLowerCase().includes(search.toLowerCase())
+    const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase())
     const matchesCompany = companyFilter ? m.company_id === companyFilter : true
     return matchesSearch && matchesCompany
   })
@@ -152,7 +151,6 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{model.name}</div>
                         <div className="text-xs text-primary font-medium truncate mt-0.5">{model.car_companies?.name || "Unknown"}</div>
-                        <div className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">{model.slug}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -185,7 +183,6 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                   <TableHeader>
                     <TableRow>
                       <TableHead>Model Name</TableHead>
-                      <TableHead>Slug</TableHead>
                       <TableHead>Company</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -194,7 +191,6 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                     {paginatedModels.map(model => (
                       <TableRow key={model.id}>
                         <TableCell className="font-medium">{model.name}</TableCell>
-                        <TableCell className="text-muted-foreground">{model.slug}</TableCell>
                         <TableCell>{model.car_companies?.name || "Unknown"}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">

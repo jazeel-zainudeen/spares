@@ -14,11 +14,23 @@ export async function fetchCategoriesAction(): Promise<{ data?: CategoryRow[], e
   }
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '') || 'category'
+}
+
 export async function createCategoryAction(data: CategoryInsert): Promise<{ error?: string }> {
   try {
     await requireAuth()
-    const parsedData = categorySchema.parse(data)
-    await createCategory(parsedData)
+    const payload = {
+      ...data,
+      slug: data.slug || slugify(data.name),
+    }
+    const parsedData = categorySchema.parse(payload) as CategoryInsert
+    await createCategory({ ...parsedData, slug: payload.slug })
     try { updateTag('categories') } catch {}
     revalidatePath('/admin/categories')
     revalidatePath('/spare-parts')
@@ -35,8 +47,12 @@ export async function createCategoryAction(data: CategoryInsert): Promise<{ erro
 export async function updateCategoryAction(id: string, data: CategoryUpdate): Promise<{ error?: string }> {
   try {
     await requireAuth()
-    const parsedData = categorySchema.parse(data)
-    await updateCategory(id, parsedData)
+    const payload = {
+      ...data,
+      slug: data.slug || (data.name ? slugify(data.name) : undefined),
+    }
+    const parsedData = categorySchema.parse(payload) as CategoryUpdate
+    await updateCategory(id, { ...parsedData, ...(payload.slug ? { slug: payload.slug } : {}) })
     try { updateTag('categories') } catch {}
     revalidatePath('/admin/categories')
     revalidatePath('/spare-parts')

@@ -27,8 +27,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
   const [deletingCategory, setDeletingCategory] = useState<CategoryRow | null>(null)
 
   const filteredCategories = categories.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.slug.toLowerCase().includes(search.toLowerCase())
+    c.name.toLowerCase().includes(search.toLowerCase())
   )
 
   const totalPages = Math.ceil(filteredCategories.length / PAGE_SIZE)
@@ -133,7 +132,6 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                       )}
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{category.name}</div>
-                        <div className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">{category.slug}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -166,7 +164,6 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead>Slug</TableHead>
                       <TableHead>Image</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -175,7 +172,6 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                     {paginatedCategories.map(category => (
                       <TableRow key={category.id}>
                         <TableCell className="font-medium">{category.name}</TableCell>
-                        <TableCell className="text-muted-foreground">{category.slug}</TableCell>
                         <TableCell>
                           {category.image_url ? (
                             <div className="flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">

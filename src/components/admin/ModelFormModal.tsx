@@ -18,7 +18,6 @@ interface ModelFormModalProps {
 
 export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies }: ModelFormModalProps) {
   const [name, setName] = useState("")
-  const [slug, setSlug] = useState("")
   const [companyId, setCompanyId] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -26,31 +25,22 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
   useEffect(() => {
     if (isOpen) {
       setName(initialData?.name || "")
-      setSlug(initialData?.slug || "")
       setCompanyId(initialData?.company_id || "")
       setError("")
     }
   }, [isOpen, initialData])
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value
-    setName(newName)
-    if (!initialData) {
-      setSlug(newName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''))
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !slug || !companyId) {
-      setError("Name, slug, and company are required")
+    if (!name || !companyId) {
+      setError("Name and company are required")
       return
     }
 
     setLoading(true)
     setError("")
     try {
-      await onSave({ name, slug, company_id: companyId })
+      await onSave({ name, company_id: companyId })
       onClose()
     } catch (err: any) {
       setError(err.message || "Something went wrong")
@@ -83,18 +73,8 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
           <label className="text-sm font-medium leading-none">Model Name</label>
           <Input 
             value={name}
-            onChange={handleNameChange}
+            onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Corolla"
-            disabled={loading}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Slug</label>
-          <Input 
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="e.g. corolla"
             disabled={loading}
           />
         </div>

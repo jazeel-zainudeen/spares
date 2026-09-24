@@ -15,11 +15,23 @@ export async function fetchCompaniesAction(): Promise<{ data?: CompanyRow[], err
   }
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '') || 'company'
+}
+
 export async function createCompanyAction(data: CompanyInsert): Promise<{ error?: string }> {
   try {
     await requireAuth()
-    const parsedData = companySchema.parse(data)
-    await createCompany(parsedData)
+    const payload = {
+      ...data,
+      slug: data.slug || slugify(data.name),
+    }
+    const parsedData = companySchema.parse(payload) as CompanyInsert
+    await createCompany({ ...parsedData, slug: payload.slug })
     try { updateTag('companies') } catch {}
     revalidatePath('/admin/companies')
     revalidatePath('/brands')
@@ -36,8 +48,12 @@ export async function createCompanyAction(data: CompanyInsert): Promise<{ error?
 export async function updateCompanyAction(id: string, data: CompanyUpdate): Promise<{ error?: string }> {
   try {
     await requireAuth()
-    const parsedData = companySchema.parse(data)
-    await updateCompany(id, parsedData)
+    const payload = {
+      ...data,
+      slug: data.slug || (data.name ? slugify(data.name) : undefined),
+    }
+    const parsedData = companySchema.parse(payload) as CompanyUpdate
+    await updateCompany(id, { ...parsedData, ...(payload.slug ? { slug: payload.slug } : {}) })
     try { updateTag('companies') } catch {}
     revalidatePath('/admin/companies')
     revalidatePath('/brands')

@@ -16,7 +16,6 @@ interface CategoryFormModalProps {
 
 export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: CategoryFormModalProps) {
   const [name, setName] = useState("")
-  const [slug, setSlug] = useState("")
   const [description, setDescription] = useState("")
   const [imageUrl, setImageUrl] = useState("")
   const [loading, setLoading] = useState(false)
@@ -26,26 +25,16 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
     if (isOpen) {
       if (initialData) {
         setName(initialData.name)
-        setSlug(initialData.slug)
         setDescription(initialData.description || "")
         setImageUrl(initialData.image_url || "")
       } else {
         setName("")
-        setSlug("")
         setDescription("")
         setImageUrl("")
       }
       setError("")
     }
   }, [isOpen, initialData])
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value
-    setName(val)
-    if (!initialData) {
-      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''))
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -55,7 +44,6 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
     try {
       await onSave({
         name,
-        slug,
         description: description || null,
         image_url: imageUrl || null
       })
@@ -85,20 +73,8 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
           <Input 
             id="name" 
             value={name} 
-            onChange={handleNameChange}
+            onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Compressor"
-            required 
-            disabled={loading}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="slug" className="text-sm font-medium">Slug *</label>
-          <Input 
-            id="slug" 
-            value={slug} 
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="e.g. compressor"
             required 
             disabled={loading}
           />

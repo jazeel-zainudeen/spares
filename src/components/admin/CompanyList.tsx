@@ -27,8 +27,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
   const [deletingCompany, setDeletingCompany] = useState<CompanyRow | null>(null)
 
   const filteredCompanies = companies.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.slug.toLowerCase().includes(search.toLowerCase())
+    c.name.toLowerCase().includes(search.toLowerCase())
   )
 
   const totalPages = Math.ceil(filteredCompanies.length / PAGE_SIZE)
@@ -133,7 +132,6 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                       )}
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{company.name}</div>
-                        <div className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">{company.slug}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -166,7 +164,6 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead>Slug</TableHead>
                       <TableHead>Logo</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -175,7 +172,6 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                     {paginatedCompanies.map(company => (
                       <TableRow key={company.id}>
                         <TableCell className="font-medium">{company.name}</TableCell>
-                        <TableCell className="text-muted-foreground">{company.slug}</TableCell>
                         <TableCell>
                           {company.logo_url ? (
                             <div className="flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
