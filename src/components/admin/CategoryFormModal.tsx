@@ -5,6 +5,7 @@ import { CategoryRow } from "@/lib/services/categories"
 import { Modal } from "@/components/ui/Modal"
 import { Input } from "@/components/ui/Input"
 import { Button } from "@/components/ui/Button"
+import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload"
 
 interface CategoryFormModalProps {
   isOpen: boolean
@@ -72,65 +73,67 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
       onClose={onClose} 
       title={initialData ? 'Edit Category' : 'Add Category'}
     >
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          {error && (
-            <div className="bg-red-500/10 text-red-500 p-3 rounded-md text-sm">
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">Name *</label>
-            <Input 
-              id="name" 
-              value={name} 
-              onChange={handleNameChange}
-              placeholder="e.g. Compressor"
-              required 
-            />
+      <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+        {error && (
+          <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
+            {error}
           </div>
+        )}
 
-          <div className="space-y-2">
-            <label htmlFor="slug" className="text-sm font-medium">Slug *</label>
-            <Input 
-              id="slug" 
-              value={slug} 
-              onChange={(e) => setSlug(e.target.value)}
-              placeholder="e.g. compressor"
-              required 
-            />
-          </div>
+        <div className="space-y-2">
+          <label htmlFor="name" className="text-sm font-medium">Name *</label>
+          <Input 
+            id="name" 
+            value={name} 
+            onChange={handleNameChange}
+            placeholder="e.g. Compressor"
+            required 
+            disabled={loading}
+          />
+        </div>
 
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">Description</label>
-            <Input 
-              id="description" 
-              value={description} 
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description..."
-            />
-          </div>
+        <div className="space-y-2">
+          <label htmlFor="slug" className="text-sm font-medium">Slug *</label>
+          <Input 
+            id="slug" 
+            value={slug} 
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="e.g. compressor"
+            required 
+            disabled={loading}
+          />
+        </div>
 
-          <div className="space-y-2">
-            <label htmlFor="image_url" className="text-sm font-medium">Image URL</label>
-            <Input 
-              id="image_url" 
-              type="url"
-              value={imageUrl} 
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://..."
-            />
-          </div>
+        <div className="space-y-2">
+          <label htmlFor="description" className="text-sm font-medium">Description</label>
+          <Input 
+            id="description" 
+            value={description} 
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Brief description..."
+            disabled={loading}
+          />
+        </div>
 
-          <div className="pt-4 flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save"}
-            </Button>
-          </div>
-        </form>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Category Icon / Image</label>
+          <CloudinaryUpload
+            value={imageUrl}
+            folder="categories/images"
+            onChange={(url) => setImageUrl(url)}
+            onRemove={() => setImageUrl("")}
+          />
+        </div>
+
+        <div className="pt-4 flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Save"}
+          </Button>
+        </div>
+      </form>
     </Modal>
   )
 }

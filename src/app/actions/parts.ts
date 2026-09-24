@@ -6,9 +6,11 @@ import { getParts, createPart, updatePart, deletePart, PartRow, PartInsert, Part
 import { partSchema } from '@/lib/validations'
 import { v2 as cloudinary } from 'cloudinary'
 
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  cloud_name: cloudName,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
@@ -80,7 +82,7 @@ export async function getCloudinarySignature(folder: string) {
     process.env.CLOUDINARY_API_SECRET!
   )
 
-  return { timestamp, signature, cloudName: process.env.CLOUDINARY_CLOUD_NAME, apiKey: process.env.CLOUDINARY_API_KEY }
+  return { timestamp, signature, cloudName, apiKey: process.env.CLOUDINARY_API_KEY }
 }
 
 export async function deleteCloudinaryImageAction(publicId: string): Promise<{ error?: string }> {

@@ -58,7 +58,7 @@ export default async function PartDetailPage({
               {part.car_models.name}
             </Link>
             <span>/</span>
-            <span className="text-foreground font-medium truncate max-w-[200px]">{part.item}</span>
+            <span className="text-foreground font-medium truncate max-w-50">{part.item}</span>
           </div>
 
           <Button variant="ghost" size="sm" asChild className="gap-1.5 -ml-2 text-xs text-muted-foreground hover:text-foreground">

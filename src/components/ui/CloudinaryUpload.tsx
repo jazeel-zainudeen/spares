@@ -35,15 +35,20 @@ export function CloudinaryUpload({ value, publicId, onChange, onRemove, folder }
 
     try {
       const { timestamp, signature, cloudName, apiKey } = await getCloudinarySignature(folder)
+      const effectiveCloudName = cloudName || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+
+      if (!effectiveCloudName) {
+        throw new Error("Cloudinary cloud_name is missing. Please configure NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME.")
+      }
 
       const formData = new FormData()
       formData.append("file", file)
-      formData.append("api_key", apiKey!)
+      formData.append("api_key", (apiKey || process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY)!)
       formData.append("timestamp", timestamp.toString())
       formData.append("signature", signature)
       formData.append("folder", folder)
 
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${effectiveCloudName}/image/upload`, {
         method: "POST",
         body: formData,
       })

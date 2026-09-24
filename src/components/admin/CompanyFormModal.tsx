@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
+import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload"
 import { CompanyRow } from "@/lib/services/companies"
 
 interface CompanyFormModalProps {
@@ -60,40 +61,42 @@ export function CompanyFormModal({ isOpen, onClose, onSave, initialData }: Compa
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Company" : "Add Company"}>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
-        
+
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Company Name
+          <label className="text-sm font-medium leading-none">
+            Company Name *
           </label>
-          <Input 
+          <Input
             value={name}
             onChange={handleNameChange}
             placeholder="e.g. Toyota"
             disabled={loading}
+            required
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Slug
+          <label className="text-sm font-medium leading-none">
+            Slug *
           </label>
-          <Input 
+          <Input
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             placeholder="e.g. toyota"
             disabled={loading}
+            required
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Logo URL
+          <label className="text-sm font-medium leading-none">
+            Company Logo
           </label>
-          <Input 
+          <CloudinaryUpload
             value={logoUrl}
-            onChange={(e) => setLogoUrl(e.target.value)}
-            placeholder="https://example.com/logo.png"
-            disabled={loading}
+            folder="companies/logos"
+            onChange={(url) => setLogoUrl(url)}
+            onRemove={() => setLogoUrl("")}
           />
         </div>
 
