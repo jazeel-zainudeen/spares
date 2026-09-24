@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "scrape": "node scripts/scrape.js",
+    "migrate:images": "node scripts/migrate_images_to_cloudinary.js",
+    "cleanup": "node scripts/cleanup.js",
     "db:push": "npx supabase db push",
     "db:status": "npx supabase migration list",
     "db:new": "npx supabase migration new"

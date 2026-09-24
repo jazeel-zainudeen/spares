@@ -1,11 +1,46 @@
 require('dotenv').config({ path: '.env.local' });
+require('dotenv').config({ path: '.env' });
 const cheerio = require('cheerio');
 const { createClient } = require('@supabase/supabase-js');
 const { execSync } = require('child_process');
+const cloudinary = require('cloudinary').v2;
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const apiKey = process.env.CLOUDINARY_API_KEY;
+const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+if (cloudName && apiKey && apiSecret) {
+  cloudinary.config({
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
+  });
+}
+
+async function uploadToCloudinary(imageUrl, folder = 'spares/parts') {
+  if (!imageUrl) return { url: null, publicId: null };
+  if (imageUrl.includes('res.cloudinary.com')) {
+    return { url: imageUrl, publicId: null };
+  }
+  if (!cloudName || !apiKey || !apiSecret) {
+    console.warn(`⚠️ Cloudinary credentials missing. Saving raw image URL: ${imageUrl}`);
+    return { url: imageUrl, publicId: null };
+  }
+  try {
+    const res = await cloudinary.uploader.upload(imageUrl, { folder });
+    return {
+      url: res.secure_url,
+      publicId: res.public_id,
+    };
+  } catch (err) {
+    console.error(`⚠️ Failed to upload image (${imageUrl}) to Cloudinary: ${err.message}`);
+    return { url: imageUrl, publicId: null };
+  }
+}
 
 const BASE_URL = 'https://bestcoolautoac.com';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36';
@@ -288,9 +323,19 @@ async function scrape() {
         // Check if part already exists in parts table
         const { data: existingPart } = await supabase
           .from('parts')
-          .select('id')
+          .select('id, image_url, cloudinary_public_id, category_id')
           .eq('ref_number', refNumber)
           .maybeSingle();
+
+        // Upload scraped image to Cloudinary if available
+        let imageUrl = null;
+        let cloudinaryPublicId = null;
+
+        if (details.image_url) {
+          const uploaded = await uploadToCloudinary(details.image_url, 'spares/parts');
+          imageUrl = uploaded.url;
+          cloudinaryPublicId = uploaded.publicId;
+        }
 
         if (!existingPart) {
           const { error } = await supabase.from('parts').insert({
@@ -300,7 +345,8 @@ async function scrape() {
             category_id: categoryId,
             model_id: modelId,
             description: `Compatible: ${companyName} ${modelName}. Category: ${category.name}`,
-            image_url: details.image_url || null
+            image_url: imageUrl,
+            cloudinary_public_id: cloudinaryPublicId,
           });
 
           if (error) {
@@ -310,8 +356,18 @@ async function scrape() {
             console.log(`✅ [${category.name} #${insertedInThisCategory}] Inserted: ${itemName} (${companyName} - ${refNumber})`);
           }
         } else {
-          // If it exists, update category_id if missing
-          await supabase.from('parts').update({ category_id: categoryId }).eq('id', existingPart.id);
+          // If it exists, update category_id if missing or image if non-Cloudinary
+          const updates = {};
+          if (!existingPart.category_id) updates.category_id = categoryId;
+
+          if (imageUrl && (!existingPart.image_url || !existingPart.image_url.includes('res.cloudinary.com'))) {
+            updates.image_url = imageUrl;
+            if (cloudinaryPublicId) updates.cloudinary_public_id = cloudinaryPublicId;
+          }
+
+          if (Object.keys(updates).length > 0) {
+            await supabase.from('parts').update(updates).eq('id', existingPart.id);
+          }
           console.log(`ℹ️ [${category.name}] Exists: ${refNumber}`);
         }
       } catch (err) {
