@@ -99,9 +99,9 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
             <tbody>
               {filteredCompanies.map(company => (
                 <tr key={company.id}>
-                  <td className="font-medium">{company.name}</td>
-                  <td className="text-muted-foreground">{company.slug}</td>
-                  <td>
+                  <td className="font-medium" data-label="Name">{company.name}</td>
+                  <td className="text-muted-foreground" data-label="Slug">{company.slug}</td>
+                  <td data-label="Logo">
                     {company.logo_url ? (
                       <div className="h-8 w-16 bg-white/5 rounded flex items-center justify-center overflow-hidden">
                         <img src={company.logo_url} alt={company.name} className="h-full object-contain" />
@@ -110,12 +110,12 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                       <span className="text-xs text-muted-foreground">No logo</span>
                     )}
                   </td>
-                  <td className="text-right">
+                  <td className="text-right" data-label="Actions">
                     <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(company)}>
+                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-blue-600" onClick={() => handleEdit(company)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(company)}>
+                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(company)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

@@ -161,7 +161,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
               <tbody>
                 {filteredParts.map(part => (
                   <tr key={part.id}>
-                    <td>
+                    <td data-label="Image">
                       {part.image_url ? (
                         <div className="h-10 w-10 bg-white/5 rounded-md flex items-center justify-center overflow-hidden">
                           <img src={part.image_url} alt={part.item} className="h-full w-full object-cover" />
@@ -172,20 +172,20 @@ export function PartList({ initialParts, categories, companies, models }: { init
                         </div>
                       )}
                     </td>
-                    <td className="font-medium">{part.item}</td>
-                    <td className="text-muted-foreground">{part.ref_number}</td>
-                    <td className="text-muted-foreground">{part.oem_number || '-'}</td>
-                    <td className="text-muted-foreground">{part.categories?.name || '-'}</td>
-                    <td>
+                    <td className="font-medium" data-label="Item">{part.item}</td>
+                    <td className="text-muted-foreground" data-label="Ref #">{part.ref_number}</td>
+                    <td className="text-muted-foreground" data-label="OEM #">{part.oem_number || '-'}</td>
+                    <td className="text-muted-foreground" data-label="Category">{part.categories?.name || '-'}</td>
+                    <td data-label="Model / Company">
                       <div className="text-sm">{part.car_models?.name || 'Unknown'}</div>
                       <div className="text-xs text-muted-foreground">{part.car_models?.car_companies?.name || ''}</div>
                     </td>
-                    <td className="text-right">
+                    <td className="text-right" data-label="Actions">
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEdit(part)}>
+                        <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-blue-600" onClick={() => handleEdit(part)}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleDelete(part)}>
+                        <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(part)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

@@ -115,15 +115,15 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
             <tbody>
               {filteredModels.map(model => (
                 <tr key={model.id}>
-                  <td className="font-medium">{model.name}</td>
-                  <td className="text-muted-foreground">{model.slug}</td>
-                  <td>{model.car_companies?.name || 'Unknown'}</td>
-                  <td className="text-right">
+                  <td className="font-medium" data-label="Model Name">{model.name}</td>
+                  <td className="text-muted-foreground" data-label="Slug">{model.slug}</td>
+                  <td data-label="Company">{model.car_companies?.name || 'Unknown'}</td>
+                  <td className="text-right" data-label="Actions">
                     <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(model)}>
+                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-blue-600" onClick={() => handleEdit(model)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(model)}>
+                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(model)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

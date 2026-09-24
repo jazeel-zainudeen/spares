@@ -98,9 +98,9 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
             <tbody>
               {filteredCategories.map(category => (
                 <tr key={category.id}>
-                  <td className="font-medium">{category.name}</td>
-                  <td className="text-muted-foreground">{category.slug}</td>
-                  <td>
+                  <td className="font-medium" data-label="Name">{category.name}</td>
+                  <td className="text-muted-foreground" data-label="Slug">{category.slug}</td>
+                  <td data-label="Image">
                     {category.image_url ? (
                       <div className="h-8 w-16 bg-white/5 rounded flex items-center justify-center overflow-hidden">
                         <img src={category.image_url} alt={category.name} className="h-full object-contain" />
@@ -109,12 +109,12 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                       <span className="text-xs text-muted-foreground">No image</span>
                     )}
                   </td>
-                  <td className="text-right">
+                  <td className="text-right" data-label="Actions">
                     <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(category)}>
+                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-blue-600" onClick={() => handleEdit(category)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(category)}>
+                      <Button variant="ghost" size="icon-sm" className="text-slate-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(category)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
