@@ -95,35 +95,82 @@ async function getOrCreateModel(companyId, modelName) {
 
 function extractProductDetails($) {
   const data = {};
-  data.title = $('.section-title, h1, h2, h3, h4').first().text().replace(/\s+/g, ' ').trim();
-  data.image_url = $('.img-fluid, .product-image img, img').map((i, el) => $(el).attr('src')).get().find(src => src && src.includes('product'));
-  if (data.image_url && !data.image_url.startsWith('http')) {
-    data.image_url = BASE_URL + (data.image_url.startsWith('/') ? '' : '/') + data.image_url;
-  }
 
-  $('tr, li, p, .row').each((i, el) => {
-    const text = $(el).text().replace(/\s+/g, ' ').trim();
-    if (text.includes('Manufacturer Brand')) {
-      const match = text.match(/Manufacturer Brand\s+([A-Za-z0-9_-]+)/i);
-      if (match) data.manufacturerBrand = match[1].trim();
-    }
-    if (text.includes('Vehicle Brand')) {
-      const match = text.match(/Vehicle Brand\s+([A-Za-z0-9_-]+)/i);
-      if (match) data.vehicleBrand = match[1].trim();
-    }
-    if (text.includes('Part No')) {
-      const match = text.match(/Part No\s+([A-Za-z0-9_.-]+)/i);
-      if (match) data.partNo = match[1].trim();
-    }
-    if (text.includes('OEM')) {
-      const match = text.match(/OEM\s*(?:No|Number)?\s*[:\s]?\s*([A-Za-z0-9_.-]+)/i);
-      if (match) data.oemNo = match[1].trim();
-    }
-    if (text.includes('Vehicle') && !text.includes('Brand')) {
-      const match = text.match(/Vehicle\s+([A-Za-z0-9_\s-]+?)(?:\s+(?:Application|Description|Location|Part|$))/i);
-      if (match) data.vehicleModel = match[1].trim();
+  // Title: first h4.mb-0 or any heading
+  data.title = $('h4.mb-0').first().text().replace(/\s+/g, ' ').trim()
+    || $('h1, h2, h3, h4').first().text().replace(/\s+/g, ' ').trim();
+
+  // Image: look for the product image in images/car_image/ path
+  $('img').each((i, el) => {
+    const src = $(el).attr('src') || '';
+    if (src.includes('images/car_image') || src.includes('car_image/')) {
+      if (!data.image_url) {
+        data.image_url = src.startsWith('http') ? src : BASE_URL + (src.startsWith('/') ? '' : '/') + src;
+      }
     }
   });
+
+  // Parse the label/value <td> table pairs
+  // Structure: <td style="...font-weight: bold;">Label</td>\n<td>Value</td>
+  const tds = $('td');
+  for (let i = 0; i < tds.length - 1; i++) {
+    const labelTd = $(tds[i]);
+    const valueTd = $(tds[i + 1]);
+    const labelText = labelTd.text().replace(/\s+/g, ' ').trim();
+    const valueText = valueTd.text().replace(/\s+/g, ' ').trim();
+    
+    // Only process bold label cells (skip value cells)
+    const style = labelTd.attr('style') || '';
+    if (!style.includes('font-weight') && !style.includes('bold')) continue;
+
+    if (labelText === 'Manufacturer Brand' && valueText) {
+      data.manufacturerBrand = valueText;
+      i++; // skip value td
+    } else if (labelText === 'Vehicle Brand' && valueText) {
+      data.vehicleBrand = valueText;
+      i++;
+    } else if (labelText === 'Part No' && valueText) {
+      // Part No can be "ACY3741-1, 88320-6A070" (ref + OEM comma-separated)
+      const parts = valueText.split(/[,;]/).map(s => s.trim()).filter(Boolean);
+      data.partNo = parts[0];
+      if (parts.length > 1) {
+        data.oemNo = parts[1];
+      }
+      i++;
+    } else if (labelText === 'OEM' || labelText === 'OEM No' || labelText === 'OEM Number') {
+      if (valueText) data.oemNo = valueText;
+      i++;
+    } else if (labelText === 'Vehicle' && valueText) {
+      data.vehicleModel = valueText;
+      i++;
+    } else if (labelText === 'Year' && valueText) {
+      data.year = valueText;
+      i++;
+    } else if (labelText === 'Application' && valueText) {
+      data.application = valueText;
+      i++;
+    }
+  }
+
+  // Fallback: try to extract model from URL slug in the title
+  // e.g., "ACY44090-1 TOYOTA HILUX 2020" → extract "HILUX 2020" if vehicleModel is missing
+  if (!data.vehicleModel && data.title && data.vehicleBrand) {
+    const brand = data.vehicleBrand.toUpperCase();
+    const titleUpper = data.title.toUpperCase();
+    const brandIdx = titleUpper.indexOf(brand);
+    if (brandIdx !== -1) {
+      const afterBrand = data.title.substring(brandIdx + brand.length).trim();
+      if (afterBrand) {
+        // Take the model portion (up to any technical specs like "4PK", "6PK", etc.)
+        const modelMatch = afterBrand.match(/^([A-Za-z0-9\s-]+?)(?:\s+\d+[Pp][Kk]|\s+\d{5,}|$)/);
+        if (modelMatch) {
+          data.vehicleModel = modelMatch[1].trim();
+        } else {
+          data.vehicleModel = afterBrand.split(/\s+/).slice(0, 3).join(' ');
+        }
+      }
+    }
+  }
 
   return data;
 }
