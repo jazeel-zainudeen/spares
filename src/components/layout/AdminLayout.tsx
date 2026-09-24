@@ -70,25 +70,45 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main content area */}
-      <div className="lg:pl-72 flex-1 flex flex-col min-h-screen w-full pb-20 lg:pb-0">
+      <div className="lg:pl-72 flex-1 flex flex-col min-h-screen w-full pb-24 lg:pb-0">
         
-        {/* Top header for mobile - sticky with blur */}
-        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/80 bg-card/85 backdrop-blur-md px-4 shadow-2xs lg:hidden">
-          <Link href="/" className="flex items-center space-x-2 transition-opacity hover:opacity-80">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-2xs">
-              <Wrench className="h-4 w-4" />
-            </div>
-            <span className="font-bold text-base tracking-tight text-foreground">AutoParts<span className="text-primary">Admin</span></span>
-          </Link>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-              title="Logout"
+        {/* Mobile Top App Bar (iOS / Android Native Look) */}
+        <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-background/80 backdrop-blur-xl px-4 lg:hidden">
+          <div className="flex items-center gap-2.5">
+            <Link 
+              href="/" 
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform active:scale-95"
+              title="Visit Storefront"
             >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </form>
+              <Wrench className="h-4 w-4" />
+            </Link>
+            <div>
+              <div className="text-xs font-semibold leading-tight text-foreground tracking-tight">
+                AutoParts <span className="text-primary font-bold">Admin</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground font-medium capitalize leading-tight">
+                {navigation.find(n => n.href === pathname)?.name || "Control Center"}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <Link
+              href="/"
+              className="px-2.5 py-1 text-[11px] font-medium rounded-full bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Storefront
+            </Link>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all active:scale-95 hover:bg-destructive/10 hover:text-destructive"
+                title="Logout"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
+            </form>
+          </div>
         </header>
 
         <main className="flex-1 w-full grow">
@@ -98,9 +118,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation (App-like sleek pill style) */}
-      <nav aria-label="Mobile navigation" className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-t border-border/80 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom,0px)]">
-        <div className="flex items-center justify-around h-15 px-2">
+      {/* Floating Island App Dock (Native Mobile App Experience) */}
+      <nav 
+        aria-label="Mobile Navigation Dock"
+        className="lg:hidden fixed bottom-3 inset-x-3 z-50 rounded-2xl border border-border/80 bg-card/90 backdrop-blur-xl shadow-xl shadow-black/10 px-2 py-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))]"
+      >
+        <div className="flex items-center justify-between">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -108,19 +131,27 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 relative",
+                  "flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all duration-200 active:scale-90",
                   isActive 
-                    ? "text-primary font-semibold" 
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-primary" 
+                    : "text-muted-foreground/75 hover:text-foreground"
                 )}
               >
                 <div className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
-                  isActive && "bg-primary/10 text-primary"
+                  "relative flex h-8 w-12 items-center justify-center rounded-full transition-all duration-200",
+                  isActive && "bg-primary/15 text-primary shadow-xs"
                 )}>
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className="h-4.5 w-4.5" />
+                  {isActive && (
+                    <span className="absolute -bottom-0.5 h-1 w-1 rounded-full bg-primary" />
+                  )}
                 </div>
-                <span className="text-[10px] tracking-tight leading-none mt-0.5">{item.name}</span>
+                <span className={cn(
+                  "text-[10px] tracking-tight leading-none mt-1 font-medium",
+                  isActive && "font-semibold text-primary"
+                )}>
+                  {item.name}
+                </span>
               </Link>
             )
           })}
