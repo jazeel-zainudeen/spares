@@ -14,6 +14,9 @@ import { Search, Plus, Edit, Trash2, Image as ImageIcon } from "lucide-react"
 import { PartFormModal } from "./PartFormModal"
 import { DeletePartModal } from "./DeletePartModal"
 import { createPartAction, updatePartAction, deletePartAction } from "@/app/actions/parts"
+import { Pagination } from "@/components/ui/Pagination"
+
+const PAGE_SIZE = 10
 
 export function PartList({ initialParts, categories, companies, models }: { initialParts: any[], categories: CategoryRow[], companies: CompanyRow[], models: ModelRow[] }) {
   const [parts, setParts] = useState<any[]>(initialParts)
@@ -21,6 +24,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
   const [categoryFilter, setCategoryFilter] = useState("")
   const [companyFilter, setCompanyFilter] = useState("")
   const [modelFilter, setModelFilter] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -46,6 +50,33 @@ export function PartList({ initialParts, categories, companies, models }: { init
 
     return matchesSearch && matchesCategory && matchesCompany && matchesModel
   })
+
+  const totalPages = Math.ceil(filteredParts.length / PAGE_SIZE)
+  const paginatedParts = filteredParts.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  )
+
+  const handleSearchChange = (val: string) => {
+    setSearch(val)
+    setCurrentPage(1)
+  }
+
+  const handleCompanyFilterChange = (val: string) => {
+    setCompanyFilter(val)
+    setModelFilter("") // reset model filter
+    setCurrentPage(1)
+  }
+
+  const handleCategoryFilterChange = (val: string) => {
+    setCategoryFilter(val)
+    setCurrentPage(1)
+  }
+
+  const handleModelFilterChange = (val: string) => {
+    setModelFilter(val)
+    setCurrentPage(1)
+  }
 
   const availableModelsForFilter = models.filter(m => companyFilter ? m.company_id === companyFilter : true)
 
@@ -82,15 +113,6 @@ export function PartList({ initialParts, categories, companies, models }: { init
     setParts(parts.filter(p => p.id !== id))
   }
 
-  const handleCompanyFilterChange = (val: string) => {
-    setCompanyFilter(val)
-    setModelFilter("") // reset model filter
-  }
-
-  const handleCategoryFilterChange = (val: string) => {
-    setCategoryFilter(val)
-  }
-
   const categoryOptions = categories.map(c => ({ label: c.name, value: c.id }))
   const companyOptions = companies.map(c => ({ label: c.name, value: c.id }))
   const modelOptions = availableModelsForFilter.map(m => ({ label: m.name, value: m.id }))
@@ -102,7 +124,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Spare Parts</h1>
           <p className="text-sm text-muted-foreground">Manage catalog items, reference numbers, and specs</p>
         </div>
-        <Button onClick={handleAdd} className="gap-2">
+        <Button onClick={handleAdd} className="gap-2 self-start sm:self-auto">
           <Plus className="h-4 w-4" />
           Add Part
         </Button>
@@ -121,7 +143,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                 <Input
                   placeholder="Search item, ref, OEM..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-8"
                 />
               </div>
@@ -140,7 +162,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
               <Select
                 options={[{ label: "All Models", value: "" }, ...modelOptions]}
                 value={modelFilter}
-                onChange={(e) => setModelFilter(e.target.value)}
+                onChange={(e) => handleModelFilterChange(e.target.value)}
                 disabled={!companyFilter && availableModelsForFilter.length > 50}
                 placeholder="All Models"
               />
@@ -153,43 +175,37 @@ export function PartList({ initialParts, categories, companies, models }: { init
               {(search || companyFilter || modelFilter || categoryFilter) ? "No parts found matching your filters." : "No parts added yet."}
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16">Image</TableHead>
-                  <TableHead>Item</TableHead>
-                  <TableHead>Ref #</TableHead>
-                  <TableHead>OEM #</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Model / Brand</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredParts.map(part => (
-                  <TableRow key={part.id}>
-                    <TableCell>
-                      {part.image_url ? (
-                        <div className="flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" />
+            <>
+              {/* Mobile View: Cards */}
+              <div className="grid grid-cols-1 gap-3 sm:hidden">
+                {paginatedParts.map(part => (
+                  <div
+                    key={part.id}
+                    className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3.5 shadow-2xs"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {part.image_url ? (
+                          <div className="flex h-12 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/40">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" />
+                          </div>
+                        ) : (
+                          <div className="flex h-12 w-14 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/30">
+                            <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="font-semibold text-sm text-foreground truncate">{part.item}</div>
+                          <div className="text-xs text-primary font-medium">
+                            {part.car_models?.car_companies?.name} {part.car_models?.name}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {part.categories?.name || "Uncategorized"}
+                          </div>
                         </div>
-                      ) : (
-                        <div className="flex h-10 w-12 items-center justify-center rounded-md border border-border bg-muted/30">
-                          <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="font-medium text-foreground">{part.item}</TableCell>
-                    <TableCell className="font-mono text-xs text-muted-foreground">{part.ref_number}</TableCell>
-                    <TableCell className="font-mono text-xs text-muted-foreground">{part.oem_number || "—"}</TableCell>
-                    <TableCell className="text-muted-foreground">{part.categories?.name || "—"}</TableCell>
-                    <TableCell>
-                      <div className="text-xs font-medium text-foreground">{part.car_models?.name || "Unknown"}</div>
-                      <div className="text-[11px] text-muted-foreground">{part.car_models?.car_companies?.name || ""}</div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
                         <Button
                           variant="ghost"
                           size="icon-sm"
@@ -208,11 +224,90 @@ export function PartList({ initialParts, categories, companies, models }: { init
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/60 text-xs font-mono text-muted-foreground">
+                      <span className="rounded-sm bg-muted px-2 py-0.5">REF: {part.ref_number}</span>
+                      {part.oem_number && (
+                        <span className="rounded-sm bg-muted px-2 py-0.5">OEM: {part.oem_number}</span>
+                      )}
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Desktop View: Full Table */}
+              <div className="hidden sm:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-16">Image</TableHead>
+                      <TableHead>Item</TableHead>
+                      <TableHead>Ref #</TableHead>
+                      <TableHead>OEM #</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Model / Brand</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedParts.map(part => (
+                      <TableRow key={part.id}>
+                        <TableCell>
+                          {part.image_url ? (
+                            <div className="flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" />
+                            </div>
+                          ) : (
+                            <div className="flex h-10 w-12 items-center justify-center rounded-md border border-border bg-muted/30">
+                              <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="font-medium text-foreground">{part.item}</TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{part.ref_number}</TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{part.oem_number || "—"}</TableCell>
+                        <TableCell className="text-muted-foreground">{part.categories?.name || "—"}</TableCell>
+                        <TableCell>
+                          <div className="text-xs font-medium text-foreground">{part.car_models?.name || "Unknown"}</div>
+                          <div className="text-[11px] text-muted-foreground">{part.car_models?.car_companies?.name || ""}</div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleEdit(part)}
+                              aria-label="Edit part"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                              onClick={() => handleDelete(part)}
+                              aria-label="Delete part"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                totalItems={filteredParts.length}
+                pageSize={PAGE_SIZE}
+              />
+            </>
           )}
         </CardContent>
       </Card>

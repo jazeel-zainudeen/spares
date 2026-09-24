@@ -6,15 +6,19 @@ import { SearchBar } from "@/components/public/SearchBar"
 import { Image as ImageIcon, ChevronRight, Layers } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
+import { Pagination } from "@/components/ui/Pagination"
+
+const PAGE_SIZE = 12
 
 export default async function CatalogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string }>
+  searchParams: Promise<{ search?: string; page?: string }>
 }) {
   const resolvedParams = await searchParams
   const search = resolvedParams?.search || ""
-  const parts = await getPublicParts({ search })
+  const page = Math.max(1, Number(resolvedParams?.page) || 1)
+  const { data: parts, total, totalPages } = await getPublicParts({ search, page, pageSize: PAGE_SIZE })
   const { data: categories = [] } = await fetchCategoriesAction()
 
   return (
@@ -81,52 +85,68 @@ export default async function CatalogPage({
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {parts.map((part: any) => {
-                const categorySlug = part.categories?.slug || "uncategorized"
-                const companySlug = part.car_models?.car_companies?.slug || "unknown"
-                const modelSlug = part.car_models?.slug || "model"
-                const href = `/spare-parts/${categorySlug}/${companySlug}/${modelSlug}/${part.id}`
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {parts.map((part: any) => {
+                  const categorySlug = part.categories?.slug || "uncategorized"
+                  const companySlug = part.car_models?.car_companies?.slug || "unknown"
+                  const modelSlug = part.car_models?.slug || "model"
+                  const href = `/spare-parts/${categorySlug}/${companySlug}/${modelSlug}/${part.id}`
 
-                return (
-                  <Link key={part.id} href={href} className="group">
-                    <Card className="h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-xs">
-                      <div className="aspect-16/10 bg-muted/40 relative flex items-center justify-center p-3 border-b border-border/60">
-                        {part.image_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={part.image_url}
-                            alt={part.item}
-                            className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                          />
-                        ) : (
-                          <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
-                        )}
-                        <div className="absolute top-2 left-2">
-                          <Badge variant="secondary" className="text-[10px] px-2 py-0.5">
-                            {part.categories?.name || "Auto Part"}
-                          </Badge>
-                        </div>
-                      </div>
-                      <CardContent className="p-3.5 space-y-2">
-                        <div className="text-[11px] font-medium text-primary truncate">
-                          {part.car_models?.car_companies?.name} • {part.car_models?.name}
-                        </div>
-                        <h3 className="font-semibold text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors text-foreground">
-                          {part.item}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] text-muted-foreground font-mono">
-                          <span className="rounded-sm bg-muted px-1.5 py-0.5">REF: {part.ref_number}</span>
-                          {part.oem_number && (
-                            <span className="rounded-sm bg-muted px-1.5 py-0.5">OEM: {part.oem_number}</span>
+                  return (
+                    <Link key={part.id} href={href} className="group">
+                      <Card className="h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-xs">
+                        <div className="aspect-16/10 bg-muted/40 relative flex items-center justify-center p-3 border-b border-border/60">
+                          {part.image_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={part.image_url}
+                              alt={part.item}
+                              className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                            />
+                          ) : (
+                            <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
                           )}
+                          <div className="absolute top-2 left-2">
+                            <Badge variant="secondary" className="text-[10px] px-2 py-0.5">
+                              {part.categories?.name || "Auto Part"}
+                            </Badge>
+                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                )
-              })}
-            </div>
+                        <CardContent className="p-3.5 space-y-2">
+                          <div className="text-[11px] font-medium text-primary truncate">
+                            {part.car_models?.car_companies?.name} • {part.car_models?.name}
+                          </div>
+                          <h3 className="font-semibold text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors text-foreground">
+                            {part.item}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] text-muted-foreground font-mono">
+                            <span className="rounded-sm bg-muted px-1.5 py-0.5">REF: {part.ref_number}</span>
+                            {part.oem_number && (
+                              <span className="rounded-sm bg-muted px-1.5 py-0.5">OEM: {part.oem_number}</span>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  )
+                })}
+              </div>
+
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
+                pageSize={PAGE_SIZE}
+                buildLink={(p) => {
+                  const params = new URLSearchParams()
+                  if (search) params.set("search", search)
+                  if (p > 1) params.set("page", String(p))
+                  const query = params.toString()
+                  return `/spare-parts${query ? `?${query}` : ""}`
+                }}
+              />
+            </>
           )}
         </div>
       </div>

@@ -8,18 +8,30 @@ import { SearchBar } from "@/components/public/SearchBar"
 import { Image as ImageIcon, ChevronRight, ArrowLeft, Car } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
+import { Pagination } from "@/components/ui/Pagination"
+
+const PAGE_SIZE = 12
 
 export default async function ModelCatalogPage({
   params,
   searchParams,
 }: {
   params: Promise<{ category: string, company: string, model: string }>
-  searchParams: Promise<{ search?: string }>
+  searchParams: Promise<{ search?: string; page?: string }>
 }) {
   const resolvedParams = await params
   const resolvedSearchParams = await searchParams
   const search = resolvedSearchParams?.search || ""
-  const parts = await getPublicParts({ search, categorySlug: resolvedParams.category, companySlug: resolvedParams.company, modelSlug: resolvedParams.model })
+  const page = Math.max(1, Number(resolvedSearchParams?.page) || 1)
+
+  const { data: parts, total, totalPages } = await getPublicParts({
+    search,
+    categorySlug: resolvedParams.category,
+    companySlug: resolvedParams.company,
+    modelSlug: resolvedParams.model,
+    page,
+    pageSize: PAGE_SIZE,
+  })
 
   const { data: categories = [] } = await fetchCategoriesAction()
   const currentCategory = categories.find(c => c.slug === resolvedParams.category)
@@ -120,44 +132,60 @@ export default async function ModelCatalogPage({
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {parts.map((part: any) => {
-                const href = `/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${resolvedParams.model}/${part.id}`
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {parts.map((part: any) => {
+                  const href = `/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${resolvedParams.model}/${part.id}`
 
-                return (
-                  <Link key={part.id} href={href} className="group">
-                    <Card className="h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-xs">
-                      <div className="aspect-16/10 bg-muted/40 relative flex items-center justify-center p-3 border-b border-border/60">
-                        {part.image_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={part.image_url}
-                            alt={part.item}
-                            className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                          />
-                        ) : (
-                          <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
-                        )}
-                      </div>
-                      <CardContent className="p-3.5 space-y-2">
-                        <div className="text-[11px] font-medium text-primary truncate">
-                          {currentCompany.name} • {currentModel.name}
-                        </div>
-                        <h3 className="font-semibold text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors text-foreground">
-                          {part.item}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] text-muted-foreground font-mono">
-                          <span className="rounded-sm bg-muted px-1.5 py-0.5">REF: {part.ref_number}</span>
-                          {part.oem_number && (
-                            <span className="rounded-sm bg-muted px-1.5 py-0.5">OEM: {part.oem_number}</span>
+                  return (
+                    <Link key={part.id} href={href} className="group">
+                      <Card className="h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-xs">
+                        <div className="aspect-16/10 bg-muted/40 relative flex items-center justify-center p-3 border-b border-border/60">
+                          {part.image_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={part.image_url}
+                              alt={part.item}
+                              className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                            />
+                          ) : (
+                            <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
                           )}
                         </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                )
-              })}
-            </div>
+                        <CardContent className="p-3.5 space-y-2">
+                          <div className="text-[11px] font-medium text-primary truncate">
+                            {currentCompany.name} • {currentModel.name}
+                          </div>
+                          <h3 className="font-semibold text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors text-foreground">
+                            {part.item}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] text-muted-foreground font-mono">
+                            <span className="rounded-sm bg-muted px-1.5 py-0.5">REF: {part.ref_number}</span>
+                            {part.oem_number && (
+                              <span className="rounded-sm bg-muted px-1.5 py-0.5">OEM: {part.oem_number}</span>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  )
+                })}
+              </div>
+
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
+                pageSize={PAGE_SIZE}
+                buildLink={(p) => {
+                  const params = new URLSearchParams()
+                  if (search) params.set("search", search)
+                  if (p > 1) params.set("page", String(p))
+                  const query = params.toString()
+                  return `/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${resolvedParams.model}${query ? `?${query}` : ""}`
+                }}
+              />
+            </>
           )}
         </div>
       </div>

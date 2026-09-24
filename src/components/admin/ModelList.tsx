@@ -8,15 +8,20 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { Search, Plus, Edit, Trash2 } from "lucide-react"
+import { Search, Plus, Edit, Trash2, Car } from "lucide-react"
 import { ModelFormModal } from "./ModelFormModal"
 import { DeleteModelModal } from "./DeleteModelModal"
 import { createModelAction, updateModelAction, deleteModelAction } from "@/app/actions/models"
+
+import { Pagination } from "@/components/ui/Pagination"
+
+const PAGE_SIZE = 10
 
 export function ModelList({ initialModels, companies }: { initialModels: any[], companies: CompanyRow[] }) {
   const [models, setModels] = useState<any[]>(initialModels)
   const [search, setSearch] = useState("")
   const [companyFilter, setCompanyFilter] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -30,6 +35,22 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
     const matchesCompany = companyFilter ? m.company_id === companyFilter : true
     return matchesSearch && matchesCompany
   })
+
+  const totalPages = Math.ceil(filteredModels.length / PAGE_SIZE)
+  const paginatedModels = filteredModels.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  )
+
+  const handleSearchChange = (val: string) => {
+    setSearch(val)
+    setCurrentPage(1)
+  }
+
+  const handleCompanyFilterChange = (val: string) => {
+    setCompanyFilter(val)
+    setCurrentPage(1)
+  }
 
   const handleAdd = () => {
     setEditingModel(null)
@@ -76,7 +97,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Models</h1>
           <p className="text-sm text-muted-foreground">Manage vehicle models associated with car manufacturers</p>
         </div>
-        <Button onClick={handleAdd} className="gap-2">
+        <Button onClick={handleAdd} className="gap-2 self-start sm:self-auto">
           <Plus className="h-4 w-4" />
           Add Model
         </Button>
@@ -95,7 +116,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                 <Input
                   placeholder="Search models..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-8"
                 />
               </div>
@@ -103,7 +124,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                 <Select
                   options={[{ label: "All Companies", value: "" }, ...companyOptions]}
                   value={companyFilter}
-                  onChange={(e) => setCompanyFilter(e.target.value)}
+                  onChange={(e) => handleCompanyFilterChange(e.target.value)}
                   placeholder="Filter by company"
                 />
               </div>
@@ -116,46 +137,99 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
               {(search || companyFilter) ? "No models found matching your filters." : "No models added yet."}
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Model Name</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredModels.map(model => (
-                  <TableRow key={model.id}>
-                    <TableCell className="font-medium">{model.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{model.slug}</TableCell>
-                    <TableCell>{model.car_companies?.name || "Unknown"}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => handleEdit(model)}
-                          aria-label="Edit model"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => handleDelete(model)}
-                          aria-label="Delete model"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+            <>
+              {/* Mobile View: Cards */}
+              <div className="grid grid-cols-1 gap-3 sm:hidden">
+                {paginatedModels.map(model => (
+                  <div
+                    key={model.id}
+                    className="flex items-center justify-between rounded-xl border border-border bg-card p-3.5 shadow-2xs"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/30 text-primary">
+                        <Car className="h-5 w-5" />
                       </div>
-                    </TableCell>
-                  </TableRow>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-sm text-foreground truncate">{model.name}</div>
+                        <div className="text-xs text-primary font-medium truncate">{model.car_companies?.name || "Unknown"}</div>
+                        <div className="text-[11px] text-muted-foreground font-mono">{model.slug}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => handleEdit(model)}
+                        aria-label="Edit model"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => handleDelete(model)}
+                        aria-label="Delete model"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Desktop View: Full Table */}
+              <div className="hidden sm:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Model Name</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>Company</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedModels.map(model => (
+                      <TableRow key={model.id}>
+                        <TableCell className="font-medium">{model.name}</TableCell>
+                        <TableCell className="text-muted-foreground">{model.slug}</TableCell>
+                        <TableCell>{model.car_companies?.name || "Unknown"}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleEdit(model)}
+                              aria-label="Edit model"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                              onClick={() => handleDelete(model)}
+                              aria-label="Delete model"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                totalItems={filteredModels.length}
+                pageSize={PAGE_SIZE}
+              />
+            </>
           )}
         </CardContent>
       </Card>

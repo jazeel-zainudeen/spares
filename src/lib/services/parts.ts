@@ -19,9 +19,23 @@ export async function getParts(modelId?: string) {
   return data as any
 }
 
-export async function getPublicParts(options?: { categorySlug?: string, companySlug?: string, modelSlug?: string, search?: string }) {
+export async function getPublicParts(options?: {
+  categorySlug?: string
+  companySlug?: string
+  modelSlug?: string
+  search?: string
+  page?: number
+  pageSize?: number
+}) {
   const supabase = await createClient()
-  let query = supabase.from('parts').select('*, categories!inner(name, slug), car_models!inner(name, slug, car_companies!inner(name, slug))')
+  const page = options?.page && options.page > 0 ? options.page : 1
+  const pageSize = options?.pageSize && options.pageSize > 0 ? options.pageSize : undefined
+
+  let query = supabase
+    .from('parts')
+    .select('*, categories!inner(name, slug), car_models!inner(name, slug, car_companies!inner(name, slug))', {
+      count: 'exact',
+    })
 
   if (options?.categorySlug) {
     query = query.eq('categories.slug', options.categorySlug)
@@ -40,10 +54,25 @@ export async function getPublicParts(options?: { categorySlug?: string, companyS
     query = query.or(`item.ilike.${term},ref_number.ilike.${term},oem_number.ilike.${term},description.ilike.${term}`)
   }
 
-  const { data, error } = await query.order('created_at', { ascending: false })
+  query = query.order('created_at', { ascending: false })
+
+  if (pageSize) {
+    const from = (page - 1) * pageSize
+    const to = from + pageSize - 1
+    query = query.range(from, to)
+  }
+
+  const { data, count, error } = await query
   
   if (error) throw new Error(error.message)
-  return data as any
+  
+  return {
+    data: (data || []) as any[],
+    total: count ?? (data?.length || 0),
+    page,
+    pageSize: pageSize ?? (count ?? data?.length ?? 0),
+    totalPages: pageSize ? Math.ceil((count ?? 0) / pageSize) : 1,
+  }
 }
 
 export async function getPartById(id: string) {
