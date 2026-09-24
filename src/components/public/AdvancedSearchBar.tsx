@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
+import { Select } from "@/components/ui/Select"
 import { fetchCategoriesAction } from "@/app/actions/categories"
 import { fetchCompaniesAction } from "@/app/actions/companies"
 import { fetchModelsAction } from "@/app/actions/models"
@@ -93,42 +94,30 @@ export function AdvancedSearchBar() {
 
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
-          <select 
-            className="glass-card h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+          <Select 
+            className="bg-white/80 backdrop-blur-md border border-slate-200/60 hover:border-slate-300/80 hover:bg-white/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">All Categories</option>
-            {categories.map(c => (
-              <option key={c.id} value={c.slug}>{c.name}</option>
-            ))}
-          </select>
+            options={[{ label: "All Categories", value: "" }, ...categories.map(c => ({ label: c.name, value: c.slug }))]}
+          />
 
-          <select 
-            className="glass-card h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+          <Select 
+            className="bg-white/80 backdrop-blur-md border border-slate-200/60 hover:border-slate-300/80 hover:bg-white/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
             value={company}
             onChange={(e) => {
               setCompany(e.target.value)
               setModel("") // Reset model when company changes
             }}
-          >
-            <option value="">All Brands</option>
-            {companies.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+            options={[{ label: "All Brands", value: "" }, ...companies.map(c => ({ label: c.name, value: c.id }))]}
+          />
 
-          <select 
-            className="glass-card h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:opacity-50"
+          <Select 
+            className="bg-white/80 backdrop-blur-md border border-slate-200/60 hover:border-slate-300/80 hover:bg-white/90 shadow-sm hover:shadow transition-all duration-300 h-12 px-4 rounded-xl text-slate-600 outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:opacity-50"
             value={model}
             onChange={(e) => setModel(e.target.value)}
             disabled={!company}
-          >
-            <option value="">All Models</option>
-            {availableModels.map(m => (
-              <option key={m.id} value={m.slug}>{m.name}</option>
-            ))}
-          </select>
+            options={[{ label: "All Models", value: "" }, ...availableModels.map(m => ({ label: m.name, value: m.slug }))]}
+          />
         </div>
       </form>
     </div>
