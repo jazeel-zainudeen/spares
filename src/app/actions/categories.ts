@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 import { getCategories, createCategory, updateCategory, deleteCategory, CategoryRow, CategoryInsert, CategoryUpdate } from '@/lib/services/categories'
 import { categorySchema } from '@/lib/validations'
 import { requireAuth } from '@/lib/auth'
@@ -19,7 +19,9 @@ export async function createCategoryAction(data: CategoryInsert): Promise<{ erro
     await requireAuth()
     const parsedData = categorySchema.parse(data)
     await createCategory(parsedData)
+    try { updateTag('categories') } catch {}
     revalidatePath('/admin/categories')
+    revalidatePath('/spare-parts')
     revalidatePath('/')
     return {}
   } catch (err: any) {
@@ -35,7 +37,9 @@ export async function updateCategoryAction(id: string, data: CategoryUpdate): Pr
     await requireAuth()
     const parsedData = categorySchema.parse(data)
     await updateCategory(id, parsedData)
+    try { updateTag('categories') } catch {}
     revalidatePath('/admin/categories')
+    revalidatePath('/spare-parts')
     revalidatePath('/')
     return {}
   } catch (err: any) {
@@ -50,7 +54,9 @@ export async function deleteCategoryAction(id: string): Promise<{ error?: string
   try {
     await requireAuth()
     await deleteCategory(id)
+    try { updateTag('categories') } catch {}
     revalidatePath('/admin/categories')
+    revalidatePath('/spare-parts')
     revalidatePath('/')
     return {}
   } catch (err: any) {

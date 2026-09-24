@@ -5,27 +5,42 @@ export type CompanyRow = Database['public']['Tables']['car_companies']['Row']
 export type CompanyInsert = Database['public']['Tables']['car_companies']['Insert']
 export type CompanyUpdate = Database['public']['Tables']['car_companies']['Update']
 
-export async function getCompanies() {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('car_companies')
-    .select('*')
-    .order('name')
+import { unstable_cache } from 'next/cache'
+import { getPublicClient } from '@/lib/supabase/public'
 
-  if (error) throw new Error(error.message)
-  return data as any
+export async function getCompanies(): Promise<CompanyRow[]> {
+  return unstable_cache(
+    async () => {
+      const supabase = getPublicClient()
+      const { data, error } = await supabase
+        .from('car_companies')
+        .select('*')
+        .order('name')
+
+      if (error) throw new Error(error.message)
+      return (data || []) as any
+    },
+    ['companies-all'],
+    { revalidate: 3600, tags: ['companies'] }
+  )()
 }
 
-export async function getCompanyById(id: string) {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('car_companies')
-    .select('*')
-    .eq('id', id)
-    .single()
+export async function getCompanyById(id: string): Promise<CompanyRow> {
+  return unstable_cache(
+    async () => {
+      const supabase = getPublicClient()
+      const { data, error } = await supabase
+        .from('car_companies')
+        .select('*')
+        .eq('id', id)
+        .single()
 
-  if (error) throw new Error(error.message)
-  return data as any
+      if (error) throw new Error(error.message)
+      return data as any
+    },
+    ['company-by-id', id],
+    { revalidate: 3600, tags: ['companies', `company-${id}`] }
+  )()
 }
 
 export async function createCompany(company: CompanyInsert) {

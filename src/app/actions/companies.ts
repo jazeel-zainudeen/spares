@@ -1,7 +1,7 @@
 'use server'
 
 import { requireAuth } from '@/lib/auth'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 import { getCompanies, createCompany, updateCompany, deleteCompany, CompanyRow, CompanyInsert, CompanyUpdate } from '@/lib/services/companies'
 import { getModels } from '@/lib/services/models'
 import { companySchema } from '@/lib/validations'
@@ -20,7 +20,10 @@ export async function createCompanyAction(data: CompanyInsert): Promise<{ error?
     await requireAuth()
     const parsedData = companySchema.parse(data)
     await createCompany(parsedData)
+    try { updateTag('companies') } catch {}
     revalidatePath('/admin/companies')
+    revalidatePath('/brands')
+    revalidatePath('/')
     return {}
   } catch (err: any) {
     if (err.errors) {
@@ -35,7 +38,10 @@ export async function updateCompanyAction(id: string, data: CompanyUpdate): Prom
     await requireAuth()
     const parsedData = companySchema.parse(data)
     await updateCompany(id, parsedData)
+    try { updateTag('companies') } catch {}
     revalidatePath('/admin/companies')
+    revalidatePath('/brands')
+    revalidatePath('/')
     return {}
   } catch (err: any) {
     if (err.errors) {
@@ -54,7 +60,10 @@ export async function deleteCompanyAction(id: string): Promise<{ error?: string 
 
     await requireAuth()
     await deleteCompany(id)
+    try { updateTag('companies') } catch {}
     revalidatePath('/admin/companies')
+    revalidatePath('/brands')
+    revalidatePath('/')
     return {}
   } catch (err: any) {
     return { error: err.message || 'Failed to delete company' }

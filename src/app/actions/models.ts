@@ -1,7 +1,7 @@
 'use server'
 
 import { requireAuth } from '@/lib/auth'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 import { getModels, createModel, updateModel, deleteModel, ModelRow, ModelInsert, ModelUpdate } from '@/lib/services/models'
 import { getParts } from '@/lib/services/parts'
 
@@ -17,7 +17,10 @@ export async function fetchModelsAction(companyId?: string): Promise<{ data?: Mo
 export async function createModelAction(model: ModelInsert): Promise<{ error?: string }> {
   try {
     await createModel(model)
+    try { updateTag('models') } catch {}
     revalidatePath('/admin/models')
+    revalidatePath('/models')
+    revalidatePath('/')
     return {}
   } catch (err: any) {
     return { error: err.message || 'Failed to create model' }
@@ -27,7 +30,10 @@ export async function createModelAction(model: ModelInsert): Promise<{ error?: s
 export async function updateModelAction(id: string, updates: ModelUpdate): Promise<{ error?: string }> {
   try {
     await updateModel(id, updates)
+    try { updateTag('models') } catch {}
     revalidatePath('/admin/models')
+    revalidatePath('/models')
+    revalidatePath('/')
     return {}
   } catch (err: any) {
     return { error: err.message || 'Failed to update model' }
@@ -44,7 +50,10 @@ export async function deleteModelAction(id: string): Promise<{ error?: string }>
 
     await requireAuth()
     await deleteModel(id)
+    try { updateTag('models') } catch {}
     revalidatePath('/admin/models')
+    revalidatePath('/models')
+    revalidatePath('/')
     return {}
   } catch (err: any) {
     return { error: err.message || 'Failed to delete model' }

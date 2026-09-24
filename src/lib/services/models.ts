@@ -5,30 +5,46 @@ export type ModelRow = Database['public']['Tables']['car_models']['Row']
 export type ModelInsert = Database['public']['Tables']['car_models']['Insert']
 export type ModelUpdate = Database['public']['Tables']['car_models']['Update']
 
-export async function getModels(companyId?: string) {
-  const supabase = await createClient()
-  let query = supabase.from('car_models').select('*, car_companies(name)')
-  
-  if (companyId) {
-    query = query.eq('company_id', companyId)
-  }
+import { unstable_cache } from 'next/cache'
+import { getPublicClient } from '@/lib/supabase/public'
 
-  const { data, error } = await query.order('name')
+export async function getModels(companyId?: string): Promise<ModelRow[]> {
+  const cacheKey = companyId ? `models-company-${companyId}` : 'models-all'
+  return unstable_cache(
+    async () => {
+      const supabase = getPublicClient()
+      let query = supabase.from('car_models').select('*, car_companies(name)')
+      
+      if (companyId) {
+        query = query.eq('company_id', companyId)
+      }
 
-  if (error) throw new Error(error.message)
-  return data as any
+      const { data, error } = await query.order('name')
+
+      if (error) throw new Error(error.message)
+      return (data || []) as any
+    },
+    [cacheKey],
+    { revalidate: 3600, tags: ['models', ...(companyId ? [`models-${companyId}`] : [])] }
+  )()
 }
 
-export async function getModelById(id: string) {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('car_models')
-    .select('*, car_companies(name)')
-    .eq('id', id)
-    .single()
+export async function getModelById(id: string): Promise<ModelRow> {
+  return unstable_cache(
+    async () => {
+      const supabase = getPublicClient()
+      const { data, error } = await supabase
+        .from('car_models')
+        .select('*, car_companies(name)')
+        .eq('id', id)
+        .single()
 
-  if (error) throw new Error(error.message)
-  return data as any
+      if (error) throw new Error(error.message)
+      return data as any
+    },
+    ['model-by-id', id],
+    { revalidate: 3600, tags: ['models', `model-${id}`] }
+  )()
 }
 
 export async function createModel(model: ModelInsert) {

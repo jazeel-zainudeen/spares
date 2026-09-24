@@ -2,8 +2,15 @@ import Link from "next/link";
 import { Wrench, ArrowRight, ShieldCheck, Sparkles, Layers } from "lucide-react";
 import { AdvancedSearchBar } from "@/components/public/AdvancedSearchBar";
 import { Card } from "@/components/ui/Card";
+import { getCategories } from "@/lib/services/categories";
+import { getCompanies } from "@/lib/services/companies";
 
-export default function Home() {
+export default async function Home() {
+  const [categories, companies] = await Promise.all([
+    getCategories().catch(() => []),
+    getCompanies().catch(() => []),
+  ]);
+
   return (
     <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-background text-foreground">
       {/* Background Decorative Gradients & Mesh (clean, premium feel) */}
@@ -65,7 +72,7 @@ export default function Home() {
         <div className="w-full">
           <Card className="border-border/80 bg-card/85 shadow-xl shadow-black/5 backdrop-blur-md transition-all hover:border-primary/30">
             <div className="p-4 sm:p-6">
-              <AdvancedSearchBar />
+              <AdvancedSearchBar initialCategories={categories} initialCompanies={companies} />
             </div>
           </Card>
         </div>

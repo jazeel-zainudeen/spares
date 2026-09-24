@@ -9,35 +9,54 @@ import { fetchCategoriesAction } from "@/app/actions/categories"
 import { fetchCompaniesAction } from "@/app/actions/companies"
 import { fetchModelsAction } from "@/app/actions/models"
 
-export function AdvancedSearchBar() {
+export function AdvancedSearchBar({
+  initialCategories = [],
+  initialCompanies = [],
+}: {
+  initialCategories?: any[]
+  initialCompanies?: any[]
+}) {
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState("")
   const [company, setCompany] = useState("")
   const [model, setModel] = useState("")
 
-  const [categories, setCategories] = useState<any[]>([])
-  const [companies, setCompanies] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>(initialCategories)
+  const [companies, setCompanies] = useState<any[]>(initialCompanies)
   const [models, setModels] = useState<any[]>([])
+  const [loadingModels, setLoadingModels] = useState(false)
 
   const router = useRouter()
 
+  // If initial props are not passed (e.g. standalone usage), fetch them once
   useEffect(() => {
-    async function loadFilters() {
-      try {
-        const [catRes, compRes, modRes] = await Promise.all([
-          fetchCategoriesAction(),
-          fetchCompaniesAction(),
-          fetchModelsAction()
-        ])
+    if (initialCategories.length === 0 || initialCompanies.length === 0) {
+      Promise.all([
+        fetchCategoriesAction(),
+        fetchCompaniesAction()
+      ]).then(([catRes, compRes]) => {
         if (catRes.data) setCategories(catRes.data)
         if (compRes.data) setCompanies(compRes.data)
-        if (modRes.data) setModels(modRes.data)
-      } catch (e) {
-        console.error("Failed to load filters", e)
-      }
+      }).catch(console.error)
     }
-    loadFilters()
-  }, [])
+  }, [initialCategories.length, initialCompanies.length])
+
+  // Load models on-demand only when a company/brand is selected
+  useEffect(() => {
+    if (!company) {
+      setModels([])
+      setModel("")
+      return
+    }
+
+    setLoadingModels(true)
+    fetchModelsAction(company)
+      .then((res) => {
+        if (res.data) setModels(res.data)
+      })
+      .catch(console.error)
+      .finally(() => setLoadingModels(false))
+  }, [company])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -110,9 +129,9 @@ export function AdvancedSearchBar() {
           <Select
             value={model}
             onChange={(e) => setModel(e.target.value)}
-            disabled={!company}
-            options={[{ label: "All Models", value: "" }, ...availableModels.map(m => ({ label: m.name, value: m.slug }))]}
-            placeholder="All Models"
+            disabled={!company || loadingModels}
+            options={[{ label: loadingModels ? "Loading models..." : "All Models", value: "" }, ...availableModels.map(m => ({ label: m.name, value: m.slug }))]}
+            placeholder={loadingModels ? "Loading models..." : "All Models"}
           />
         </div>
       </form>

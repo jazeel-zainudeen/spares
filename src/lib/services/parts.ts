@@ -1,11 +1,12 @@
 import { createClient } from '../supabase/server'
+import { getPublicClient } from '../supabase/public'
 import { Database } from '@/types/database'
 
 export type PartRow = Database['public']['Tables']['parts']['Row']
 export type PartInsert = Database['public']['Tables']['parts']['Insert']
 export type PartUpdate = Database['public']['Tables']['parts']['Update']
 
-export async function getParts(modelId?: string) {
+export async function getParts(modelId?: string, limit: number = 100) {
   const supabase = await createClient()
   let query = supabase.from('parts').select('*, categories(name, slug), car_models(name, car_companies(name))')
   
@@ -13,7 +14,13 @@ export async function getParts(modelId?: string) {
     query = query.eq('model_id', modelId)
   }
 
-  const { data, error } = await query.order('created_at', { ascending: false })
+  query = query.order('created_at', { ascending: false })
+
+  if (limit > 0) {
+    query = query.limit(limit)
+  }
+
+  const { data, error } = await query
 
   if (error) throw new Error(error.message)
   return data as any
@@ -27,7 +34,7 @@ export async function getPublicParts(options?: {
   page?: number
   pageSize?: number
 }) {
-  const supabase = await createClient()
+  const supabase = getPublicClient()
   const page = options?.page && options.page > 0 ? options.page : 1
   const pageSize = options?.pageSize && options.pageSize > 0 ? options.pageSize : undefined
 
@@ -76,7 +83,7 @@ export async function getPublicParts(options?: {
 }
 
 export async function getPartById(id: string) {
-  const supabase = await createClient()
+  const supabase = getPublicClient()
   const { data, error } = await supabase
     .from('parts')
     .select('*, categories(name, slug), car_models(name, slug, car_companies(name, slug))')
