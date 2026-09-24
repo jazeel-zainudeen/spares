@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
+import { Button } from "@/components/ui/Button"
 
 export function SearchBar({ initialValue = "" }: { initialValue?: string }) {
   const [query, setQuery] = useState(initialValue)
@@ -11,30 +12,31 @@ export function SearchBar({ initialValue = "" }: { initialValue?: string }) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
-      router.push(`/parts?search=${encodeURIComponent(query)}`)
+      router.push(`/spare-parts?search=${encodeURIComponent(query.trim())}`)
     } else {
-      router.push(`/parts`)
+      router.push(`/spare-parts`)
     }
   }
 
   return (
-    <form onSubmit={handleSearch} className="w-full max-w-2xl mx-auto p-2 glass rounded-2xl flex items-center gap-2 transition-shadow focus-within:ring-2 focus-within:ring-primary/50">
-      <div className="flex-1 flex items-center px-4 gap-3 text-muted-foreground">
-        <Search className="h-5 w-5" />
-        <input 
-          type="text" 
-          placeholder="Search by part number, name, or vehicle..." 
-          className="bg-transparent border-none outline-none w-full text-foreground placeholder:text-muted-foreground/60 h-10"
+    <form onSubmit={handleSearch} className="w-full flex items-center gap-2 rounded-xl border border-border bg-card p-1.5 shadow-xs transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
+      <div className="flex-1 flex items-center px-3 gap-2.5 text-muted-foreground">
+        <Search className="h-4 w-4 shrink-0" />
+        <input
+          type="text"
+          placeholder="Search by part number, name, or vehicle..."
+          className="bg-transparent border-none outline-hidden w-full text-foreground placeholder:text-muted-foreground text-sm h-9"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
-      <button 
+      <Button
         type="submit"
-        className="bg-primary text-primary-foreground px-6 py-2 rounded-xl font-medium hover:bg-primary/90 transition-colors"
+        size="sm"
+        className="h-9 px-4 font-medium"
       >
         Search
-      </button>
+      </Button>
     </form>
   )
 }
