@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
     ],
   },
   turbopack: {},
+  allowedDevOrigins: ['192.168.18.201'],
 };
 
 export default withPWA(nextConfig);

@@ -11,24 +11,26 @@ export default async function ModelCatalogPage({
   params,
   searchParams,
 }: {
-  params: { category: string, company: string, model: string }
-  searchParams: { search?: string }
+  params: Promise<{ category: string, company: string, model: string }>
+  searchParams: Promise<{ search?: string }>
 }) {
-  const search = searchParams.search || ""
-  const parts = await getPublicParts({ search, categorySlug: params.category, companySlug: params.company, modelSlug: params.model })
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const search = resolvedSearchParams?.search || ""
+  const parts = await getPublicParts({ search, categorySlug: resolvedParams.category, companySlug: resolvedParams.company, modelSlug: resolvedParams.model })
   
   const { data: categories = [] } = await fetchCategoriesAction()
-  const currentCategory = categories.find(c => c.slug === params.category)
+  const currentCategory = categories.find(c => c.slug === resolvedParams.category)
 
   const { data: companies = [] } = await fetchCompaniesAction()
-  const currentCompany = companies.find(c => c.slug === params.company)
+  const currentCompany = companies.find(c => c.slug === resolvedParams.company)
   
   if (!currentCategory || !currentCompany) {
     notFound()
   }
 
   const models = await getModels(currentCompany.id)
-  const currentModel = models.find((m: any) => m.slug === params.model)
+  const currentModel = models.find((m: any) => m.slug === resolvedParams.model)
 
   if (!currentModel) {
     notFound()
@@ -37,7 +39,7 @@ export default async function ModelCatalogPage({
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 space-y-6">
-        <Link href={`/spare-parts/${params.category}/${params.company}`} className="inline-flex items-center text-muted-foreground hover:text-primary text-sm font-medium transition-colors">
+        <Link href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}`} className="inline-flex items-center text-muted-foreground hover:text-primary text-sm font-medium transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to {currentCompany.name} {currentCategory.name}
         </Link>
@@ -53,21 +55,21 @@ export default async function ModelCatalogPage({
             <h2 className="font-bold text-lg mb-4">{currentCompany.name} Models</h2>
             <ul className="space-y-2">
               <li className="text-muted-foreground hover:text-primary transition-colors flex items-center justify-between">
-                <Link href={`/spare-parts/${params.category}/${params.company}`}>All {currentCompany.name} Models</Link>
+                <Link href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}`}>All {currentCompany.name} Models</Link>
                 <ChevronRight className="h-4 w-4 opacity-50" />
               </li>
               {models.map((model: any) => (
                 <li key={model.id}>
                   <Link 
-                    href={`/spare-parts/${params.category}/${params.company}/${model.slug}`}
+                    href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${model.slug}`}
                     className={`flex items-center justify-between transition-colors ${
-                      model.slug === params.model 
+                      model.slug === resolvedParams.model 
                         ? 'text-primary font-medium' 
                         : 'text-muted-foreground hover:text-primary'
                     }`}
                   >
                     {model.name}
-                    {model.slug === params.model && <ChevronRight className="h-4 w-4" />}
+                    {model.slug === resolvedParams.model && <ChevronRight className="h-4 w-4" />}
                   </Link>
                 </li>
               ))}
@@ -92,7 +94,7 @@ export default async function ModelCatalogPage({
               {parts.map((part: any) => (
                 <Link 
                   key={part.id} 
-                  href={`/spare-parts/${params.category}/${params.company}/${params.model}/${part.id}`}
+                  href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${resolvedParams.model}/${part.id}`}
                   className="glass rounded-2xl overflow-hidden group hover:ring-2 hover:ring-primary/50 transition-all"
                 >
                   <div className="aspect-square bg-white/5 relative flex items-center justify-center p-4">

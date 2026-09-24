@@ -5,9 +5,10 @@ import { Image as ImageIcon, ArrowLeft, CheckCircle2, Factory, Hash, FileText } 
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
 
-export async function generateMetadata({ params }: { params: { category: string, company: string, model: string, part: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ category: string, company: string, model: string, part: string }> }): Promise<Metadata> {
   try {
-    const part: any = await getPartById(params.part)
+    const resolvedParams = await params
+    const part: any = await getPartById(resolvedParams.part)
     return {
       title: `${part.item} - ${part.car_models.car_companies.name} ${part.car_models.name} ${part.categories?.name || ''} Parts`,
       description: part.description || `Buy ${part.item} for ${part.car_models.car_companies.name} ${part.car_models.name}. Reference: ${part.ref_number}`,
@@ -23,12 +24,13 @@ export async function generateMetadata({ params }: { params: { category: string,
 export default async function PartDetailPage({
   params,
 }: {
-  params: { category: string, company: string, model: string, part: string }
+  params: Promise<{ category: string, company: string, model: string, part: string }>
 }) {
   try {
-    const part: any = await getPartById(params.part)
+    const resolvedParams = await params
+    const part: any = await getPartById(resolvedParams.part)
     
-    if (part.car_models.slug !== params.model || part.car_models.car_companies.slug !== params.company || part.categories?.slug !== params.category) {
+    if (part.car_models.slug !== resolvedParams.model || part.car_models.car_companies.slug !== resolvedParams.company || part.categories?.slug !== resolvedParams.category) {
       notFound()
     }
 
@@ -38,16 +40,16 @@ export default async function PartDetailPage({
           <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
             <Link href="/spare-parts" className="hover:text-primary transition-colors">Catalog</Link>
             <span>/</span>
-            <Link href={`/spare-parts/${params.category}`} className="hover:text-primary transition-colors">{part.categories?.name || 'Category'}</Link>
+            <Link href={`/spare-parts/${resolvedParams.category}`} className="hover:text-primary transition-colors">{part.categories?.name || 'Category'}</Link>
             <span>/</span>
-            <Link href={`/spare-parts/${params.category}/${params.company}`} className="hover:text-primary transition-colors">{part.car_models.car_companies.name}</Link>
+            <Link href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}`} className="hover:text-primary transition-colors">{part.car_models.car_companies.name}</Link>
             <span>/</span>
-            <Link href={`/spare-parts/${params.category}/${params.company}/${params.model}`} className="hover:text-primary transition-colors">{part.car_models.name}</Link>
+            <Link href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${resolvedParams.model}`} className="hover:text-primary transition-colors">{part.car_models.name}</Link>
             <span>/</span>
             <span className="text-foreground font-medium">{part.item}</span>
           </div>
           
-          <Link href={`/spare-parts/${params.category}/${params.company}/${params.model}`} className="inline-flex items-center text-muted-foreground hover:text-primary text-sm font-medium transition-colors">
+          <Link href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${resolvedParams.model}`} className="inline-flex items-center text-muted-foreground hover:text-primary text-sm font-medium transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to {part.car_models.name} Parts
           </Link>

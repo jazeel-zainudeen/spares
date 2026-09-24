@@ -10,22 +10,24 @@ export default async function CompanyCatalogPage({
   params,
   searchParams,
 }: {
-  params: { category: string, company: string }
-  searchParams: { search?: string }
+  params: Promise<{ category: string, company: string }>
+  searchParams: Promise<{ search?: string }>
 }) {
-  const search = searchParams.search || ""
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const search = resolvedSearchParams?.search || ""
   
   const { data: categories = [] } = await fetchCategoriesAction()
-  const currentCategory = categories.find(c => c.slug === params.category)
+  const currentCategory = categories.find(c => c.slug === resolvedParams.category)
 
   const { data: companies = [] } = await fetchCompaniesAction()
-  const currentCompany = companies.find(c => c.slug === params.company)
+  const currentCompany = companies.find(c => c.slug === resolvedParams.company)
 
   if (!currentCategory || !currentCompany) {
     notFound()
   }
 
-  const parts = await getPublicParts({ search, categorySlug: params.category, companySlug: params.company })
+  const parts = await getPublicParts({ search, categorySlug: resolvedParams.category, companySlug: resolvedParams.company })
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -47,21 +49,21 @@ export default async function CompanyCatalogPage({
             <h2 className="font-bold text-lg mb-4">Browse by Company</h2>
             <ul className="space-y-2">
               <li className="text-muted-foreground hover:text-primary transition-colors flex items-center justify-between">
-                <Link href={`/spare-parts/${params.category}`}>All Companies</Link>
+                <Link href={`/spare-parts/${resolvedParams.category}`}>All Companies</Link>
                 <ChevronRight className="h-4 w-4 opacity-50" />
               </li>
               {companies.map((company: any) => (
                 <li key={company.id}>
                   <Link 
-                    href={`/spare-parts/${params.category}/${company.slug}`}
+                    href={`/spare-parts/${resolvedParams.category}/${company.slug}`}
                     className={`flex items-center justify-between transition-colors ${
-                      company.slug === params.company 
+                      company.slug === resolvedParams.company 
                         ? 'text-primary font-medium' 
                         : 'text-muted-foreground hover:text-primary'
                     }`}
                   >
                     {company.name}
-                    {company.slug === params.company && <ChevronRight className="h-4 w-4" />}
+                    {company.slug === resolvedParams.company && <ChevronRight className="h-4 w-4" />}
                   </Link>
                 </li>
               ))}
@@ -86,7 +88,7 @@ export default async function CompanyCatalogPage({
               {parts.map((part: any) => (
                 <Link 
                   key={part.id} 
-                  href={`/spare-parts/${params.category}/${params.company}/${part.car_models.slug}/${part.id}`}
+                  href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${part.car_models.slug}/${part.id}`}
                   className="glass rounded-2xl overflow-hidden group hover:ring-2 hover:ring-primary/50 transition-all"
                 >
                   <div className="aspect-square bg-white/5 relative flex items-center justify-center p-4">

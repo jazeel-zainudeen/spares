@@ -1,39 +1,37 @@
 import Link from "next/link";
 import { Wrench } from "lucide-react";
 import { AdvancedSearchBar } from "@/components/public/AdvancedSearchBar";
-import { Flex, Box, Heading, Text, Container } from "@radix-ui/themes";
 
 export default function Home() {
   return (
-    <Flex direction="column" position="relative" style={{ minHeight: '100dvh' }}>
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
       {/* Top right Admin Link */}
-      <Box position="absolute" style={{ top: '1rem', right: '1rem', zIndex: 10 }}>
-        <Link 
-          href="/admin" 
-          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
+      <div className="absolute top-4 right-4 z-10">
+        <Link
+          href="/admin"
+          className="rounded-md border border-border bg-card/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-xs backdrop-blur-xs transition-colors hover:bg-accent hover:text-foreground"
         >
-          Admin
+          Admin Portal
         </Link>
-      </Box>
+      </div>
 
       {/* Centered Main Content */}
-      <Flex direction="column" align="center" justify="center" p="4" style={{ flex: 1, marginTop: '-5rem' }}>
-        <Flex direction="column" align="center" mb="7" style={{ textAlign: 'center' }}>
-          <Box p="4" mb="6" style={{ backgroundColor: 'var(--accent-a3)', borderRadius: 'var(--radius-6)' }}>
-            <Wrench className="h-12 w-12" style={{ color: 'var(--accent-11)' }} />
-          </Box>
-          <Heading size="9" mb="2" weight="bold" style={{ letterSpacing: '-0.02em' }}>
-            AutoParts<span style={{ color: 'var(--accent-11)' }}>Pro</span>
-          </Heading>
-          <Text size="5" color="gray">
-            Find exactly what you need.
-          </Text>
-        </Flex>
+      <div className="flex w-full max-w-2xl flex-col items-center text-center">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 shadow-xs ring-1 ring-primary/20">
+          <Wrench className="h-8 w-8 text-primary" />
+        </div>
 
-        <Container size="3">
+        <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          AutoParts<span className="text-primary">Pro</span>
+        </h1>
+        <p className="mb-8 text-sm text-muted-foreground sm:text-base">
+          Precision auto parts lookup by vehicle model, manufacturer, and catalog reference.
+        </p>
+
+        <div className="w-full">
           <AdvancedSearchBar />
-        </Container>
-      </Flex>
-    </Flex>
+        </div>
+      </div>
+    </div>
   );
 }

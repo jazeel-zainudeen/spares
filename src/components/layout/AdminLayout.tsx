@@ -87,7 +87,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </form>
         </div>
 
-        <main className="flex-1 w-full flex-grow">
+        <main className="flex-1 w-full grow">
           {/* We ensure div occupies top of main by not using justify-center */}
           <div className="p-4 sm:p-6 lg:p-8 mx-auto max-w-7xl w-full h-full flex flex-col justify-start items-stretch">
             {children}

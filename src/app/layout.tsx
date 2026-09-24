@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import "@radix-ui/themes/styles.css";
 import "./globals.css";
-import { Theme } from "@radix-ui/themes";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -10,13 +8,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Spare Parts Catalog",
-  description: "Premium spare parts management system",
+  title: "AutoParts Pro | Spare Parts Catalog",
+  description: "Find automotive spare parts and reference numbers quickly and reliably",
   manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#64748b",
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({
@@ -27,11 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col selection:bg-primary selection:text-primary-foreground">
-        <Theme accentColor="blue" grayColor="slate" radius="large" scaling="100%">
-          <main className="flex-1 flex flex-col">
-            {children}
-          </main>
-        </Theme>
+        <main className="flex-1 flex flex-col">
+          {children}
+        </main>
       </body>
     </html>
   );

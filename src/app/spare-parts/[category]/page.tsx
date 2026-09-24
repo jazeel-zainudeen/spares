@@ -10,19 +10,21 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: {
-  params: { category: string }
-  searchParams: { search?: string }
+  params: Promise<{ category: string }>
+  searchParams: Promise<{ search?: string }>
 }) {
-  const search = searchParams.search || ""
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const search = resolvedSearchParams?.search || ""
   
   const { data: categories = [] } = await fetchCategoriesAction()
-  const currentCategory = categories.find(c => c.slug === params.category)
+  const currentCategory = categories.find(c => c.slug === resolvedParams.category)
   
   if (!currentCategory) {
     notFound()
   }
 
-  const parts = await getPublicParts({ search, categorySlug: params.category })
+  const parts = await getPublicParts({ search, categorySlug: resolvedParams.category })
   const { data: companies = [] } = await fetchCompaniesAction()
 
   return (
@@ -54,11 +56,11 @@ export default async function CategoryPage({
                   <Link 
                     href={`/spare-parts/${category.slug}`}
                     className={`transition-colors flex items-center justify-between ${
-                      category.slug === params.category ? 'text-primary font-medium' : 'text-muted-foreground hover:text-primary'
+                      category.slug === resolvedParams.category ? 'text-primary font-medium' : 'text-muted-foreground hover:text-primary'
                     }`}
                   >
                     {category.name}
-                    {category.slug === params.category && <ChevronRight className="h-4 w-4" />}
+                    {category.slug === resolvedParams.category && <ChevronRight className="h-4 w-4" />}
                   </Link>
                 </li>
               ))}
@@ -104,7 +106,7 @@ export default async function CategoryPage({
                       <div className="text-xs text-secondary font-medium tracking-wide uppercase">
                         {part.car_models.car_companies.name} • {part.car_models.name}
                       </div>
-                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground bg-slate-800/80 border border-slate-700 px-2 py-1 rounded-full truncate max-w-[100px]">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground bg-slate-800/80 border border-slate-700 px-2 py-1 rounded-full truncate max-w-25">
                         {part.categories?.name || 'Uncategorized'}
                       </div>
                     </div>

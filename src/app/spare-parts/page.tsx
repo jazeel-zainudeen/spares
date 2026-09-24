@@ -8,9 +8,10 @@ import { Image as ImageIcon, ChevronRight } from "lucide-react"
 export default async function CatalogPage({
   searchParams,
 }: {
-  searchParams: { search?: string }
+  searchParams: Promise<{ search?: string }>
 }) {
-  const search = searchParams.search || ""
+  const resolvedParams = await searchParams
+  const search = resolvedParams?.search || ""
   const parts = await getPublicParts({ search })
   const { data: companies = [] } = await fetchCompaniesAction()
   const { data: categories = [] } = await fetchCategoriesAction()
@@ -80,7 +81,7 @@ export default async function CatalogPage({
                       <div className="text-xs text-primary font-medium">
                         {part.car_models.car_companies.name} • {part.car_models.name}
                       </div>
-                      <div className="text-xs text-muted-foreground bg-white/5 px-2 py-1 rounded-full truncate max-w-[100px]">
+                      <div className="text-xs text-muted-foreground bg-white/5 px-2 py-1 rounded-full truncate max-w-25">
                         {part.categories?.name || 'Uncategorized'}
                       </div>
                     </div>

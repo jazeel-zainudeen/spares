@@ -5,25 +5,24 @@ import { CategoryRow } from "@/lib/services/categories"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
 import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { CategoryFormModal } from "./CategoryFormModal"
 import { DeleteCategoryModal } from "./DeleteCategoryModal"
 import { createCategoryAction, updateCategoryAction, deleteCategoryAction } from "@/app/actions/categories"
 
-import { Flex, Box, Heading, Text, Card, TextField } from "@radix-ui/themes"
-
 export function CategoryList({ initialCategories }: { initialCategories: CategoryRow[] }) {
   const [categories, setCategories] = useState<CategoryRow[]>(initialCategories)
   const [search, setSearch] = useState("")
-  
+
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<CategoryRow | null>(null)
   const [deletingCategory, setDeletingCategory] = useState<CategoryRow | null>(null)
 
-  const filteredCategories = categories.filter(c => 
-    c.name.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredCategories = categories.filter(c =>
+    c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.slug.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -61,80 +60,98 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
   }
 
   return (
-    <Flex direction="column" gap="6">
-      <Flex direction={{ initial: 'column', sm: 'row' }} align={{ sm: 'center' }} justify="between" gap="4">
-        <Heading size="8" style={{ letterSpacing: '-0.02em' }}>Categories</Heading>
-        <Button onClick={handleAdd}>
-          <Plus className="h-4 w-4 mr-2" />
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Categories</h1>
+          <p className="text-sm text-muted-foreground">Manage spare part categories and visual assets</p>
+        </div>
+        <Button onClick={handleAdd} className="gap-2">
+          <Plus className="h-4 w-4" />
           Add Category
         </Button>
-      </Flex>
+      </div>
 
-      <Card size="3" variant="surface">
-        <Box mb="5">
-          <TextField.Root 
-            placeholder="Search categories..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            size="2"
-            style={{ maxWidth: '300px' }}
-          >
-            <TextField.Slot>
-              <Search height="16" width="16" color="var(--gray-a10)" />
-            </TextField.Slot>
-          </TextField.Root>
-        </Box>
-
-        {filteredCategories.length === 0 ? (
-          <Box py="8" style={{ textAlign: 'center' }}>
-            <Text color="gray">
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>All Categories</CardTitle>
+              <CardDescription>Total {categories.length} categories available</CardDescription>
+            </div>
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search categories..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {filteredCategories.length === 0 ? (
+            <div className="py-12 text-center text-sm text-muted-foreground">
               {search ? "No categories found matching your search." : "No categories added yet."}
-            </Text>
-          </Box>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Image</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCategories.map(category => (
-                <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{category.slug}</TableCell>
-                  <TableCell>
-                    {category.image_url ? (
-                      <Box style={{ height: '32px', width: '64px', backgroundColor: 'var(--gray-a3)', borderRadius: 'var(--radius-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                        <img src={category.image_url} alt={category.name} style={{ height: '100%', objectFit: 'contain' }} />
-                      </Box>
-                    ) : (
-                      <Text size="1" color="gray">No image</Text>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Flex justify="end" gap="2">
-                      <Button variant="ghost" size="icon-sm" color="gray" onClick={() => handleEdit(category)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon-sm" color="red" onClick={() => handleDelete(category)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </Flex>
-                  </TableCell>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Slug</TableHead>
+                  <TableHead>Image</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+              </TableHeader>
+              <TableBody>
+                {filteredCategories.map(category => (
+                  <TableRow key={category.id}>
+                    <TableCell className="font-medium">{category.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{category.slug}</TableCell>
+                    <TableCell>
+                      {category.image_url ? (
+                        <div className="flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={category.image_url} alt={category.name} className="h-full object-contain" />
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No image</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => handleEdit(category)}
+                          aria-label="Edit category"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => handleDelete(category)}
+                          aria-label="Delete category"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
       </Card>
 
-      <CategoryFormModal 
-        isOpen={isFormOpen} 
-        onClose={() => setIsFormOpen(false)} 
+      <CategoryFormModal
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
         onSave={onSaveCategory}
         initialData={editingCategory}
       />
@@ -145,6 +162,6 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
         onConfirm={onConfirmDelete}
         category={deletingCategory}
       />
-    </Flex>
+    </div>
   )
 }
