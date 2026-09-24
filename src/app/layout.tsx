@@ -23,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col selection:bg-primary selection:text-primary-foreground">
+    <html lang="en" className={`${inter.variable} ${inter.className} h-full antialiased`}>
+      <body className={`${inter.className} min-h-full font-sans flex flex-col selection:bg-primary selection:text-primary-foreground`}>
         <main className="flex-1 flex flex-col">
           {children}
         </main>

@@ -139,26 +139,27 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
           ) : (
             <>
               {/* Mobile View: Cards */}
-              <div className="grid grid-cols-1 gap-3 sm:hidden">
+              <div className="grid grid-cols-1 gap-2.5 sm:hidden">
                 {paginatedModels.map(model => (
                   <div
                     key={model.id}
-                    className="flex items-center justify-between rounded-xl border border-border bg-card p-3.5 shadow-2xs"
+                    className="flex items-center justify-between rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/30 text-primary">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-primary/10 text-primary">
                         <Car className="h-5 w-5" />
                       </div>
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{model.name}</div>
-                        <div className="text-xs text-primary font-medium truncate">{model.car_companies?.name || "Unknown"}</div>
-                        <div className="text-[11px] text-muted-foreground font-mono">{model.slug}</div>
+                        <div className="text-xs text-primary font-medium truncate mt-0.5">{model.car_companies?.name || "Unknown"}</div>
+                        <div className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">{model.slug}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
                       <Button
                         variant="ghost"
                         size="icon-sm"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         onClick={() => handleEdit(model)}
                         aria-label="Edit model"
                       >
@@ -167,7 +168,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
                         onClick={() => handleDelete(model)}
                         aria-label="Delete model"
                       >

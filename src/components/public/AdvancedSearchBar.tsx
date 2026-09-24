@@ -69,22 +69,22 @@ export function AdvancedSearchBar() {
     <div className="w-full space-y-3">
       <form onSubmit={handleSearch} className="flex flex-col gap-3">
         {/* Main Search Input */}
-        <div className="flex w-full items-center gap-2 rounded-xl border border-border bg-card p-1.5 shadow-sm">
+        <div className="flex w-full items-center gap-2 rounded-2xl border border-border/80 bg-card p-1.5 shadow-sm transition-all focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
             <input
               type="text"
-              placeholder="Search by part number, name, or description..."
-              className="h-11 w-full rounded-lg bg-transparent pl-11 pr-3 text-sm text-foreground outline-hidden placeholder:text-muted-foreground"
+              placeholder="Search by part name, ref number, OEM code..."
+              className="h-11 w-full rounded-xl bg-transparent pl-10 pr-3 text-sm text-foreground outline-hidden placeholder:text-muted-foreground/70"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
           <Button
             type="submit"
-            className="h-11 px-6 font-medium shadow-xs"
+            className="h-11 px-6 font-semibold shadow-xs"
           >
-            Search
+            Search Parts
           </Button>
         </div>
 

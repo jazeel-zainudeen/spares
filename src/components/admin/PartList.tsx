@@ -181,34 +181,36 @@ export function PartList({ initialParts, categories, companies, models }: { init
                 {paginatedParts.map(part => (
                   <div
                     key={part.id}
-                    className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3.5 shadow-2xs"
+                    className="flex flex-col gap-2.5 rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-start justify-between gap-2.5">
+                      <div className="flex items-start gap-3 min-w-0">
                         {part.image_url ? (
-                          <div className="flex h-12 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/40">
+                          <div className="flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted/40 p-1">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" />
                           </div>
                         ) : (
-                          <div className="flex h-12 w-14 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/30">
-                            <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                          <div className="flex h-14 w-16 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/30">
+                            <ImageIcon className="h-5 w-5 text-muted-foreground/60" />
                           </div>
                         )}
-                        <div className="min-w-0">
-                          <div className="font-semibold text-sm text-foreground truncate">{part.item}</div>
-                          <div className="text-xs text-primary font-medium">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-sm text-foreground line-clamp-1">{part.item}</div>
+                          <div className="text-xs text-primary font-medium truncate mt-0.5">
                             {part.car_models?.car_companies?.name} {part.car_models?.name}
                           </div>
-                          <div className="text-[11px] text-muted-foreground">
+                          <div className="text-[11px] text-muted-foreground mt-0.5">
                             {part.categories?.name || "Uncategorized"}
                           </div>
                         </div>
                       </div>
+
                       <div className="flex items-center gap-1 shrink-0">
                         <Button
                           variant="ghost"
                           size="icon-sm"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           onClick={() => handleEdit(part)}
                           aria-label="Edit part"
                         >
@@ -217,7 +219,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                         <Button
                           variant="ghost"
                           size="icon-sm"
-                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
                           onClick={() => handleDelete(part)}
                           aria-label="Delete part"
                         >
@@ -226,10 +228,14 @@ export function PartList({ initialParts, categories, companies, models }: { init
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/60 text-xs font-mono text-muted-foreground">
-                      <span className="rounded-sm bg-muted px-2 py-0.5">REF: {part.ref_number}</span>
+                    <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border/60 text-[11px] font-mono text-muted-foreground">
+                      <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
+                        REF: {part.ref_number}
+                      </span>
                       {part.oem_number && (
-                        <span className="rounded-sm bg-muted px-2 py-0.5">OEM: {part.oem_number}</span>
+                        <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
+                          OEM: {part.oem_number}
+                        </span>
                       )}
                     </div>
                   </div>

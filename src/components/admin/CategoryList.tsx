@@ -114,32 +114,33 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
           ) : (
             <>
               {/* Mobile View: Cards */}
-              <div className="grid grid-cols-1 gap-3 sm:hidden">
+              <div className="grid grid-cols-1 gap-2.5 sm:hidden">
                 {paginatedCategories.map(category => (
                   <div
                     key={category.id}
-                    className="flex items-center justify-between rounded-xl border border-border bg-card p-3.5 shadow-2xs"
+                    className="flex items-center justify-between rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       {category.image_url ? (
-                        <div className="flex h-12 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/40">
+                        <div className="flex h-12 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted/40 p-1">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={category.image_url} alt={category.name} className="h-full w-full object-contain" />
                         </div>
                       ) : (
-                        <div className="flex h-12 w-14 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/30 text-xs text-muted-foreground">
+                        <div className="flex h-12 w-14 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/30 text-xs text-muted-foreground/60 font-medium">
                           No img
                         </div>
                       )}
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{category.name}</div>
-                        <div className="text-xs text-muted-foreground font-mono truncate">{category.slug}</div>
+                        <div className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">{category.slug}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
                       <Button
                         variant="ghost"
                         size="icon-sm"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         onClick={() => handleEdit(category)}
                         aria-label="Edit category"
                       >
@@ -148,7 +149,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
                         onClick={() => handleDelete(category)}
                         aria-label="Delete category"
                       >

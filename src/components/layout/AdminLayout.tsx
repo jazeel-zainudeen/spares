@@ -12,6 +12,7 @@ import {
   Tags
 } from "lucide-react"
 import { logout } from "@/app/actions/auth"
+import { cn } from "@/lib/utils"
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
@@ -69,54 +70,62 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main content area */}
-      <div className="lg:pl-72 flex-1 flex flex-col min-h-screen w-full pb-16 lg:pb-0">
+      <div className="lg:pl-72 flex-1 flex flex-col min-h-screen w-full pb-20 lg:pb-0">
         
-        {/* Top header for mobile - minimal logo */}
-        <div className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-border/60 bg-card/95 backdrop-blur-md px-4 shadow-sm lg:hidden">
-          <Link href="/" className="flex items-center space-x-2">
-            <Wrench className="h-5 w-5 text-primary" />
-            <span className="font-bold text-lg tracking-tight">AutoParts<span className="text-primary">Admin</span></span>
+        {/* Top header for mobile - sticky with blur */}
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/80 bg-card/85 backdrop-blur-md px-4 shadow-2xs lg:hidden">
+          <Link href="/" className="flex items-center space-x-2 transition-opacity hover:opacity-80">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-2xs">
+              <Wrench className="h-4 w-4" />
+            </div>
+            <span className="font-bold text-base tracking-tight text-foreground">AutoParts<span className="text-primary">Admin</span></span>
           </Link>
           <form action={logout}>
             <button
               type="submit"
-              className="p-2 text-muted-foreground hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+              title="Logout"
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-4 w-4" />
             </button>
           </form>
-        </div>
+        </header>
 
         <main className="flex-1 w-full grow">
-          {/* We ensure div occupies top of main by not using justify-center */}
-          <div className="p-4 sm:p-6 lg:p-8 mx-auto max-w-7xl w-full h-full flex flex-col justify-start items-stretch">
+          <div className="p-3.5 sm:p-6 lg:p-8 mx-auto max-w-7xl w-full h-full flex flex-col justify-start items-stretch">
             {children}
           </div>
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation (App-like) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/60 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe">
-        <nav className="flex items-center justify-around h-16 px-2">
+      {/* Mobile Bottom Navigation (App-like sleek pill style) */}
+      <nav aria-label="Mobile navigation" className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-t border-border/80 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="flex items-center justify-around h-15 px-2">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
+                className={cn(
+                  "flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 relative",
                   isActive 
-                    ? 'text-primary' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                    ? "text-primary font-semibold" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className="text-[10px] font-medium leading-none">{item.name}</span>
+                <div className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
+                  isActive && "bg-primary/10 text-primary"
+                )}>
+                  <item.icon className="h-4 w-4" />
+                </div>
+                <span className="text-[10px] tracking-tight leading-none mt-0.5">{item.name}</span>
               </Link>
             )
           })}
-        </nav>
-      </div>
+        </div>
+      </nav>
     </div>
   )
 }
