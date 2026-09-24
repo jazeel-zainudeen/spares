@@ -188,7 +188,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                         {part.image_url ? (
                           <div className="flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted/40 p-1">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" />
+                            <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
                           </div>
                         ) : (
                           <div className="flex h-14 w-16 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/30">
@@ -263,7 +263,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                           {part.image_url ? (
                             <div className="flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" />
+                              <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
                             </div>
                           ) : (
                             <div className="flex h-10 w-12 items-center justify-center rounded-md border border-border bg-muted/30">

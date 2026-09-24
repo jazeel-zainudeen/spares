@@ -89,15 +89,41 @@ export function CloudinaryUpload({ value, publicId, onChange, onRemove, folder }
       {error && <p className="mb-2 text-xs font-medium text-destructive">{error}</p>}
 
       {value ? (
-        <div className="group relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-muted/40">
-          <div className="flex h-full items-center justify-center">
+        <div className="group relative w-full overflow-hidden rounded-lg border border-border bg-muted/40">
+          <div className="relative aspect-video w-full flex items-center justify-center p-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={value} alt="Upload preview" className="max-h-full object-contain" />
+            <img src={value} alt="Upload preview" className="max-h-full object-contain" loading="lazy" decoding="async" />
+
+            {/* Desktop hover overlay */}
+            <div className="hidden sm:flex absolute inset-0 items-center justify-center gap-3 bg-black/60 opacity-0 backdrop-blur-xs transition-opacity group-hover:opacity-100">
+              <label className="cursor-pointer">
+                <Button asChild size="sm" variant="secondary" disabled={isUploading}>
+                  <span>Replace</span>
+                </Button>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                />
+              </label>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleRemove}
+                disabled={isUploading}
+              >
+                Remove
+              </Button>
+            </div>
           </div>
-          <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/60 opacity-0 backdrop-blur-xs transition-opacity group-hover:opacity-100">
-            <label className="cursor-pointer">
-              <Button asChild size="sm" variant="secondary" disabled={isUploading}>
-                <span>Replace</span>
+
+          {/* Mobile action bar (always visible below image preview on mobile) */}
+          <div className="flex sm:hidden items-center justify-between gap-2 border-t border-border/60 bg-card p-2.5">
+            <label className="cursor-pointer flex-1">
+              <Button asChild size="sm" variant="secondary" className="w-full" disabled={isUploading}>
+                <span>Replace Image</span>
               </Button>
               <input
                 type="file"
@@ -110,12 +136,14 @@ export function CloudinaryUpload({ value, publicId, onChange, onRemove, folder }
             <Button
               variant="destructive"
               size="sm"
+              className="flex-1"
               onClick={handleRemove}
               disabled={isUploading}
             >
               Remove
             </Button>
           </div>
+
           {isUploading && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-xs">
               <Loader2 className="h-7 w-7 animate-spin text-primary" />

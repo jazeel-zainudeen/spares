@@ -4,6 +4,8 @@ import { ArrowRight, Settings2, Database, Factory, Tags } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 
+export const revalidate = 60
+
 export default async function AdminDashboard() {
   const supabase = await createClient()
 
@@ -104,7 +106,7 @@ export default async function AdminDashboard() {
                     {part.image_url ? (
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" />
+                        <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
                       </div>
                     ) : (
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border bg-muted/30">
