@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Wrench, ArrowLeft, ShieldCheck, Search, Layers, Building2, Car } from "lucide-react";
 
-export default function SparePartsLayout({
+export default function CatalogLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -162,4 +162,3 @@ export default function SparePartsLayout({
     </div>
   );
 }
-

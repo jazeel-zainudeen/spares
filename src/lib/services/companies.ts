@@ -64,3 +64,34 @@ export async function deleteCompany(id: string) {
 
   if (error) throw new Error(error.message)
 }
+
+export async function getCompaniesWithStats() {
+  const supabase = await createClient()
+  const { data: companies, error } = await supabase
+    .from('car_companies')
+    .select('*, car_models(id)')
+    .order('name')
+
+  if (error) throw new Error(error.message)
+
+  // Get part counts per company via models
+  const result = (companies || []).map((company: any) => ({
+    ...company,
+    model_count: company.car_models?.length ?? 0,
+    car_models: undefined,
+  }))
+
+  return result
+}
+
+export async function getCompanyBySlug(slug: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('car_companies')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data as any
+}

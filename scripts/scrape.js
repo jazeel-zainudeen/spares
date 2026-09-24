@@ -174,29 +174,27 @@ async function scrape() {
     if (!catHtml) continue;
 
     const $cat = cheerio.load(catHtml);
-    let candidateLinks = [];
+    let directProductLinks = [];
+    let subcategoryLinks = [];
 
     $cat('a').each((i, el) => {
       const href = $cat(el).attr('href');
       if (href) {
         if (href.includes('/product/details/')) {
-          candidateLinks.push(href);
-        } else if (href.includes('/car/category/car_type/') && href !== category.url) {
-          candidateLinks.push(href);
+          directProductLinks.push(href);
+        } else if (href.startsWith(category.url + '/')) {
+          subcategoryLinks.push(href);
         }
       }
     });
 
-    candidateLinks = [...new Set(candidateLinks)];
-
-    // Separate direct product links and subcategory links
-    const directProductLinks = candidateLinks.filter(l => l.includes('/product/details/'));
-    const subcategoryLinks = candidateLinks.filter(l => !l.includes('/product/details/'));
+    directProductLinks = [...new Set(directProductLinks)];
+    subcategoryLinks = [...new Set(subcategoryLinks)];
 
     let allProductLinks = [...directProductLinks];
 
-    // If subcategories exist, crawl up to 4 subcategories to pick diverse products
-    for (const subLink of subcategoryLinks.slice(0, 4)) {
+    // If subcategories exist, crawl up to 6 subcategories to pick diverse products
+    for (const subLink of subcategoryLinks.slice(0, 6)) {
       if (allProductLinks.length >= MAX_PARTS_PER_CATEGORY * 2) break;
       const subHtml = await fetchHtml(subLink);
       if (!subHtml) continue;

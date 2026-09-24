@@ -2,11 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Car, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Building2,
+  Car,
+  Settings,
   LogOut,
   Wrench,
   Tags
@@ -43,11 +43,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
-                  isActive 
-                    ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20' 
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                }`}
+                className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${isActive
+                  ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
               >
                 <item.icon className={`mr-3 h-5 w-5 shrink-0 ${isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-foreground'}`} />
                 {item.name}
@@ -71,12 +70,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main content area */}
       <div className="lg:pl-72 flex-1 flex flex-col min-h-screen w-full pb-24 lg:pb-0">
-        
+
         {/* Mobile Top App Bar (iOS / Android Native Look) */}
         <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-background/80 backdrop-blur-xl px-4 lg:hidden">
           <div className="flex items-center gap-2.5">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform active:scale-95"
               title="Visit Storefront"
             >
@@ -119,7 +118,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Floating Island App Dock (Native Mobile App Experience) */}
-      <nav 
+      <nav
         aria-label="Mobile Navigation Dock"
         className="lg:hidden fixed bottom-3 inset-x-3 z-50 rounded-2xl border border-border/80 bg-card/90 backdrop-blur-xl shadow-xl shadow-black/10 px-2 py-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))]"
       >
@@ -132,8 +131,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={cn(
                   "flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all duration-200 active:scale-90",
-                  isActive 
-                    ? "text-primary" 
+                  isActive
+                    ? "text-primary"
                     : "text-muted-foreground/75 hover:text-foreground"
                 )}
               >

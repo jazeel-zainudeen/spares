@@ -67,3 +67,31 @@ export async function deleteModel(id: string) {
 
   if (error) throw new Error(error.message)
 }
+
+export async function getModelsWithCompany(companySlug?: string) {
+  const supabase = await createClient()
+  let query = supabase
+    .from('car_models')
+    .select('*, car_companies!inner(name, slug, logo_url)')
+
+  if (companySlug) {
+    query = query.eq('car_companies.slug', companySlug)
+  }
+
+  const { data, error } = await query.order('name')
+
+  if (error) throw new Error(error.message)
+  return data as any[]
+}
+
+export async function getModelBySlug(slug: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('car_models')
+    .select('*, car_companies(name, slug)')
+    .eq('slug', slug)
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data as any
+}

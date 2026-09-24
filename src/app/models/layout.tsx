@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Wrench, ArrowLeft, ShieldCheck, Search, Layers, Building2, Car } from "lucide-react";
 
-export default function SparePartsLayout({
+export default function ModelsLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -41,13 +41,13 @@ export default function SparePartsLayout({
             </Link>
             <Link
               href="/models"
-              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-lg hover:bg-muted/60"
+              className="text-xs font-semibold text-primary bg-primary/10 transition-colors px-2.5 py-1.5 rounded-lg"
             >
               Models
             </Link>
             <Link
               href="/spare-parts"
-              className="text-xs font-semibold text-primary bg-primary/10 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-muted/60"
             >
               <Search className="h-3.5 w-3.5" />
               <span>Catalog</span>
@@ -140,26 +140,25 @@ export default function SparePartsLayout({
 
           <Link
             href="/models"
-            className="flex flex-col items-center justify-center py-0.5 text-muted-foreground hover:text-foreground transition-all active:scale-95"
+            className="flex flex-col items-center justify-center py-0.5 text-primary font-semibold transition-all active:scale-95"
           >
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15 text-primary">
               <Car className="h-4 w-4" />
             </div>
-            <span className="text-[10px] font-medium leading-none mt-0.5">Models</span>
+            <span className="text-[10px] font-semibold leading-none mt-0.5">Models</span>
           </Link>
 
           <Link
             href="/spare-parts"
-            className="flex flex-col items-center justify-center py-0.5 text-primary font-semibold transition-all active:scale-95"
+            className="flex flex-col items-center justify-center py-0.5 text-muted-foreground hover:text-foreground transition-all active:scale-95"
           >
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15 text-primary">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg">
               <Search className="h-4 w-4" />
             </div>
-            <span className="text-[10px] font-semibold leading-none mt-0.5">Catalog</span>
+            <span className="text-[10px] font-medium leading-none mt-0.5">Catalog</span>
           </Link>
         </div>
       </nav>
     </div>
   );
 }
-
