@@ -8,12 +8,21 @@ export function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false)
 
   useEffect(() => {
+    // Clean up any legacy permanent localStorage dismiss flag
+    try {
+      localStorage.removeItem("pwa_install_dismissed")
+    } catch {}
+
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault()
       setDeferredPrompt(e)
-      // Check if user previously dismissed
-      const dismissed = localStorage.getItem("pwa_install_dismissed")
-      if (!dismissed) {
+      // Check if user dismissed for the current session
+      try {
+        const dismissed = sessionStorage.getItem("pwa_install_dismissed")
+        if (!dismissed) {
+          setShowPrompt(true)
+        }
+      } catch {
         setShowPrompt(true)
       }
     }
@@ -37,7 +46,9 @@ export function InstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false)
-    localStorage.setItem("pwa_install_dismissed", "true")
+    try {
+      sessionStorage.setItem("pwa_install_dismissed", "true")
+    } catch {}
   }
 
   if (!showPrompt) return null
