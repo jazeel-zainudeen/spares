@@ -145,8 +145,12 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                     className="flex items-center justify-between rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-primary/10 text-primary">
-                        <Car className="h-5 w-5" />
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-primary/10 text-primary overflow-hidden">
+                        {model.image_url ? (
+                          <img src={model.image_url} alt={model.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <Car className="h-5 w-5" />
+                        )}
                       </div>
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{model.name}</div>
@@ -182,7 +186,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Model Name</TableHead>
+                      <TableHead>Model</TableHead>
                       <TableHead>Company</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -190,7 +194,18 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                   <TableBody>
                     {paginatedModels.map(model => (
                       <TableRow key={model.id}>
-                        <TableCell className="font-medium">{model.name}</TableCell>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-primary/10 text-primary overflow-hidden">
+                              {model.image_url ? (
+                                <img src={model.image_url} alt={model.name} className="h-full w-full object-cover" />
+                              ) : (
+                                <Car className="h-4 w-4" />
+                              )}
+                            </div>
+                            <span className="font-semibold text-foreground">{model.name}</span>
+                          </div>
+                        </TableCell>
                         <TableCell>{model.car_companies?.name || "Unknown"}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">

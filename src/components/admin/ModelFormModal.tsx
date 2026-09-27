@@ -5,6 +5,7 @@ import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
+import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload"
 import type { ModelRow } from "@/lib/services/models"
 import type { CompanyRow } from "@/lib/services/companies"
 
@@ -19,6 +20,7 @@ interface ModelFormModalProps {
 export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies }: ModelFormModalProps) {
   const [name, setName] = useState("")
   const [companyId, setCompanyId] = useState("")
+  const [imageUrl, setImageUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -26,6 +28,7 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
     if (isOpen) {
       setName(initialData?.name || "")
       setCompanyId(initialData?.company_id || "")
+      setImageUrl(initialData?.image_url || "")
       setError("")
     }
   }, [isOpen, initialData])
@@ -40,7 +43,11 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
     setLoading(true)
     setError("")
     try {
-      await onSave({ name, company_id: companyId })
+      await onSave({
+        name,
+        company_id: companyId,
+        image_url: imageUrl || null
+      })
       onClose()
     } catch (err: any) {
       setError(err.message || "Something went wrong")
@@ -60,7 +67,7 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
         {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
         
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Company</label>
+          <label className="text-sm font-medium leading-none">Company *</label>
           <Select 
             options={[{ label: "Select a company...", value: "" }, ...companyOptions]}
             value={companyId}
@@ -70,12 +77,22 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Model Name</label>
+          <label className="text-sm font-medium leading-none">Model Name *</label>
           <Input 
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Corolla"
             disabled={loading}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium leading-none">Model Image</label>
+          <CloudinaryUpload
+            value={imageUrl}
+            folder="models/images"
+            onChange={(url) => setImageUrl(url)}
+            onRemove={() => setImageUrl("")}
           />
         </div>
 
