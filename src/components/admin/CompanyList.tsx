@@ -184,7 +184,12 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                           )}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground font-mono">
-                          {company.created_at ? new Date(company.created_at).toLocaleDateString() : "—"}
+                          {company.created_at
+                            ? new Date(company.created_at).toLocaleString(undefined, {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })
+                            : "—"}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">

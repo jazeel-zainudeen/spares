@@ -145,11 +145,13 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                     className="flex items-center justify-between rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-primary/10 text-primary overflow-hidden">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-primary overflow-hidden p-1">
                         {model.image_url ? (
                           <img src={model.image_url} alt={model.name} className="h-full w-full object-cover" />
+                        ) : model.car_companies?.logo_url ? (
+                          <img src={model.car_companies.logo_url} alt={model.name} className="h-full w-full object-contain" />
                         ) : (
-                          <Car className="h-5 w-5" />
+                          <Car className="h-5 w-5 text-primary" />
                         )}
                       </div>
                       <div className="min-w-0">
@@ -197,11 +199,13 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                       <TableRow key={model.id}>
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-primary/10 text-primary overflow-hidden">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-primary overflow-hidden p-1">
                               {model.image_url ? (
                                 <img src={model.image_url} alt={model.name} className="h-full w-full object-cover" />
+                              ) : model.car_companies?.logo_url ? (
+                                <img src={model.car_companies.logo_url} alt={model.name} className="h-full w-full object-contain" />
                               ) : (
-                                <Car className="h-4 w-4" />
+                                <Car className="h-4 w-4 text-primary" />
                               )}
                             </div>
                             <span className="font-semibold text-foreground">{model.name}</span>
@@ -209,7 +213,12 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                         </TableCell>
                         <TableCell>{model.car_companies?.name || "Unknown"}</TableCell>
                         <TableCell className="text-xs text-muted-foreground font-mono">
-                          {model.created_at ? new Date(model.created_at).toLocaleDateString() : "—"}
+                          {model.created_at
+                            ? new Date(model.created_at).toLocaleString(undefined, {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })
+                            : "—"}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">

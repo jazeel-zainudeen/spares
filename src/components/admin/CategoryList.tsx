@@ -184,7 +184,12 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                           )}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground font-mono">
-                          {category.created_at ? new Date(category.created_at).toLocaleDateString() : "—"}
+                          {category.created_at
+                            ? new Date(category.created_at).toLocaleString(undefined, {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })
+                            : "—"}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">

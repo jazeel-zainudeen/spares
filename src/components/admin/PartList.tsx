@@ -299,7 +299,12 @@ export function PartList({ initialParts, categories, companies, models }: { init
                           <div className="text-[11px] text-muted-foreground">{part.car_models?.car_companies?.name || ""}</div>
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground font-mono">
-                          {part.created_at ? new Date(part.created_at).toLocaleDateString() : "—"}
+                          {part.created_at
+                            ? new Date(part.created_at).toLocaleString(undefined, {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })
+                            : "—"}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
