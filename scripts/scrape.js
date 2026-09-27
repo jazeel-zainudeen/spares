@@ -6,7 +6,7 @@ const { execSync } = require('child_process');
 const cloudinary = require('cloudinary').v2;
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -45,8 +45,7 @@ async function uploadToCloudinary(imageUrl, folder = 'spares/parts') {
 const BASE_URL = 'https://bestcoolautoac.com';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36';
 
-// Configurable scraping targets
-const MAX_PARTS_PER_CATEGORY = 25; // Ensures rapid variety across all product categories!
+const MAX_PARTS_PER_CATEGORY = 25;
 
 function slugify(text) {
   return text
@@ -69,38 +68,97 @@ const cache = {
   models: new Map(),
 };
 
-async function getOrCreateCategory(name) {
+const companyLogosMap = new Map();
+
+function extractCompanyLogosFromHome($home) {
+  function addCompanyLogo(name, src) {
+    if (!name || !src) return;
+    const cleanName = name.replace(/\s+/g, ' ').trim();
+    if (!cleanName) return;
+    const fullUrl = src.startsWith('http') ? src : BASE_URL + (src.startsWith('/') ? '' : '/') + src;
+    const slug = slugify(cleanName);
+    if (slug && !companyLogosMap.has(slug)) {
+      companyLogosMap.set(slug, fullUrl);
+    }
+  }
+
+  $home('img').each((i, el) => {
+    const src = $home(el).attr('src') || '';
+    const alt = $home(el).attr('alt') || '';
+    if (src.includes('m_brands') || src.includes('vehicle_brand') || src.includes('brands/')) {
+      addCompanyLogo(alt, src);
+    }
+  });
+
+  $home('a').each((i, el) => {
+    const href = $home(el).attr('href') || '';
+    const img = $home(el).find('img').attr('src') || '';
+    const alt = $home(el).find('img').attr('alt') || $home(el).text();
+    if ((href.includes('vehicle_brand') || href.includes('brand')) && img) {
+      addCompanyLogo(alt, img);
+    }
+  });
+}
+
+async function getOrCreateCategory(name, rawCategoryImageUrl = null) {
   if (!name) name = "General";
   const slug = slugify(name);
   if (cache.categories.has(slug)) return cache.categories.get(slug);
 
-  let { data } = await supabase.from('categories').select('id').eq('slug', slug).maybeSingle();
+  let categoryImageUrl = null;
+  if (rawCategoryImageUrl) {
+    const uploaded = await uploadToCloudinary(rawCategoryImageUrl, 'spares/categories');
+    categoryImageUrl = uploaded.url;
+  }
+
+  let { data } = await supabase.from('categories').select('*').eq('slug', slug).maybeSingle();
   if (!data) {
-    const { data: newData, error } = await supabase.from('categories').insert({ name, slug }).select().single();
+    const { data: newData, error } = await supabase.from('categories').insert({
+      name,
+      slug,
+      image_url: categoryImageUrl,
+    }).select().single();
     if (error) {
       console.error(`Error inserting category ${name}:`, error.message);
       return null;
     }
     data = newData;
+  } else if (categoryImageUrl && (!data.image_url || !data.image_url.includes('res.cloudinary.com'))) {
+    await supabase.from('categories').update({ image_url: categoryImageUrl }).eq('id', data.id);
   }
+
   cache.categories.set(slug, data.id);
   return data.id;
 }
 
-async function getOrCreateCompany(name) {
+async function getOrCreateCompany(name, rawLogoUrl = null) {
   if (!name) name = "Universal";
   const slug = slugify(name);
   if (cache.companies.has(slug)) return cache.companies.get(slug);
 
-  let { data } = await supabase.from('car_companies').select('id').eq('slug', slug).maybeSingle();
+  let logoUrl = null;
+  const logoCandidate = rawLogoUrl || companyLogosMap.get(slug);
+  if (logoCandidate) {
+    const uploaded = await uploadToCloudinary(logoCandidate, 'spares/companies');
+    logoUrl = uploaded.url;
+  }
+
+  let { data } = await supabase.from('car_companies').select('*').eq('slug', slug).maybeSingle();
   if (!data) {
-    const { data: newData, error } = await supabase.from('car_companies').insert({ name, slug }).select().single();
+    const { data: newData, error } = await supabase.from('car_companies').insert({
+      name,
+      slug,
+      logo_url: logoUrl,
+    }).select().single();
     if (error) {
       console.error(`Error inserting company ${name}:`, error.message);
       return null;
     }
     data = newData;
+  } else if (logoUrl && (!data.logo_url || !data.logo_url.includes('res.cloudinary.com'))) {
+    await supabase.from('car_companies').update({ logo_url: logoUrl }).eq('id', data.id);
   }
+
   cache.companies.set(slug, data.id);
   return data.id;
 }
@@ -131,11 +189,9 @@ async function getOrCreateModel(companyId, modelName) {
 function extractProductDetails($) {
   const data = {};
 
-  // Title: first h4.mb-0 or any heading
   data.title = $('h4.mb-0').first().text().replace(/\s+/g, ' ').trim()
     || $('h1, h2, h3, h4').first().text().replace(/\s+/g, ' ').trim();
 
-  // Image: look for the product image in images/car_image/ path
   $('img').each((i, el) => {
     const src = $(el).attr('src') || '';
     if (src.includes('images/car_image') || src.includes('car_image/')) {
@@ -145,8 +201,6 @@ function extractProductDetails($) {
     }
   });
 
-  // Parse the label/value <td> table pairs
-  // Structure: <td style="...font-weight: bold;">Label</td>\n<td>Value</td>
   const tds = $('td');
   for (let i = 0; i < tds.length - 1; i++) {
     const labelTd = $(tds[i]);
@@ -154,18 +208,16 @@ function extractProductDetails($) {
     const labelText = labelTd.text().replace(/\s+/g, ' ').trim();
     const valueText = valueTd.text().replace(/\s+/g, ' ').trim();
     
-    // Only process bold label cells (skip value cells)
     const style = labelTd.attr('style') || '';
     if (!style.includes('font-weight') && !style.includes('bold')) continue;
 
     if (labelText === 'Manufacturer Brand' && valueText) {
       data.manufacturerBrand = valueText;
-      i++; // skip value td
+      i++;
     } else if (labelText === 'Vehicle Brand' && valueText) {
       data.vehicleBrand = valueText;
       i++;
     } else if (labelText === 'Part No' && valueText) {
-      // Part No can be "ACY3741-1, 88320-6A070" (ref + OEM comma-separated)
       const parts = valueText.split(/[,;]/).map(s => s.trim()).filter(Boolean);
       data.partNo = parts[0];
       if (parts.length > 1) {
@@ -187,8 +239,6 @@ function extractProductDetails($) {
     }
   }
 
-  // Fallback: try to extract model from URL slug in the title
-  // e.g., "ACY44090-1 TOYOTA HILUX 2020" → extract "HILUX 2020" if vehicleModel is missing
   if (!data.vehicleModel && data.title && data.vehicleBrand) {
     const brand = data.vehicleBrand.toUpperCase();
     const titleUpper = data.title.toUpperCase();
@@ -196,7 +246,6 @@ function extractProductDetails($) {
     if (brandIdx !== -1) {
       const afterBrand = data.title.substring(brandIdx + brand.length).trim();
       if (afterBrand) {
-        // Take the model portion (up to any technical specs like "4PK", "6PK", etc.)
         const modelMatch = afterBrand.match(/^([A-Za-z0-9\s-]+?)(?:\s+\d+[Pp][Kk]|\s+\d{5,}|$)/);
         if (modelMatch) {
           data.vehicleModel = modelMatch[1].trim();
@@ -220,6 +269,8 @@ async function scrape() {
   }
 
   const $home = cheerio.load(homeHtml);
+  extractCompanyLogosFromHome($home);
+
   const categoriesList = [];
 
   $home('a').each((i, el) => {
@@ -230,7 +281,6 @@ async function scrape() {
     }
   });
 
-  // Filter unique categories
   const seenCat = new Set();
   const uniqueCategories = [];
   for (const cat of categoriesList) {
@@ -243,19 +293,26 @@ async function scrape() {
   console.log(`Found ${uniqueCategories.length} distinct categories on bestcoolautoac.com:`);
   uniqueCategories.forEach((c, idx) => console.log(`  ${idx + 1}. ${c.name} (${c.url})`));
 
-  // Loop through each category and collect items round-robin to ensure variety
   for (const category of uniqueCategories) {
     console.log(`\n==============================================`);
     console.log(`📂 Processing Category: "${category.name}"`);
     console.log(`==============================================`);
 
-    const categoryId = await getOrCreateCategory(category.name);
-    if (!categoryId) continue;
-
     const catHtml = await fetchHtml(category.url);
     if (!catHtml) continue;
 
     const $cat = cheerio.load(catHtml);
+    let categoryImageUrl = null;
+    $cat('img').each((i, el) => {
+      const src = $cat(el).attr('src') || '';
+      if (src.includes('/images/cat/')) {
+        categoryImageUrl = src.startsWith('http') ? src : BASE_URL + (src.startsWith('/') ? '' : '/') + src;
+      }
+    });
+
+    const categoryId = await getOrCreateCategory(category.name, categoryImageUrl);
+    if (!categoryId) continue;
+
     let directProductLinks = [];
     let subcategoryLinks = [];
 
@@ -275,7 +332,6 @@ async function scrape() {
 
     let allProductLinks = [...directProductLinks];
 
-    // If subcategories exist, crawl up to 6 subcategories to pick diverse products
     for (const subLink of subcategoryLinks.slice(0, 6)) {
       if (allProductLinks.length >= MAX_PARTS_PER_CATEGORY * 2) break;
       const subHtml = await fetchHtml(subLink);
@@ -311,7 +367,6 @@ async function scrape() {
 
         if (!itemName || !refNumber) continue;
 
-        // Determine company & vehicle model
         const companyName = details.vehicleBrand || details.manufacturerBrand || "Universal";
         const companyId = await getOrCreateCompany(companyName);
         if (!companyId) continue;
@@ -320,14 +375,12 @@ async function scrape() {
         const modelId = await getOrCreateModel(companyId, modelName);
         if (!modelId) continue;
 
-        // Check if part already exists in parts table
         const { data: existingPart } = await supabase
           .from('parts')
           .select('id, image_url, cloudinary_public_id, category_id')
           .eq('ref_number', refNumber)
           .maybeSingle();
 
-        // Upload scraped image to Cloudinary if available
         let imageUrl = null;
         let cloudinaryPublicId = null;
 
@@ -356,7 +409,6 @@ async function scrape() {
             console.log(`✅ [${category.name} #${insertedInThisCategory}] Inserted: ${itemName} (${companyName} - ${refNumber})`);
           }
         } else {
-          // If it exists, update category_id if missing or image if non-Cloudinary
           const updates = {};
           if (!existingPart.category_id) updates.category_id = categoryId;
 
