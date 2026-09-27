@@ -169,12 +169,12 @@ async function getOrCreateModel(companyId, modelName) {
   const cacheKey = `${companyId}:${modelSlug}`;
   if (cache.models.has(cacheKey)) return cache.models.get(cacheKey);
 
-  let { data } = await supabase.from('car_models').select('id').eq('company_id', companyId).eq('slug', modelSlug).maybeSingle();
+  let { data } = await supabase.from('car_models').select('*').eq('company_id', companyId).eq('slug', modelSlug).maybeSingle();
   if (!data) {
     const { data: newData, error } = await supabase.from('car_models').insert({
       company_id: companyId,
       name: modelName,
-      slug: modelSlug
+      slug: modelSlug,
     }).select().single();
     if (error) {
       console.error(`Error inserting model ${modelName}:`, error.message);
