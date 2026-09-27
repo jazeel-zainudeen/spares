@@ -263,6 +263,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                       <TableHead>OEM #</TableHead>
                       <TableHead>Category</TableHead>
                       <TableHead>Model / Brand</TableHead>
+                      <TableHead>Created At</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -296,6 +297,9 @@ export function PartList({ initialParts, categories, companies, models }: { init
                         <TableCell>
                           <div className="text-xs font-medium text-foreground">{part.car_models?.name || "Unknown"}</div>
                           <div className="text-[11px] text-muted-foreground">{part.car_models?.car_companies?.name || ""}</div>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground font-mono">
+                          {part.created_at ? new Date(part.created_at).toLocaleDateString() : "—"}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">

@@ -57,8 +57,8 @@ export function InstallPrompt() {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] inset-x-3 z-50 sm:left-auto sm:right-6 sm:bottom-6 sm:w-96 animate-in fade-in slide-in-from-bottom-5">
-      <div className="flex items-center justify-between gap-3 rounded-2xl border md:border-primary/30 bg-card/95 p-3.5 shadow md:shadow-xl backdrop-blur-md">
+    <div className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] inset-x-3 z-50 lg:left-auto lg:right-6 lg:bottom-6 lg:w-96 animate-in fade-in slide-in-from-bottom-5">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border md:border-primary/30 bg-card/95 p-3.5 shadow lg:shadow-xl backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs">
             <Download className="h-5 w-5" />

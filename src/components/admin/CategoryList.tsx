@@ -165,6 +165,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>Image</TableHead>
+                      <TableHead>Created At</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -181,6 +182,9 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                           ) : (
                             <span className="text-xs text-muted-foreground">No image</span>
                           )}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground font-mono">
+                          {category.created_at ? new Date(category.created_at).toLocaleDateString() : "—"}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">

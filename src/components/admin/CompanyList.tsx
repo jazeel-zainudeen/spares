@@ -165,6 +165,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>Logo</TableHead>
+                      <TableHead>Created At</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -181,6 +182,9 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                           ) : (
                             <span className="text-xs text-muted-foreground">No logo</span>
                           )}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground font-mono">
+                          {company.created_at ? new Date(company.created_at).toLocaleDateString() : "—"}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">

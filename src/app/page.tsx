@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { Wrench, ArrowRight, ShieldCheck, Sparkles, Layers } from "lucide-react";
+import { ShieldCheck, Sparkles } from "lucide-react";
 import { AdvancedSearchBar } from "@/components/public/AdvancedSearchBar";
 import { Card } from "@/components/ui/Card";
 import { getCategories } from "@/lib/services/categories";
 import { getCompanies } from "@/lib/services/companies";
+import { PublicHeader } from "@/components/layout/PublicHeader";
+import { PublicMobileNav } from "@/components/layout/PublicMobileNav";
 
 export default async function Home() {
   const [categories, companies] = await Promise.all([
@@ -12,7 +14,7 @@ export default async function Home() {
   ]);
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-background text-foreground">
+    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-background text-foreground pb-16 sm:pb-0">
       {/* Background Decorative Gradients & Mesh (clean, premium feel) */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-[-35%] left-1/2 h-150 w-225 -translate-x-1/2 rounded-full bg-linear-to-b from-primary/15 via-primary/5 to-transparent blur-3xl" />
@@ -22,34 +24,7 @@ export default async function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-size-[24px_24px] opacity-60" />
       </div>
 
-      {/* Header bar */}
-      <header className="w-full px-6 py-5 flex items-center justify-between z-20">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm shadow-primary/20 transition-transform group-hover:scale-105">
-            <Wrench className="h-5 w-5" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            AutoParts<span className="text-primary">Pro</span>
-          </span>
-        </Link>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/spare-parts"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-muted/60"
-          >
-            <Layers className="h-3.5 w-3.5" />
-            Catalog
-          </Link>
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3.5 py-1.5 text-xs font-medium text-foreground shadow-2xs backdrop-blur-xs transition-all hover:bg-accent hover:border-primary/40 hover:text-primary"
-          >
-            <span>Admin Portal</span>
-            <ArrowRight className="h-3.5 w-3.5 opacity-60" />
-          </Link>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Centered Hero & Search Section (Single unified focus, no clutter) */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12 z-10 w-full max-w-4xl mx-auto">
@@ -108,6 +83,7 @@ export default async function Home() {
           </Link>
         </div>
       </footer>
+      <PublicMobileNav />
     </div>
   );
 }

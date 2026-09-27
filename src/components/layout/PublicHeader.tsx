@@ -1,0 +1,79 @@
+"use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Wrench, Layers, Building2, Car, Search, ShieldCheck, Home } from "lucide-react"
+
+export function PublicHeader() {
+  const pathname = usePathname()
+
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return pathname === "/"
+    }
+    return pathname.startsWith(path)
+  }
+
+  const navItems = [
+    { label: "Home", href: "/", icon: Home },
+    { label: "Categories", href: "/categories", icon: Layers },
+    { label: "Brands", href: "/brands", icon: Building2 },
+    { label: "Models", href: "/models", icon: Car },
+    { label: "Catalog", href: "/spare-parts", icon: Search },
+  ]
+
+  return (
+    <header className="sticky top-0 z-30 border-b border-border/80 bg-background/80 backdrop-blur-xl">
+      <div className="container mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs shadow-primary/20 transition-transform group-hover:scale-105">
+            <Wrench className="h-4 w-4 sm:h-5 sm:w-5" />
+          </div>
+          <span className="font-bold text-base sm:text-lg text-foreground tracking-tight">
+            AutoParts<span className="text-primary">Pro</span>
+          </span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden sm:flex items-center gap-1 lg:gap-1.5" aria-label="Main Navigation">
+          {navItems.map((item) => {
+            const active = isActive(item.href)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-xs transition-colors px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 ${
+                  active
+                    ? "text-primary font-semibold bg-primary/10 shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                }`}
+              >
+                {item.icon && <item.icon className="h-3.5 w-3.5" />}
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-foreground shadow-2xs backdrop-blur-xs transition-colors hover:bg-accent hover:border-primary/40 hover:text-primary ml-1.5"
+          >
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+            <span>Admin</span>
+          </Link>
+        </nav>
+
+        {/* Mobile Quick Admin Link */}
+        <div className="flex sm:hidden items-center gap-2">
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1 text-xs font-medium text-foreground shadow-2xs transition-colors"
+          >
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+            <span>Admin</span>
+          </Link>
+        </div>
+      </div>
+    </header>
+  )
+}

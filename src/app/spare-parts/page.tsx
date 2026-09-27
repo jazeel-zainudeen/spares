@@ -2,9 +2,10 @@ import Link from "next/link"
 import { getPublicParts, getPartImages } from "@/lib/services/parts"
 import { fetchCompaniesAction } from "@/app/actions/companies"
 import { fetchCategoriesAction } from "@/app/actions/categories"
+import { getModelsWithCompany } from "@/lib/services/models"
 import { SearchBar } from "@/components/public/SearchBar"
 import { ListingImageCarousel } from "@/components/public/ListingImageCarousel"
-import { Image as ImageIcon, ChevronRight, Layers } from "lucide-react"
+import { CatalogFilters } from "@/components/public/CatalogFilters"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
 import { Pagination } from "@/components/ui/Pagination"
@@ -14,13 +15,33 @@ const PAGE_SIZE = 12
 export default async function CatalogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; page?: string }>
+  searchParams: Promise<{ search?: string; category?: string; brand?: string; model?: string; page?: string }>
 }) {
   const resolvedParams = await searchParams
   const search = resolvedParams?.search || ""
+  const category = resolvedParams?.category || ""
+  const brand = resolvedParams?.brand || ""
+  const model = resolvedParams?.model || ""
   const page = Math.max(1, Number(resolvedParams?.page) || 1)
-  const { data: parts, total, totalPages } = await getPublicParts({ search, page, pageSize: PAGE_SIZE })
-  const { data: categories = [] } = await fetchCategoriesAction()
+
+  const [
+    { data: parts, total, totalPages },
+    { data: categories = [] },
+    { data: companies = [] },
+    models,
+  ] = await Promise.all([
+    getPublicParts({
+      categorySlug: category || undefined,
+      companySlug: brand || undefined,
+      modelSlug: model || undefined,
+      search: search || undefined,
+      page,
+      pageSize: PAGE_SIZE,
+    }),
+    fetchCategoriesAction().catch(() => ({ data: [] })),
+    fetchCompaniesAction().catch(() => ({ data: [] })),
+    getModelsWithCompany().catch(() => []),
+  ])
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-8">
@@ -28,71 +49,69 @@ export default async function CatalogPage({
       <div className="mb-8 space-y-4 max-w-3xl">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Spare Parts Catalog</h1>
-          <p className="text-sm text-muted-foreground mt-1">Browse all available vehicle parts and cross-references</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Browse all available vehicle parts, cross-references, and compatible models
+          </p>
         </div>
         <SearchBar initialValue={search} />
       </div>
 
+      {/* Mobile Filters view */}
+      <div className="block lg:hidden mb-6">
+        <CatalogFilters
+          categories={categories}
+          companies={companies}
+          models={models}
+          activeCategory={category}
+          activeBrand={brand}
+          activeModel={model}
+          searchQuery={search}
+        />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Categories Sidebar */}
+        {/* Desktop Sidebar Filters */}
         <aside className="hidden lg:block space-y-6">
-          <Card>
-            <CardContent className="p-4 sm:p-5">
-              <div className="flex items-center gap-2 font-semibold text-sm mb-3 text-foreground">
-                <Layers className="h-4 w-4 text-primary" />
-                <span>Categories</span>
-              </div>
-              <ul className="space-y-1 text-xs">
-                <li>
-                  <Link
-                    href="/spare-parts"
-                    className="flex items-center justify-between py-1.5 px-2 rounded-md font-medium text-primary bg-primary/10 transition-colors"
-                  >
-                    <span>All Categories</span>
-                    <ChevronRight className="h-3.5 w-3.5 opacity-70" />
-                  </Link>
-                </li>
-                {categories.map((category: any) => (
-                  <li key={category.id}>
-                    <Link
-                      href={`/spare-parts/${category.slug}`}
-                      className="flex items-center justify-between py-1.5 px-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-                    >
-                      <span className="truncate">{category.name}</span>
-                      <ChevronRight className="h-3.5 w-3.5 opacity-40 shrink-0" />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+          <CatalogFilters
+            categories={categories}
+            companies={companies}
+            models={models}
+            activeCategory={category}
+            activeBrand={brand}
+            activeModel={model}
+            searchQuery={search}
+          />
         </aside>
 
         {/* Main Parts Grid */}
         <div className="lg:col-span-3 space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-border/60">
             <h2 className="font-semibold text-sm text-foreground">
-              {search ? `Search Results for "${search}"` : "All Catalog Parts"}
+              {search
+                ? `Search Results for "${search}"`
+                : category || brand || model
+                ? "Filtered Inventory"
+                : "All Catalog Parts"}
             </h2>
             <Badge variant="secondary" className="text-xs font-normal">
-              {parts.length} {parts.length === 1 ? "item" : "items"}
+              {parts.length} {parts.length === 1 ? "item" : "items"} (Total: {total})
             </Badge>
           </div>
 
           {parts.length === 0 ? (
             <Card>
               <CardContent className="py-16 text-center text-sm text-muted-foreground">
-                No parts found matching your criteria. Try searching for a different keyword or part number.
+                No parts found matching your criteria. Try adjusting your category, brand, model, or search term.
               </CardContent>
             </Card>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {parts.map((part: any) => {
-                  const categorySlug = part.categories?.slug || "uncategorized"
-                  const companySlug = part.car_models?.car_companies?.slug || "unknown"
-                  const modelSlug = part.car_models?.slug || "model"
-                  const href = `/spare-parts/${categorySlug}/${companySlug}/${modelSlug}/${part.id}`
+                  const catSlug = part.categories?.slug || "uncategorized"
+                  const compSlug = part.car_models?.car_companies?.slug || "unknown"
+                  const modSlug = part.car_models?.slug || "model"
+                  const href = `/spare-parts/${catSlug}/${compSlug}/${modSlug}/${part.id}`
                   const images = getPartImages(part)
 
                   return (
@@ -131,6 +150,9 @@ export default async function CatalogPage({
                 buildLink={(p) => {
                   const params = new URLSearchParams()
                   if (search) params.set("search", search)
+                  if (category) params.set("category", category)
+                  if (brand) params.set("brand", brand)
+                  if (model) params.set("model", model)
                   if (p > 1) params.set("page", String(p))
                   const query = params.toString()
                   return `/spare-parts${query ? `?${query}` : ""}`

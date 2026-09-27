@@ -15,7 +15,7 @@ export async function getCategories(): Promise<CategoryRow[]> {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('name')
+        .order('created_at', { ascending: false })
       
       if (error) throw error
       return (data || []) as CategoryRow[]

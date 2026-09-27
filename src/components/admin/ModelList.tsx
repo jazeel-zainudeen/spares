@@ -188,6 +188,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                     <TableRow>
                       <TableHead>Model</TableHead>
                       <TableHead>Company</TableHead>
+                      <TableHead>Created At</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -207,6 +208,9 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                           </div>
                         </TableCell>
                         <TableCell>{model.car_companies?.name || "Unknown"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground font-mono">
+                          {model.created_at ? new Date(model.created_at).toLocaleDateString() : "—"}
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
                             <Button

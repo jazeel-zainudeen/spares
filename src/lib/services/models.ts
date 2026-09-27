@@ -19,7 +19,7 @@ export async function getModels(companyId?: string): Promise<ModelRow[]> {
         query = query.eq('company_id', companyId)
       }
 
-      const { data, error } = await query.order('name')
+      const { data, error } = await query.order('created_at', { ascending: false })
 
       if (error) throw new Error(error.message)
       return (data || []) as any
@@ -94,7 +94,7 @@ export async function getModelsWithCompany(companySlug?: string) {
     query = query.eq('car_companies.slug', companySlug)
   }
 
-  const { data, error } = await query.order('name')
+  const { data, error } = await query.order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
   return data as any[]

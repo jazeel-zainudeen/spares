@@ -15,7 +15,7 @@ export async function getCompanies(): Promise<CompanyRow[]> {
       const { data, error } = await supabase
         .from('car_companies')
         .select('*')
-        .order('name')
+        .order('created_at', { ascending: false })
 
       if (error) throw new Error(error.message)
       return (data || []) as any
@@ -85,7 +85,7 @@ export async function getCompaniesWithStats() {
   const { data: companies, error } = await supabase
     .from('car_companies')
     .select('*, car_models(id)')
-    .order('name')
+    .order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
 
