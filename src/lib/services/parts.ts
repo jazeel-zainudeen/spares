@@ -2,6 +2,8 @@ import { createClient } from '../supabase/server'
 import { getPublicClient } from '../supabase/public'
 import { Database } from '@/types/database'
 
+export { getPartImages, getPartPublicIds } from '@/lib/utils/images'
+
 export type PartRow = Database['public']['Tables']['parts']['Row']
 export type PartInsert = Database['public']['Tables']['parts']['Insert']
 export type PartUpdate = Database['public']['Tables']['parts']['Update']
@@ -96,28 +98,119 @@ export async function getPartById(id: string) {
 
 export async function createPart(part: PartInsert) {
   const supabase = await createClient()
+
+  const images = (part as any).image_urls && (part as any).image_urls.length > 0
+    ? (part as any).image_urls
+    : (part.image_url ? [part.image_url] : [])
+  const publicIds = (part as any).cloudinary_public_ids && (part as any).cloudinary_public_ids.length > 0
+    ? (part as any).cloudinary_public_ids
+    : (part.cloudinary_public_id ? [part.cloudinary_public_id] : [])
+
+  const firstImageUrl = images[0] || part.image_url || null
+  const firstPublicId = publicIds[0] || part.cloudinary_public_id || null
+
+  const encodedImageUrl = images.length > 1 ? JSON.stringify(images) : firstImageUrl
+  const encodedPublicId = publicIds.length > 1 ? JSON.stringify(publicIds) : firstPublicId
+
+  const fullPayload = {
+    ...part,
+    image_url: encodedImageUrl,
+    cloudinary_public_id: encodedPublicId,
+    image_urls: images,
+    cloudinary_public_ids: publicIds,
+  }
+
   const { data, error } = await supabase
     .from('parts')
     // @ts-ignore
-    .insert(part as any)
+    .insert(fullPayload as any)
     .select()
     .single()
 
-  if (error) throw new Error(error.message)
+  if (error) {
+    if (error.code === 'PGRST204' || error.message.includes('schema cache') || error.message.includes('image_urls')) {
+      // Fallback if image_urls column doesn't exist on remote table yet
+      const fallbackPayload = {
+        ...part,
+        image_url: encodedImageUrl,
+        cloudinary_public_id: encodedPublicId,
+      }
+      delete (fallbackPayload as any).image_urls
+      delete (fallbackPayload as any).cloudinary_public_ids
+
+      const { data: fbData, error: fbError } = await supabase
+        .from('parts')
+        // @ts-ignore
+        .insert(fallbackPayload as any)
+        .select()
+        .single()
+
+      if (fbError) throw new Error(fbError.message)
+      return fbData as any
+    }
+    throw new Error(error.message)
+  }
+
   return data as any
 }
 
 export async function updatePart(id: string, updates: PartUpdate) {
   const supabase = await createClient()
+
+  const images = (updates as any).image_urls !== undefined
+    ? (updates as any).image_urls
+    : (updates.image_url ? [updates.image_url] : [])
+  const publicIds = (updates as any).cloudinary_public_ids !== undefined
+    ? (updates as any).cloudinary_public_ids
+    : (updates.cloudinary_public_id ? [updates.cloudinary_public_id] : [])
+
+  const firstImageUrl = images ? images[0] || null : updates.image_url || null
+  const firstPublicId = publicIds ? publicIds[0] || null : updates.cloudinary_public_id || null
+
+  const encodedImageUrl = Array.isArray(images) && images.length > 1 ? JSON.stringify(images) : firstImageUrl
+  const encodedPublicId = Array.isArray(publicIds) && publicIds.length > 1 ? JSON.stringify(publicIds) : firstPublicId
+
+  const fullPayload = {
+    ...updates,
+    image_url: encodedImageUrl,
+    cloudinary_public_id: encodedPublicId,
+    image_urls: images,
+    cloudinary_public_ids: publicIds,
+  }
+
   const { data, error } = await supabase
     .from('parts')
     // @ts-ignore
-    .update(updates as any)
+    .update(fullPayload as any)
     .eq('id', id)
     .select()
     .single()
 
-  if (error) throw new Error(error.message)
+  if (error) {
+    if (error.code === 'PGRST204' || error.message.includes('schema cache') || error.message.includes('image_urls')) {
+      // Fallback if image_urls column doesn't exist on remote table yet
+      const fallbackPayload = {
+        ...updates,
+        image_url: encodedImageUrl,
+        cloudinary_public_id: encodedPublicId,
+      }
+      delete (fallbackPayload as any).image_urls
+      delete (fallbackPayload as any).cloudinary_public_ids
+
+      const { data: fbData, error: fbError } = await supabase
+        .from('parts')
+        // @ts-ignore
+        .update(fallbackPayload as any)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (fbError) throw new Error(fbError.message)
+      return fbData as any
+    }
+    throw new Error(error.message)
+  }
+
   return data as any
 }
 

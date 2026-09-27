@@ -5,8 +5,8 @@ import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
-import { ModelRow } from "@/lib/services/models"
-import { CompanyRow } from "@/lib/services/companies"
+import type { ModelRow } from "@/lib/services/models"
+import type { CompanyRow } from "@/lib/services/companies"
 
 interface ModelFormModalProps {
   isOpen: boolean

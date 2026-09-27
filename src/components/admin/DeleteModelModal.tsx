@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
-import { ModelRow } from "@/lib/services/models"
+import type { ModelRow } from "@/lib/services/models"
 
 interface DeleteModelModalProps {
   isOpen: boolean

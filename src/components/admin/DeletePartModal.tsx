@@ -3,12 +3,13 @@
 import { useState } from "react"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
-import { PartRow } from "@/lib/services/parts"
+import type { PartRow } from "@/lib/services/parts"
+import { getPartPublicIds } from "@/lib/utils/images"
 
 interface DeletePartModalProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (id: string, cloudinaryPublicId?: string | null) => Promise<void>
+  onConfirm: (id: string, cloudinaryPublicId?: string | string[] | null) => Promise<void>
   part: PartRow | null
 }
 
@@ -16,12 +17,14 @@ export function DeletePartModal({ isOpen, onClose, onConfirm, part }: DeletePart
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
+  const publicIds = getPartPublicIds(part)
+
   const handleConfirm = async () => {
     if (!part) return
     setLoading(true)
     setError("")
     try {
-      await onConfirm(part.id, part.cloudinary_public_id)
+      await onConfirm(part.id, publicIds)
       onClose()
     } catch (err: any) {
       setError(err.message || "Failed to delete part")
@@ -36,7 +39,7 @@ export function DeletePartModal({ isOpen, onClose, onConfirm, part }: DeletePart
         {error && <div className="text-red-500 text-sm font-medium bg-red-500/10 p-3 rounded-md border border-red-500/20">{error}</div>}
         <p className="text-muted-foreground text-sm">
           Are you sure you want to delete <strong>{part?.item}</strong> ({part?.ref_number})? 
-          {part?.cloudinary_public_id && " This will also permanently delete the associated image."}
+          {publicIds.length > 0 && ` This will also permanently delete the ${publicIds.length} associated ${publicIds.length === 1 ? 'image' : 'images'}.`}
           {" "}This action cannot be undone.
         </p>
         <div className="flex justify-end space-x-2 pt-4">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CategoryRow } from "@/lib/services/categories"
+import type { CategoryRow } from "@/lib/services/categories"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import { AlertTriangle } from "lucide-react"

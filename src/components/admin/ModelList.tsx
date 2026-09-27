@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ModelRow } from "@/lib/services/models"
-import { CompanyRow } from "@/lib/services/companies"
+import type { ModelRow } from "@/lib/services/models"
+import type { CompanyRow } from "@/lib/services/companies"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"

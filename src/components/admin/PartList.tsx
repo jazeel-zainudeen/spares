@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { PartRow } from "@/lib/services/parts"
-import { CategoryRow } from "@/lib/services/categories"
-import { CompanyRow } from "@/lib/services/companies"
-import { ModelRow } from "@/lib/services/models"
+import type { PartRow } from "@/lib/services/parts"
+import { getPartImages } from "@/lib/utils/images"
+import type { CategoryRow } from "@/lib/services/categories"
+import type { CompanyRow } from "@/lib/services/companies"
+import type { ModelRow } from "@/lib/services/models"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
@@ -107,7 +108,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
     }
   }
 
-  const onConfirmDelete = async (id: string, publicId?: string | null) => {
+  const onConfirmDelete = async (id: string, publicId?: string | string[] | null) => {
     const res = await deletePartAction(id, publicId)
     if (res.error) throw new Error(res.error)
     setParts(parts.filter(p => p.id !== id))
@@ -178,68 +179,77 @@ export function PartList({ initialParts, categories, companies, models }: { init
             <>
               {/* Mobile View: Cards */}
               <div className="grid grid-cols-1 gap-3 sm:hidden">
-                {paginatedParts.map(part => (
-                  <div
-                    key={part.id}
-                    className="flex flex-col gap-2.5 rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
-                  >
-                    <div className="flex items-start justify-between gap-2.5">
-                      <div className="flex items-start gap-3 min-w-0">
-                        {part.image_url ? (
-                          <div className="flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted/40 p-1">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+                {paginatedParts.map(part => {
+                  const images = getPartImages(part)
+                  const mainImage = images[0]
+                  return (
+                    <div
+                      key={part.id}
+                      className="flex flex-col gap-2.5 rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-2.5">
+                        <div className="flex items-start gap-3 min-w-0">
+                          {mainImage ? (
+                            <div className="relative flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted/40 p-1">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+                              {images.length > 1 && (
+                                <span className="absolute bottom-0.5 right-0.5 bg-black/75 text-[9px] font-semibold text-white px-1 rounded-sm">
+                                  +{images.length - 1}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="flex h-14 w-16 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/30">
+                              <ImageIcon className="h-5 w-5 text-muted-foreground/60" />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="font-semibold text-sm text-foreground line-clamp-1">{part.item}</div>
+                            <div className="text-xs text-primary font-medium truncate mt-0.5">
+                              {part.car_models?.car_companies?.name} {part.car_models?.name}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground mt-0.5">
+                              {part.categories?.name || "Uncategorized"}
+                            </div>
                           </div>
-                        ) : (
-                          <div className="flex h-14 w-16 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/30">
-                            <ImageIcon className="h-5 w-5 text-muted-foreground/60" />
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-sm text-foreground line-clamp-1">{part.item}</div>
-                          <div className="text-xs text-primary font-medium truncate mt-0.5">
-                            {part.car_models?.car_companies?.name} {part.car_models?.name}
-                          </div>
-                          <div className="text-[11px] text-muted-foreground mt-0.5">
-                            {part.categories?.name || "Uncategorized"}
-                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            onClick={() => handleEdit(part)}
+                            aria-label="Edit part"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => handleDelete(part)}
+                            aria-label="Delete part"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          onClick={() => handleEdit(part)}
-                          aria-label="Edit part"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => handleDelete(part)}
-                          aria-label="Delete part"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                      <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border/60 text-[11px] font-mono text-muted-foreground">
+                        <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
+                          REF: {part.ref_number}
+                        </span>
+                        {part.oem_number && (
+                          <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
+                            OEM: {part.oem_number}
+                          </span>
+                        )}
                       </div>
                     </div>
-
-                    <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border/60 text-[11px] font-mono text-muted-foreground">
-                      <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
-                        REF: {part.ref_number}
-                      </span>
-                      {part.oem_number && (
-                        <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
-                          OEM: {part.oem_number}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               {/* Desktop View: Full Table */}
@@ -257,20 +267,28 @@ export function PartList({ initialParts, categories, companies, models }: { init
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedParts.map(part => (
-                      <TableRow key={part.id}>
-                        <TableCell>
-                          {part.image_url ? (
-                            <div className="flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
-                            </div>
-                          ) : (
-                            <div className="flex h-10 w-12 items-center justify-center rounded-md border border-border bg-muted/30">
-                              <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                          )}
-                        </TableCell>
+                    {paginatedParts.map(part => {
+                      const images = getPartImages(part)
+                      const mainImage = images[0]
+                      return (
+                        <TableRow key={part.id}>
+                          <TableCell>
+                            {mainImage ? (
+                              <div className="relative flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+                                {images.length > 1 && (
+                                  <span className="absolute bottom-0 right-0 bg-black/80 text-[8px] font-bold text-white px-0.5 rounded-tl-sm">
+                                    +{images.length - 1}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex h-10 w-12 items-center justify-center rounded-md border border-border bg-muted/30">
+                                <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                            )}
+                          </TableCell>
                         <TableCell className="font-medium text-foreground">{part.item}</TableCell>
                         <TableCell className="font-mono text-xs text-muted-foreground">{part.ref_number}</TableCell>
                         <TableCell className="font-mono text-xs text-muted-foreground">{part.oem_number || "—"}</TableCell>
@@ -301,7 +319,8 @@ export function PartList({ initialParts, categories, companies, models }: { init
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                      )
+                    })}
                   </TableBody>
                 </Table>
               </div>

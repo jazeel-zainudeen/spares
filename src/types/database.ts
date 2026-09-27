@@ -101,6 +101,8 @@ export interface Database {
           description: string | null
           image_url: string | null
           cloudinary_public_id: string | null
+          image_urls?: string[] | null
+          cloudinary_public_ids?: string[] | null
           created_at: string
           updated_at: string
         }
@@ -114,6 +116,8 @@ export interface Database {
           description?: string | null
           image_url?: string | null
           cloudinary_public_id?: string | null
+          image_urls?: string[] | null
+          cloudinary_public_ids?: string[] | null
           created_at?: string
           updated_at?: string
         }
@@ -127,6 +131,8 @@ export interface Database {
           description?: string | null
           image_url?: string | null
           cloudinary_public_id?: string | null
+          image_urls?: string[] | null
+          cloudinary_public_ids?: string[] | null
           created_at?: string
           updated_at?: string
         }

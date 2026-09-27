@@ -54,11 +54,21 @@ export async function updatePartAction(id: string, updates: PartUpdate): Promise
   }
 }
 
-export async function deletePartAction(id: string, cloudinaryPublicId?: string | null): Promise<{ error?: string }> {
+export async function deletePartAction(id: string, cloudinaryPublicId?: string | string[] | null): Promise<{ error?: string }> {
   try {
-    // If the part has an image, delete it from Cloudinary first
+    // If the part has images, delete them from Cloudinary first
     if (cloudinaryPublicId) {
-      await cloudinary.uploader.destroy(cloudinaryPublicId)
+      const publicIds = Array.isArray(cloudinaryPublicId)
+        ? cloudinaryPublicId.filter(Boolean)
+        : (cloudinaryPublicId.startsWith('[') && cloudinaryPublicId.endsWith(']')
+          ? JSON.parse(cloudinaryPublicId)
+          : [cloudinaryPublicId])
+
+      for (const pid of publicIds) {
+        if (pid && typeof pid === 'string') {
+          await cloudinary.uploader.destroy(pid).catch(() => {})
+        }
+      }
     }
 
     await requireAuth()

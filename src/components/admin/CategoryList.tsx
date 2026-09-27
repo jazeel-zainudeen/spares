@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CategoryRow } from "@/lib/services/categories"
+import type { CategoryRow } from "@/lib/services/categories"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"

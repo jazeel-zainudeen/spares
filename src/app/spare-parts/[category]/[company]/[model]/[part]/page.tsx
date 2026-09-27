@@ -1,22 +1,22 @@
 import Link from "next/link"
-import Image from "next/image"
-import { getPartById } from "@/lib/services/parts"
-import { Image as ImageIcon, ArrowLeft, CheckCircle2, Factory, Hash, FileText } from "lucide-react"
+import { getPartById, getPartImages } from "@/lib/services/parts"
+import { PartImageGallery } from "@/components/public/PartImageGallery"
+import { ArrowLeft, CheckCircle2, Factory, Hash, FileText } from "lucide-react"
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { Card, CardContent } from "@/components/ui/Card"
-import { Badge } from "@/components/ui/Badge"
 import { Button } from "@/components/ui/Button"
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string, company: string, model: string, part: string }> }): Promise<Metadata> {
   try {
     const resolvedParams = await params
     const part: any = await getPartById(resolvedParams.part)
+    const images = getPartImages(part)
     return {
       title: `${part.item} - ${part.car_models.car_companies.name} ${part.car_models.name} | AutoPartsPro`,
       description: part.description || `Buy ${part.item} for ${part.car_models.car_companies.name} ${part.car_models.name}. Reference: ${part.ref_number}`,
       openGraph: {
-        images: part.image_url ? [part.image_url] : [],
+        images: images.length > 0 ? images : [],
       }
     }
   } catch (e) {
@@ -70,33 +70,12 @@ export default async function PartDetailPage({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          {/* Part Image Card */}
-          <Card className="overflow-hidden">
-            <div className="aspect-square bg-muted/30 relative flex items-center justify-center p-6">
-              {part.image_url ? (
-                <Image
-                  src={part.image_url}
-                  alt={part.item}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-contain p-6 transition-transform duration-300 hover:scale-105"
-                  priority
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground/40">
-                  <ImageIcon className="h-16 w-16" />
-                  <span className="text-xs">No preview diagram available</span>
-                </div>
-              )}
-              {part.categories?.name && (
-                <div className="absolute top-3 left-3">
-                  <Badge variant="secondary" className="text-xs">
-                    {part.categories.name}
-                  </Badge>
-                </div>
-              )}
-            </div>
-          </Card>
+          {/* Part Image Gallery Card */}
+          <PartImageGallery
+            images={getPartImages(part)}
+            title={part.item}
+            categoryName={part.categories?.name}
+          />
 
           {/* Details & Specs Card */}
           <div className="space-y-6">

@@ -5,11 +5,12 @@ import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
-import { PartRow } from "@/lib/services/parts"
-import { CategoryRow } from "@/lib/services/categories"
-import { CompanyRow } from "@/lib/services/companies"
-import { ModelRow } from "@/lib/services/models"
-import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload"
+import type { PartRow } from "@/lib/services/parts"
+import { getPartImages, getPartPublicIds } from "@/lib/utils/images"
+import type { CategoryRow } from "@/lib/services/categories"
+import type { CompanyRow } from "@/lib/services/companies"
+import type { ModelRow } from "@/lib/services/models"
+import { CloudinaryMultiUpload, ImageItem } from "@/components/ui/CloudinaryMultiUpload"
 
 interface PartFormModalProps {
   isOpen: boolean
@@ -30,9 +31,8 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
   const [item, setItem] = useState("")
   const [description, setDescription] = useState("")
   
-  // Cloudinary state
-  const [imageUrl, setImageUrl] = useState("")
-  const [publicId, setPublicId] = useState("")
+  // Cloudinary multi-images state
+  const [imagesList, setImagesList] = useState<ImageItem[]>([])
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -48,8 +48,14 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
         setOemNumber(initialData.oem_number || "")
         setItem(initialData.item)
         setDescription(initialData.description || "")
-        setImageUrl(initialData.image_url || "")
-        setPublicId(initialData.cloudinary_public_id || "")
+
+        const urls = getPartImages(initialData)
+        const publicIds = getPartPublicIds(initialData)
+        const combinedImages: ImageItem[] = urls.map((url, idx) => ({
+          url,
+          publicId: publicIds[idx] || "",
+        }))
+        setImagesList(combinedImages)
       } else {
         setCategoryId("")
         setCompanyId("")
@@ -58,8 +64,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
         setOemNumber("")
         setItem("")
         setDescription("")
-        setImageUrl("")
-        setPublicId("")
+        setImagesList([])
       }
       setError("")
     }
@@ -78,6 +83,9 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
     setLoading(true)
     setError("")
     try {
+      const imageUrls = imagesList.map((img) => img.url).filter(Boolean)
+      const cloudinaryPublicIds = imagesList.map((img) => img.publicId).filter(Boolean)
+
       await onSave({
         category_id: categoryId || null,
         model_id: modelId,
@@ -85,8 +93,10 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
         oem_number: oemNumber || null,
         item,
         description: description || null,
-        image_url: imageUrl || null,
-        cloudinary_public_id: publicId || null
+        image_url: imageUrls[0] || null,
+        cloudinary_public_id: cloudinaryPublicIds[0] || null,
+        image_urls: imageUrls,
+        cloudinary_public_ids: cloudinaryPublicIds,
       })
       onClose()
     } catch (err: any) {
@@ -185,19 +195,11 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Part Image</label>
-          <CloudinaryUpload 
-            value={imageUrl}
-            publicId={publicId}
-            folder={`spare-parts/${companyId}/${modelId}`}
-            onChange={(url, id) => {
-              setImageUrl(url)
-              setPublicId(id)
-            }}
-            onRemove={() => {
-              setImageUrl("")
-              setPublicId("")
-            }}
+          <label className="text-sm font-medium leading-none">Part Images</label>
+          <CloudinaryMultiUpload 
+            images={imagesList}
+            folder={`spare-parts/${companyId || "general"}/${modelId || "general"}`}
+            onChange={(newImages) => setImagesList(newImages)}
           />
         </div>
 

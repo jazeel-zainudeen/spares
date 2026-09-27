@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { getPartImages } from "@/lib/services/parts"
 import Link from "next/link"
 import { ArrowRight, Settings2, Database, Factory, Tags } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card"
@@ -100,31 +101,35 @@ export default async function AdminDashboard() {
         <CardContent>
           {recentParts && recentParts.length > 0 ? (
             <div className="flex flex-col divide-y divide-border">
-              {recentParts.map((part: any) => (
-                <div key={part.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-                  <div className="flex min-w-0 items-center gap-3">
-                    {part.image_url ? (
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={part.image_url} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+              {recentParts.map((part: any) => {
+                const images = getPartImages(part)
+                const mainImage = images[0]
+                return (
+                  <div key={part.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                    <div className="flex min-w-0 items-center gap-3">
+                      {mainImage ? (
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+                        </div>
+                      ) : (
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border bg-muted/30">
+                          <Settings2 className="h-5 w-5 text-muted-foreground/60" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-foreground">{part.item}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {part.car_models?.car_companies?.name} {part.car_models?.name} • <span className="font-mono">{part.ref_number}</span>
+                        </p>
                       </div>
-                    ) : (
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border bg-muted/30">
-                        <Settings2 className="h-5 w-5 text-muted-foreground/60" />
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{part.item}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {part.car_models?.car_companies?.name} {part.car_models?.name} • <span className="font-mono">{part.ref_number}</span>
-                      </p>
                     </div>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {new Date(part.created_at).toLocaleDateString()}
+                    </span>
                   </div>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {new Date(part.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           ) : (
             <div className="py-8 text-center text-sm text-muted-foreground">No parts added yet.</div>

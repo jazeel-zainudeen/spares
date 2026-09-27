@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
-import { CompanyRow } from "@/lib/services/companies"
+import type { CompanyRow } from "@/lib/services/companies"
 
 interface DeleteCompanyModalProps {
   isOpen: boolean

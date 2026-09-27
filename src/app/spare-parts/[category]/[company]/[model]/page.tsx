@@ -1,10 +1,11 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getPublicParts } from "@/lib/services/parts"
+import { getPublicParts, getPartImages } from "@/lib/services/parts"
 import { getModels } from "@/lib/services/models"
 import { fetchCompaniesAction } from "@/app/actions/companies"
 import { fetchCategoriesAction } from "@/app/actions/categories"
 import { SearchBar } from "@/components/public/SearchBar"
+import { ListingImageCarousel } from "@/components/public/ListingImageCarousel"
 import { Image as ImageIcon, ChevronRight, ArrowLeft, Car } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
@@ -136,22 +137,15 @@ export default async function ModelCatalogPage({
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {parts.map((part: any) => {
                   const href = `/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${resolvedParams.model}/${part.id}`
+                  const images = getPartImages(part)
 
                   return (
                     <Link key={part.id} href={href} className="group">
                       <Card className="h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-xs">
-                        <div className="aspect-16/10 bg-muted/40 relative flex items-center justify-center p-3 border-b border-border/60">
-                          {part.image_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={part.image_url}
-                              alt={part.item}
-                              className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                            />
-                          ) : (
-                            <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
-                          )}
-                        </div>
+                        <ListingImageCarousel
+                          images={images}
+                          title={part.item}
+                        />
                         <CardContent className="p-3.5 space-y-2">
                           <div className="text-[11px] font-medium text-primary truncate">
                             {currentCompany.name} • {currentModel.name}

@@ -29,4 +29,7 @@ export const partSchema = z.object({
   oem_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   image_url: z.string().url().optional().nullable().or(z.literal('')),
+  cloudinary_public_id: z.string().optional().nullable().or(z.literal('')),
+  image_urls: z.array(z.string()).optional().default([]),
+  cloudinary_public_ids: z.array(z.string()).optional().default([]),
 })

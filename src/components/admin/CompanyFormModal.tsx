@@ -5,7 +5,7 @@ import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload"
-import { CompanyRow } from "@/lib/services/companies"
+import type { CompanyRow } from "@/lib/services/companies"
 
 interface CompanyFormModalProps {
   isOpen: boolean
