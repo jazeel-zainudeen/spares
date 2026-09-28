@@ -6,19 +6,27 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { Search, Plus, Edit, Trash2 } from "lucide-react"
+import { Badge } from "@/components/ui/Badge"
+import { Search, Plus, Edit, Trash2, ArrowUpDown } from "lucide-react"
 import { CategoryFormModal } from "./CategoryFormModal"
 import { DeleteCategoryModal } from "./DeleteCategoryModal"
+import { SortableHeader } from "./SortableHeader"
 import { createCategoryAction, updateCategoryAction, deleteCategoryAction } from "@/app/actions/categories"
-
 import { Pagination } from "@/components/ui/Pagination"
 
 const PAGE_SIZE = 10
+
+type SortField = "name" | "created_at"
+type SortOrder = "asc" | "desc"
 
 export function CategoryList({ initialCategories }: { initialCategories: CategoryRow[] }) {
   const [categories, setCategories] = useState<CategoryRow[]>(initialCategories)
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<SortField>("created_at")
+  const [sortDirection, setSortDirection] = useState<SortOrder>("desc")
 
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -26,12 +34,35 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
   const [editingCategory, setEditingCategory] = useState<CategoryRow | null>(null)
   const [deletingCategory, setDeletingCategory] = useState<CategoryRow | null>(null)
 
+  const handleSort = (column: string) => {
+    const col = column as SortField
+    if (sortColumn === col) {
+      setSortDirection(prev => (prev === "asc" ? "desc" : "asc"))
+    } else {
+      setSortColumn(col)
+      setSortDirection("asc")
+    }
+    setCurrentPage(1)
+  }
+
   const filteredCategories = categories.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  const totalPages = Math.ceil(filteredCategories.length / PAGE_SIZE)
-  const paginatedCategories = filteredCategories.slice(
+  const sortedCategories = [...filteredCategories].sort((a, b) => {
+    let result = 0
+    if (sortColumn === "name") {
+      result = a.name.localeCompare(b.name)
+    } else if (sortColumn === "created_at") {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : 0
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : 0
+      result = timeA - timeB
+    }
+    return sortDirection === "asc" ? result : -result
+  })
+
+  const totalPages = Math.ceil(sortedCategories.length / PAGE_SIZE)
+  const paginatedCategories = sortedCategories.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   )
@@ -74,6 +105,8 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
     setCategories(categories.filter(c => c.id !== id))
   }
 
+  const sortLabel = sortColumn === "created_at" ? "Created Time" : "Name"
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -92,7 +125,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>All Categories</CardTitle>
-              <CardDescription>Total {categories.length} categories available</CardDescription>
+              <CardDescription className="mt-1">Total {categories.length} categories available</CardDescription>
             </div>
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -106,7 +139,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
           </div>
         </CardHeader>
         <CardContent>
-          {filteredCategories.length === 0 ? (
+          {sortedCategories.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
               {search ? "No categories found matching your search." : "No categories added yet."}
             </div>
@@ -132,6 +165,14 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                       )}
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{category.name}</div>
+                        <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                          {category.created_at
+                            ? new Date(category.created_at).toLocaleString(undefined, {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })
+                            : "—"}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -163,19 +204,34 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Image</TableHead>
-                      <TableHead>Created At</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <SortableHeader
+                        label="Name"
+                        columnKey="name"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        className="w-full"
+                      />
+                      <TableHead className="w-px whitespace-nowrap text-center">Image</TableHead>
+                      <SortableHeader
+                        label="Created At"
+                        columnKey="created_at"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <TableHead className="w-px whitespace-nowrap text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedCategories.map(category => (
                       <TableRow key={category.id}>
                         <TableCell className="font-medium">{category.name}</TableCell>
-                        <TableCell>
+                        <TableCell className="w-px whitespace-nowrap text-center">
                           {category.image_url ? (
-                            <div className="flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
+                            <div className="mx-auto flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={category.image_url} alt={category.name} className="h-full object-contain" loading="lazy" decoding="async" />
                             </div>
@@ -183,7 +239,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                             <span className="text-xs text-muted-foreground">No image</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-xs text-muted-foreground font-mono">
+                        <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
                           {category.created_at
                             ? new Date(category.created_at).toLocaleString(undefined, {
                                 dateStyle: "short",
@@ -191,7 +247,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                               })
                             : "—"}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="w-px whitespace-nowrap text-right">
                           <div className="flex justify-end gap-1">
                             <Button
                               variant="ghost"
@@ -222,7 +278,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
-                totalItems={filteredCategories.length}
+                totalItems={sortedCategories.length}
                 pageSize={PAGE_SIZE}
               />
             </>

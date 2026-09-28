@@ -163,11 +163,17 @@ async function getOrCreateCompany(name, rawLogoUrl = null) {
   return data.id;
 }
 
-async function getOrCreateModel(companyId, modelName) {
+async function getOrCreateModel(companyId, modelName, rawImageUrl = null) {
   if (!modelName) modelName = "General";
   const modelSlug = slugify(modelName) || "general";
   const cacheKey = `${companyId}:${modelSlug}`;
   if (cache.models.has(cacheKey)) return cache.models.get(cacheKey);
+
+  let modelImageUrl = null;
+  if (rawImageUrl) {
+    const uploaded = await uploadToCloudinary(rawImageUrl, 'spares/models');
+    modelImageUrl = uploaded.url;
+  }
 
   let { data } = await supabase.from('car_models').select('*').eq('company_id', companyId).eq('slug', modelSlug).maybeSingle();
   if (!data) {
@@ -175,12 +181,15 @@ async function getOrCreateModel(companyId, modelName) {
       company_id: companyId,
       name: modelName,
       slug: modelSlug,
+      image_url: modelImageUrl,
     }).select().single();
     if (error) {
       console.error(`Error inserting model ${modelName}:`, error.message);
       return null;
     }
     data = newData;
+  } else if (modelImageUrl && (!data.image_url || !data.image_url.includes('res.cloudinary.com'))) {
+    await supabase.from('car_models').update({ image_url: modelImageUrl }).eq('id', data.id);
   }
   cache.models.set(cacheKey, data.id);
   return data.id;
@@ -372,7 +381,7 @@ async function scrape() {
         if (!companyId) continue;
 
         const modelName = details.vehicleModel || "General";
-        const modelId = await getOrCreateModel(companyId, modelName);
+        const modelId = await getOrCreateModel(companyId, modelName, details.image_url);
         if (!modelId) continue;
 
         const { data: existingPart } = await supabase

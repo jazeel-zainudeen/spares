@@ -13,7 +13,7 @@ export async function getModels(companyId?: string): Promise<ModelRow[]> {
   return unstable_cache(
     async () => {
       const supabase = getPublicClient()
-      let query = supabase.from('car_models').select('*, car_companies(name)')
+      let query = supabase.from('car_models').select('*, car_companies(name, logo_url, slug)')
       
       if (companyId) {
         query = query.eq('company_id', companyId)

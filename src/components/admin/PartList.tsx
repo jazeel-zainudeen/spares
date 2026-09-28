@@ -11,13 +11,18 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { Search, Plus, Edit, Trash2, Image as ImageIcon } from "lucide-react"
+import { Badge } from "@/components/ui/Badge"
+import { Search, Plus, Edit, Trash2, Image as ImageIcon, ArrowUpDown } from "lucide-react"
 import { PartFormModal } from "./PartFormModal"
 import { DeletePartModal } from "./DeletePartModal"
+import { SortableHeader } from "./SortableHeader"
 import { createPartAction, updatePartAction, deletePartAction } from "@/app/actions/parts"
 import { Pagination } from "@/components/ui/Pagination"
 
 const PAGE_SIZE = 10
+
+type SortField = "item" | "ref_number" | "oem_number" | "category" | "model" | "created_at"
+type SortOrder = "asc" | "desc"
 
 export function PartList({ initialParts, categories, companies, models }: { initialParts: any[], categories: CategoryRow[], companies: CompanyRow[], models: ModelRow[] }) {
   const [parts, setParts] = useState<any[]>(initialParts)
@@ -27,11 +32,26 @@ export function PartList({ initialParts, categories, companies, models }: { init
   const [modelFilter, setModelFilter] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
 
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<SortField>("created_at")
+  const [sortDirection, setSortDirection] = useState<SortOrder>("desc")
+
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [editingPart, setEditingPart] = useState<PartRow | null>(null)
   const [deletingPart, setDeletingPart] = useState<PartRow | null>(null)
+
+  const handleSort = (column: string) => {
+    const col = column as SortField
+    if (sortColumn === col) {
+      setSortDirection(prev => (prev === "asc" ? "desc" : "asc"))
+    } else {
+      setSortColumn(col)
+      setSortDirection("asc")
+    }
+    setCurrentPage(1)
+  }
 
   const filteredParts = parts.filter(p => {
     const searchString = `${p.item} ${p.ref_number} ${p.oem_number || ''}`.toLowerCase()
@@ -52,8 +72,32 @@ export function PartList({ initialParts, categories, companies, models }: { init
     return matchesSearch && matchesCategory && matchesCompany && matchesModel
   })
 
-  const totalPages = Math.ceil(filteredParts.length / PAGE_SIZE)
-  const paginatedParts = filteredParts.slice(
+  const sortedParts = [...filteredParts].sort((a, b) => {
+    let result = 0
+    if (sortColumn === "item") {
+      result = (a.item || "").localeCompare(b.item || "")
+    } else if (sortColumn === "ref_number") {
+      result = (a.ref_number || "").localeCompare(b.ref_number || "")
+    } else if (sortColumn === "oem_number") {
+      result = (a.oem_number || "").localeCompare(b.oem_number || "")
+    } else if (sortColumn === "category") {
+      const catA = a.categories?.name || ""
+      const catB = b.categories?.name || ""
+      result = catA.localeCompare(catB)
+    } else if (sortColumn === "model") {
+      const modA = `${a.car_models?.car_companies?.name || ''} ${a.car_models?.name || ''}`
+      const modB = `${b.car_models?.car_companies?.name || ''} ${b.car_models?.name || ''}`
+      result = modA.localeCompare(modB)
+    } else if (sortColumn === "created_at") {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : 0
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : 0
+      result = timeA - timeB
+    }
+    return sortDirection === "asc" ? result : -result
+  })
+
+  const totalPages = Math.ceil(sortedParts.length / PAGE_SIZE)
+  const paginatedParts = sortedParts.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   )
@@ -118,6 +162,14 @@ export function PartList({ initialParts, categories, companies, models }: { init
   const companyOptions = companies.map(c => ({ label: c.name, value: c.id }))
   const modelOptions = availableModelsForFilter.map(m => ({ label: m.name, value: m.id }))
 
+  const sortLabel = sortColumn === "created_at"
+    ? "Created Time"
+    : sortColumn === "ref_number"
+    ? "Ref #"
+    : sortColumn === "oem_number"
+    ? "OEM #"
+    : sortColumn.charAt(0).toUpperCase() + sortColumn.slice(1)
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -136,7 +188,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
           <div className="flex flex-col gap-3">
             <div>
               <CardTitle>Catalog Inventory</CardTitle>
-              <CardDescription>Total {parts.length} spare parts registered in the database</CardDescription>
+              <CardDescription className="mt-1">Total {parts.length} spare parts registered in the database</CardDescription>
             </div>
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
               <div className="relative">
@@ -171,7 +223,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
           </div>
         </CardHeader>
         <CardContent>
-          {filteredParts.length === 0 ? (
+          {sortedParts.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
               {(search || companyFilter || modelFilter || categoryFilter) ? "No parts found matching your filters." : "No parts added yet."}
             </div>
@@ -237,15 +289,20 @@ export function PartList({ initialParts, categories, companies, models }: { init
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border/60 text-[11px] font-mono text-muted-foreground">
-                        <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
-                          REF: {part.ref_number}
-                        </span>
-                        {part.oem_number && (
+                      <div className="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-border/60 text-[11px] font-mono text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
                           <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
-                            OEM: {part.oem_number}
+                            REF: {part.ref_number}
                           </span>
-                        )}
+                          {part.oem_number && (
+                            <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
+                              OEM: {part.oem_number}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-muted-foreground/80">
+                          {part.created_at ? new Date(part.created_at).toLocaleDateString() : ""}
+                        </span>
                       </div>
                     </div>
                   )
@@ -257,14 +314,61 @@ export function PartList({ initialParts, categories, companies, models }: { init
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-16">Image</TableHead>
-                      <TableHead>Item</TableHead>
-                      <TableHead>Ref #</TableHead>
-                      <TableHead>OEM #</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Model / Brand</TableHead>
-                      <TableHead>Created At</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead className="w-px whitespace-nowrap text-center">Image</TableHead>
+                      <SortableHeader
+                        label="Item"
+                        columnKey="item"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        className="w-full"
+                      />
+                      <SortableHeader
+                        label="Ref #"
+                        columnKey="ref_number"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <SortableHeader
+                        label="OEM #"
+                        columnKey="oem_number"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <SortableHeader
+                        label="Category"
+                        columnKey="category"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <SortableHeader
+                        label="Model / Brand"
+                        columnKey="model"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <SortableHeader
+                        label="Created At"
+                        columnKey="created_at"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <TableHead className="w-px whitespace-nowrap text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -273,9 +377,9 @@ export function PartList({ initialParts, categories, companies, models }: { init
                       const mainImage = images[0]
                       return (
                         <TableRow key={part.id}>
-                          <TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-center">
                             {mainImage ? (
-                              <div className="relative flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
+                              <div className="mx-auto relative flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
                                 {images.length > 1 && (
@@ -285,49 +389,49 @@ export function PartList({ initialParts, categories, companies, models }: { init
                                 )}
                               </div>
                             ) : (
-                              <div className="flex h-10 w-12 items-center justify-center rounded-md border border-border bg-muted/30">
+                              <div className="mx-auto flex h-10 w-12 items-center justify-center rounded-md border border-border bg-muted/30">
                                 <ImageIcon className="h-4 w-4 text-muted-foreground" />
                               </div>
                             )}
                           </TableCell>
-                        <TableCell className="font-medium text-foreground">{part.item}</TableCell>
-                        <TableCell className="font-mono text-xs text-muted-foreground">{part.ref_number}</TableCell>
-                        <TableCell className="font-mono text-xs text-muted-foreground">{part.oem_number || "—"}</TableCell>
-                        <TableCell className="text-muted-foreground">{part.categories?.name || "—"}</TableCell>
-                        <TableCell>
-                          <div className="text-xs font-medium text-foreground">{part.car_models?.name || "Unknown"}</div>
-                          <div className="text-[11px] text-muted-foreground">{part.car_models?.car_companies?.name || ""}</div>
-                        </TableCell>
-                        <TableCell className="text-xs text-muted-foreground font-mono">
-                          {part.created_at
-                            ? new Date(part.created_at).toLocaleString(undefined, {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })
-                            : "—"}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handleEdit(part)}
-                              aria-label="Edit part"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                              onClick={() => handleDelete(part)}
-                              aria-label="Delete part"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                          <TableCell className="font-medium text-foreground">{part.item}</TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-center font-mono text-xs text-muted-foreground">{part.ref_number}</TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-center font-mono text-xs text-muted-foreground">{part.oem_number || "—"}</TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-center text-muted-foreground">{part.categories?.name || "—"}</TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-center">
+                            <div className="text-xs font-medium text-foreground">{part.car_models?.name || "Unknown"}</div>
+                            <div className="text-[11px] text-muted-foreground">{part.car_models?.car_companies?.name || ""}</div>
+                          </TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
+                            {part.created_at
+                              ? new Date(part.created_at).toLocaleString(undefined, {
+                                  dateStyle: "short",
+                                  timeStyle: "short",
+                                })
+                              : "—"}
+                          </TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => handleEdit(part)}
+                                aria-label="Edit part"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                onClick={() => handleDelete(part)}
+                                aria-label="Delete part"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       )
                     })}
                   </TableBody>
@@ -338,7 +442,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
-                totalItems={filteredParts.length}
+                totalItems={sortedParts.length}
                 pageSize={PAGE_SIZE}
               />
             </>

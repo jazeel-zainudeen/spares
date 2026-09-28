@@ -8,14 +8,18 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { Search, Plus, Edit, Trash2, Car } from "lucide-react"
+import { Badge } from "@/components/ui/Badge"
+import { Search, Plus, Edit, Trash2, ArrowUpDown } from "lucide-react"
 import { ModelFormModal } from "./ModelFormModal"
 import { DeleteModelModal } from "./DeleteModelModal"
+import { SortableHeader } from "./SortableHeader"
 import { createModelAction, updateModelAction, deleteModelAction } from "@/app/actions/models"
-
 import { Pagination } from "@/components/ui/Pagination"
 
 const PAGE_SIZE = 10
+
+type SortField = "name" | "company" | "created_at"
+type SortOrder = "asc" | "desc"
 
 export function ModelList({ initialModels, companies }: { initialModels: any[], companies: CompanyRow[] }) {
   const [models, setModels] = useState<any[]>(initialModels)
@@ -23,11 +27,26 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
   const [companyFilter, setCompanyFilter] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
 
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<SortField>("created_at")
+  const [sortDirection, setSortDirection] = useState<SortOrder>("desc")
+
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [editingModel, setEditingModel] = useState<ModelRow | null>(null)
   const [deletingModel, setDeletingModel] = useState<ModelRow | null>(null)
+
+  const handleSort = (column: string) => {
+    const col = column as SortField
+    if (sortColumn === col) {
+      setSortDirection(prev => (prev === "asc" ? "desc" : "asc"))
+    } else {
+      setSortColumn(col)
+      setSortDirection("asc")
+    }
+    setCurrentPage(1)
+  }
 
   const filteredModels = models.filter(m => {
     const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase())
@@ -35,8 +54,24 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
     return matchesSearch && matchesCompany
   })
 
-  const totalPages = Math.ceil(filteredModels.length / PAGE_SIZE)
-  const paginatedModels = filteredModels.slice(
+  const sortedModels = [...filteredModels].sort((a, b) => {
+    let result = 0
+    if (sortColumn === "name") {
+      result = a.name.localeCompare(b.name)
+    } else if (sortColumn === "company") {
+      const compA = a.car_companies?.name || ""
+      const compB = b.car_companies?.name || ""
+      result = compA.localeCompare(compB)
+    } else if (sortColumn === "created_at") {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : 0
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : 0
+      result = timeA - timeB
+    }
+    return sortDirection === "asc" ? result : -result
+  })
+
+  const totalPages = Math.ceil(sortedModels.length / PAGE_SIZE)
+  const paginatedModels = sortedModels.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   )
@@ -89,6 +124,8 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
     value: c.id
   }))
 
+  const sortLabel = sortColumn === "created_at" ? "Created Time" : sortColumn === "company" ? "Company" : "Model Name"
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -107,7 +144,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>All Models</CardTitle>
-              <CardDescription>Total {models.length} car models registered</CardDescription>
+              <CardDescription className="mt-1">Total {models.length} car models registered</CardDescription>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <div className="relative w-full sm:w-64">
@@ -131,7 +168,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
           </div>
         </CardHeader>
         <CardContent>
-          {filteredModels.length === 0 ? (
+          {sortedModels.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
               {(search || companyFilter) ? "No models found matching your filters." : "No models added yet."}
             </div>
@@ -144,19 +181,16 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                     key={model.id}
                     className="flex items-center justify-between rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-primary overflow-hidden p-1">
-                        {model.image_url ? (
-                          <img src={model.image_url} alt={model.name} className="h-full w-full object-cover" />
-                        ) : model.car_companies?.logo_url ? (
-                          <img src={model.car_companies.logo_url} alt={model.name} className="h-full w-full object-contain" />
-                        ) : (
-                          <Car className="h-5 w-5 text-primary" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-semibold text-sm text-foreground truncate">{model.name}</div>
-                        <div className="text-xs text-primary font-medium truncate mt-0.5">{model.car_companies?.name || "Unknown"}</div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm text-foreground truncate">{model.name}</div>
+                      <div className="text-xs text-primary font-medium truncate mt-0.5">{model.car_companies?.name || "Unknown"}</div>
+                      <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                        {model.created_at
+                          ? new Date(model.created_at).toLocaleString(undefined, {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            })
+                          : "—"}
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -188,31 +222,43 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Model</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead>Created At</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <SortableHeader
+                        label="Model"
+                        columnKey="name"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        className="w-full"
+                      />
+                      <SortableHeader
+                        label="Company"
+                        columnKey="company"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <SortableHeader
+                        label="Created At"
+                        columnKey="created_at"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <TableHead className="w-px whitespace-nowrap text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedModels.map(model => (
                       <TableRow key={model.id}>
                         <TableCell className="font-medium">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-primary overflow-hidden p-1">
-                              {model.image_url ? (
-                                <img src={model.image_url} alt={model.name} className="h-full w-full object-cover" />
-                              ) : model.car_companies?.logo_url ? (
-                                <img src={model.car_companies.logo_url} alt={model.name} className="h-full w-full object-contain" />
-                              ) : (
-                                <Car className="h-4 w-4 text-primary" />
-                              )}
-                            </div>
-                            <span className="font-semibold text-foreground">{model.name}</span>
-                          </div>
+                          <span className="font-semibold text-foreground">{model.name}</span>
                         </TableCell>
-                        <TableCell>{model.car_companies?.name || "Unknown"}</TableCell>
-                        <TableCell className="text-xs text-muted-foreground font-mono">
+                        <TableCell className="w-px whitespace-nowrap text-center">{model.car_companies?.name || "Unknown"}</TableCell>
+                        <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
                           {model.created_at
                             ? new Date(model.created_at).toLocaleString(undefined, {
                                 dateStyle: "short",
@@ -220,7 +266,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                               })
                             : "—"}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="w-px whitespace-nowrap text-right">
                           <div className="flex justify-end gap-1">
                             <Button
                               variant="ghost"
@@ -251,7 +297,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
-                totalItems={filteredModels.length}
+                totalItems={sortedModels.length}
                 pageSize={PAGE_SIZE}
               />
             </>

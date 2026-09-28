@@ -6,19 +6,27 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { Search, Plus, Edit, Trash2 } from "lucide-react"
+import { Badge } from "@/components/ui/Badge"
+import { Search, Plus, Edit, Trash2, ArrowUpDown } from "lucide-react"
 import { CompanyFormModal } from "./CompanyFormModal"
 import { DeleteCompanyModal } from "./DeleteCompanyModal"
+import { SortableHeader } from "./SortableHeader"
 import { createCompanyAction, updateCompanyAction, deleteCompanyAction } from "@/app/actions/companies"
-
 import { Pagination } from "@/components/ui/Pagination"
 
 const PAGE_SIZE = 10
+
+type SortField = "name" | "created_at"
+type SortOrder = "asc" | "desc"
 
 export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow[] }) {
   const [companies, setCompanies] = useState<CompanyRow[]>(initialCompanies)
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<SortField>("created_at")
+  const [sortDirection, setSortDirection] = useState<SortOrder>("desc")
 
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -26,12 +34,35 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
   const [editingCompany, setEditingCompany] = useState<CompanyRow | null>(null)
   const [deletingCompany, setDeletingCompany] = useState<CompanyRow | null>(null)
 
+  const handleSort = (column: string) => {
+    const col = column as SortField
+    if (sortColumn === col) {
+      setSortDirection(prev => (prev === "asc" ? "desc" : "asc"))
+    } else {
+      setSortColumn(col)
+      setSortDirection("asc")
+    }
+    setCurrentPage(1)
+  }
+
   const filteredCompanies = companies.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  const totalPages = Math.ceil(filteredCompanies.length / PAGE_SIZE)
-  const paginatedCompanies = filteredCompanies.slice(
+  const sortedCompanies = [...filteredCompanies].sort((a, b) => {
+    let result = 0
+    if (sortColumn === "name") {
+      result = a.name.localeCompare(b.name)
+    } else if (sortColumn === "created_at") {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : 0
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : 0
+      result = timeA - timeB
+    }
+    return sortDirection === "asc" ? result : -result
+  })
+
+  const totalPages = Math.ceil(sortedCompanies.length / PAGE_SIZE)
+  const paginatedCompanies = sortedCompanies.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   )
@@ -74,6 +105,8 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
     setCompanies(companies.filter(c => c.id !== id))
   }
 
+  const sortLabel = sortColumn === "created_at" ? "Created Time" : "Name"
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -92,7 +125,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>All Companies</CardTitle>
-              <CardDescription>Total {companies.length} manufacturers listed</CardDescription>
+              <CardDescription className="mt-1">Total {companies.length} manufacturers listed</CardDescription>
             </div>
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -106,7 +139,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
           </div>
         </CardHeader>
         <CardContent>
-          {filteredCompanies.length === 0 ? (
+          {sortedCompanies.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
               {search ? "No companies found matching your search." : "No companies added yet."}
             </div>
@@ -132,6 +165,14 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                       )}
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{company.name}</div>
+                        <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                          {company.created_at
+                            ? new Date(company.created_at).toLocaleString(undefined, {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })
+                            : "—"}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -163,19 +204,34 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Logo</TableHead>
-                      <TableHead>Created At</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <SortableHeader
+                        label="Name"
+                        columnKey="name"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        className="w-full"
+                      />
+                      <TableHead className="w-px whitespace-nowrap text-center">Logo</TableHead>
+                      <SortableHeader
+                        label="Created At"
+                        columnKey="created_at"
+                        currentSortColumn={sortColumn}
+                        currentSortDirection={sortDirection}
+                        onSort={handleSort}
+                        align="center"
+                        className="w-px whitespace-nowrap"
+                      />
+                      <TableHead className="w-px whitespace-nowrap text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedCompanies.map(company => (
                       <TableRow key={company.id}>
                         <TableCell className="font-medium">{company.name}</TableCell>
-                        <TableCell>
+                        <TableCell className="w-px whitespace-nowrap text-center">
                           {company.logo_url ? (
-                            <div className="flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
+                            <div className="mx-auto flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={company.logo_url} alt={company.name} className="h-full object-contain" loading="lazy" decoding="async" />
                             </div>
@@ -183,7 +239,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                             <span className="text-xs text-muted-foreground">No logo</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-xs text-muted-foreground font-mono">
+                        <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
                           {company.created_at
                             ? new Date(company.created_at).toLocaleString(undefined, {
                                 dateStyle: "short",
@@ -191,7 +247,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                               })
                             : "—"}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="w-px whitespace-nowrap text-right">
                           <div className="flex justify-end gap-1">
                             <Button
                               variant="ghost"
@@ -222,7 +278,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
-                totalItems={filteredCompanies.length}
+                totalItems={sortedCompanies.length}
                 pageSize={PAGE_SIZE}
               />
             </>
