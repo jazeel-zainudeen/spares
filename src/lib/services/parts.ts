@@ -46,16 +46,34 @@ export async function getPublicParts(options?: {
       count: 'exact',
     })
 
+  // Multi-select category filtering
   if (options?.categorySlug) {
-    query = query.eq('categories.slug', options.categorySlug)
+    const cats = options.categorySlug.split(',').map(s => s.trim()).filter(Boolean)
+    if (cats.length === 1) {
+      query = query.eq('categories.slug', cats[0])
+    } else if (cats.length > 1) {
+      query = query.in('categories.slug', cats)
+    }
   }
 
+  // Multi-select brand/company filtering
   if (options?.companySlug) {
-    query = query.eq('car_models.car_companies.slug', options.companySlug)
+    const comps = options.companySlug.split(',').map(s => s.trim()).filter(Boolean)
+    if (comps.length === 1) {
+      query = query.eq('car_models.car_companies.slug', comps[0])
+    } else if (comps.length > 1) {
+      query = query.in('car_models.car_companies.slug', comps)
+    }
   }
-  
+
+  // Multi-select model filtering
   if (options?.modelSlug) {
-    query = query.eq('car_models.slug', options.modelSlug)
+    const mods = options.modelSlug.split(',').map(s => s.trim()).filter(Boolean)
+    if (mods.length === 1) {
+      query = query.eq('car_models.slug', mods[0])
+    } else if (mods.length > 1) {
+      query = query.in('car_models.slug', mods)
+    }
   }
   
   if (options?.search) {
