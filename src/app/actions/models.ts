@@ -2,12 +2,12 @@
 
 import { requireAuth } from '@/lib/auth'
 import { revalidatePath, updateTag } from 'next/cache'
-import { getModels, createModel, updateModel, deleteModel, ModelRow, ModelInsert, ModelUpdate } from '@/lib/services/models'
+import { getModels, getModelsWithCompany, createModel, updateModel, deleteModel, ModelRow, ModelInsert, ModelUpdate } from '@/lib/services/models'
 import { getParts } from '@/lib/services/parts'
 
-export async function fetchModelsAction(companyId?: string): Promise<{ data?: ModelRow[], error?: string }> {
+export async function fetchModelsAction(companyIdentifier?: string): Promise<{ data?: ModelRow[], error?: string }> {
   try {
-    const data = await getModels(companyId)
+    const data = await getModelsWithCompany(companyIdentifier)
     return { data }
   } catch (err: any) {
     return { error: err.message || 'Failed to fetch models' }

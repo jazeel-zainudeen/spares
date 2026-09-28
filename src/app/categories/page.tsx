@@ -39,7 +39,7 @@ export default async function CategoriesPage() {
           {categories.map((category) => (
             <Link
               key={category.id}
-              href={`/spare-parts/${category.slug}`}
+              href={`/spare-parts?category=${category.slug}`}
               className="group block"
             >
               <Card className="h-full overflow-hidden transition-all duration-200 hover:border-primary/40 hover:shadow-sm">

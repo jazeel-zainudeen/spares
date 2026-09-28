@@ -136,7 +136,7 @@ export default async function ModelsPage({
                 {group.models.map((model: any) => (
                   <Link
                     key={model.id}
-                    href={`/spare-parts?model=${model.slug}`}
+                    href={`/spare-parts?brand=${group.company.slug || ''}&model=${model.slug}`}
                     className="group block"
                   >
                     <Card className="h-full overflow-hidden transition-all duration-200 hover:border-primary/40 hover:shadow-sm">

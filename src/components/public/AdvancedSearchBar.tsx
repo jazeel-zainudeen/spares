@@ -61,27 +61,19 @@ export function AdvancedSearchBar({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
 
-    let url = `/spare-parts`
-    if (category) {
-      url += `/${category}`
-    }
-
     const params = new URLSearchParams()
     if (query.trim()) params.append('search', query.trim())
+    if (category) params.append('category', category)
     if (company) params.append('brand', company)
     if (model) params.append('model', model)
 
     const queryString = params.toString()
-    if (queryString) {
-      url += `?${queryString}`
-    }
-
-    router.push(url)
+    router.push(`/spare-parts${queryString ? `?${queryString}` : ""}`)
   }
 
   // Filter models based on selected company
   const availableModels = company
-    ? models.filter(m => m.company_id === company)
+    ? models.filter(m => m.car_companies?.slug === company || m.company_id === company)
     : models
 
   return (
@@ -122,7 +114,7 @@ export function AdvancedSearchBar({
               setCompany(e.target.value)
               setModel("")
             }}
-            options={[{ label: "All Brands", value: "" }, ...companies.map(c => ({ label: c.name, value: c.id }))]}
+            options={[{ label: "All Brands", value: "" }, ...companies.map(c => ({ label: c.name, value: c.slug }))]}
             placeholder="All Brands"
           />
 
