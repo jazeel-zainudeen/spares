@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { getPartById, getPartImages } from "@/lib/services/parts"
 import { PartImageGallery } from "@/components/public/PartImageGallery"
-import { ArrowLeft, CheckCircle2, Factory, Hash, FileText } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Factory, Hash, FileText, Layers, Calendar, Car } from "lucide-react"
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { Card, CardContent } from "@/components/ui/Card"
@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
     const part: any = await getPartById(resolvedParams.part)
     const images = getPartImages(part)
     return {
-      title: `${part.item} - ${part.car_models.car_companies.name} ${part.car_models.name} | AutoPartsPro`,
-      description: part.description || `Buy ${part.item} for ${part.car_models.car_companies.name} ${part.car_models.name}. Reference: ${part.ref_number}`,
+      title: `${part.item} - ${part.car_models?.car_companies?.name || ''} ${part.car_models?.name || ''} | AutoPartsPro`,
+      description: part.description || `Buy ${part.item} for ${part.car_models?.car_companies?.name || ''} ${part.car_models?.name || ''}. Reference: ${part.ref_number}`,
       openGraph: {
         images: images.length > 0 ? images : [],
       }
@@ -33,11 +33,15 @@ export default async function PartDetailPage({
     const resolvedParams = await params
     const part: any = await getPartById(resolvedParams.part)
 
-    if (part.car_models.slug !== resolvedParams.model || part.car_models.car_companies.slug !== resolvedParams.company || part.categories?.slug !== resolvedParams.category) {
+    const catSlug = part.categories?.slug || "uncategorized"
+    const compSlug = part.car_models?.car_companies?.slug || "unknown"
+    const modSlug = part.car_models?.slug || "model"
+
+    if (modSlug !== resolvedParams.model || compSlug !== resolvedParams.company || catSlug !== resolvedParams.category) {
       notFound()
     }
 
-    const backUrl = `/spare-parts/${resolvedParams.category}/${resolvedParams.company}/${resolvedParams.model}`
+    const catalogFilterUrl = `/spare-parts?brand=${resolvedParams.company}&model=${resolvedParams.model}`
 
     return (
       <div className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
@@ -46,25 +50,25 @@ export default async function PartDetailPage({
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
             <Link href="/spare-parts" className="hover:text-foreground transition-colors">Catalog</Link>
             <span>/</span>
-            <Link href={`/spare-parts/${resolvedParams.category}`} className="hover:text-foreground transition-colors">
+            <Link href={`/spare-parts?category=${resolvedParams.category}`} className="hover:text-foreground transition-colors">
               {part.categories?.name || 'Category'}
             </Link>
             <span>/</span>
-            <Link href={`/spare-parts/${resolvedParams.category}/${resolvedParams.company}`} className="hover:text-foreground transition-colors">
-              {part.car_models.car_companies.name}
+            <Link href={`/spare-parts?brand=${resolvedParams.company}`} className="hover:text-foreground transition-colors">
+              {part.car_models?.car_companies?.name || 'Brand'}
             </Link>
             <span>/</span>
-            <Link href={backUrl} className="hover:text-foreground transition-colors">
-              {part.car_models.name}
+            <Link href={catalogFilterUrl} className="hover:text-foreground transition-colors">
+              {part.car_models?.name || 'Model'}
             </Link>
             <span>/</span>
             <span className="text-foreground font-medium truncate max-w-50">{part.item}</span>
           </div>
 
           <Button variant="ghost" size="sm" asChild className="gap-1.5 -ml-2 text-xs text-muted-foreground hover:text-foreground">
-            <Link href={backUrl}>
+            <Link href={catalogFilterUrl}>
               <ArrowLeft className="h-3.5 w-3.5" />
-              Back to {part.car_models.name} Parts
+              Back to {part.car_models?.name || 'Catalog'} Parts
             </Link>
           </Button>
         </div>
@@ -82,7 +86,7 @@ export default async function PartDetailPage({
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary mb-2">
                 <Factory className="h-3.5 w-3.5" />
-                <span>{part.car_models.car_companies.name} {part.car_models.name}</span>
+                <span>{part.car_models?.car_companies?.name} {part.car_models?.name}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
                 {part.item}
@@ -113,12 +117,37 @@ export default async function PartDetailPage({
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-3.5">
-                  <span className="text-xs text-muted-foreground">Compatibility</span>
-                  <span className="text-xs font-medium text-foreground">
-                    {part.car_models.car_companies.name} {part.car_models.name}
+                <div className="flex items-center justify-between py-3.5">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Layers className="h-4 w-4 text-primary" />
+                    <span>Component Category</span>
+                  </div>
+                  <span className="text-xs font-semibold text-foreground">
+                    {part.categories?.name || 'General Auto Part'}
                   </span>
                 </div>
+
+                <div className="flex items-center justify-between py-3.5">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Car className="h-4 w-4 text-primary" />
+                    <span>Compatibility</span>
+                  </div>
+                  <span className="text-xs font-medium text-foreground">
+                    {part.car_models?.car_companies?.name} {part.car_models?.name}
+                  </span>
+                </div>
+
+                {part.created_at && (
+                  <div className="flex items-center justify-between pt-3.5">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span>Catalog Date</span>
+                    </div>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {new Date(part.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
