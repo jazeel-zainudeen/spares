@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
@@ -8,7 +9,6 @@ import {
   Car,
   Settings,
   LogOut,
-  Wrench,
   Tags,
   Download
 } from "lucide-react"
@@ -34,7 +34,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="hidden lg:flex fixed inset-y-0 left-0 z-50 w-72 flex-col border-r border-border/60 bg-card">
         <div className="flex h-16 shrink-0 items-center px-6 border-b border-border/40 justify-between">
           <Link href="/" className="flex items-center space-x-2 transition-opacity hover:opacity-80">
-            <Wrench className="h-6 w-6 text-primary" />
+            <Image src="/logo-mark.png" alt="" width={192} height={192} className="h-6 w-6" />
             <span className="font-bold text-xl tracking-tight">AutoParts<span className="text-primary">Admin</span></span>
           </Link>
         </div>
@@ -88,10 +88,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2.5">
             <Link
               href="/"
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform active:scale-95"
+              className="flex h-8 w-8 items-center justify-center transition-transform active:scale-95"
               title="Visit Storefront"
             >
-              <Wrench className="h-4 w-4" />
+              <Image src="/logo-mark.png" alt="" width={192} height={192} className="h-8 w-8" />
             </Link>
             <div>
               <div className="text-xs font-semibold leading-tight text-foreground tracking-tight">
