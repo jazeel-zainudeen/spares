@@ -34,7 +34,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     }
 
     return (
-      <PopoverPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverPrimitive.Root open={isOpen} onOpenChange={setIsOpen} modal={true}>
         <PopoverPrimitive.Trigger asChild>
           <button
             ref={ref}

@@ -55,7 +55,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     }
 
     return (
-      <PopoverPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverPrimitive.Root open={isOpen} onOpenChange={setIsOpen} modal={true}>
         <PopoverPrimitive.Trigger asChild>
           <button
             ref={ref}
