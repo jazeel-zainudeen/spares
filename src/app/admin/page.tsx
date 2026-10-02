@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ArrowRight, Settings2, Database, Factory, Tags } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
+import { formatDate } from "@/lib/utils"
 
 export const revalidate = 60
 
@@ -125,7 +126,7 @@ export default async function AdminDashboard() {
                       </div>
                     </div>
                     <span className="shrink-0 text-xs text-muted-foreground">
-                      {new Date(part.created_at).toLocaleDateString()}
+                      {formatDate(part.created_at)}
                     </span>
                   </div>
                 )

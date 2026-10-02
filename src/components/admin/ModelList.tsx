@@ -15,6 +15,7 @@ import { DeleteModelModal } from "./DeleteModelModal"
 import { SortableHeader } from "./SortableHeader"
 import { createModelAction, updateModelAction, deleteModelAction } from "@/app/actions/models"
 import { Pagination } from "@/components/ui/Pagination"
+import { formatDateTime } from "@/lib/utils"
 
 const PAGE_SIZE = 10
 
@@ -185,12 +186,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                       <div className="font-semibold text-sm text-foreground truncate">{model.name}</div>
                       <div className="text-xs text-primary font-medium truncate mt-0.5">{model.car_companies?.name || "Unknown"}</div>
                       <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
-                        {model.created_at
-                          ? new Date(model.created_at).toLocaleString(undefined, {
-                              dateStyle: "short",
-                              timeStyle: "short",
-                            })
-                          : "—"}
+                        {formatDateTime(model.created_at)}
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -259,12 +255,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                         </TableCell>
                         <TableCell className="w-px whitespace-nowrap text-center">{model.car_companies?.name || "Unknown"}</TableCell>
                         <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
-                          {model.created_at
-                            ? new Date(model.created_at).toLocaleString(undefined, {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })
-                            : "—"}
+                          {formatDateTime(model.created_at)}
                         </TableCell>
                         <TableCell className="w-px whitespace-nowrap text-right">
                           <div className="flex justify-end gap-1">

@@ -13,6 +13,7 @@ import { DeleteCompanyModal } from "./DeleteCompanyModal"
 import { SortableHeader } from "./SortableHeader"
 import { createCompanyAction, updateCompanyAction, deleteCompanyAction } from "@/app/actions/companies"
 import { Pagination } from "@/components/ui/Pagination"
+import { formatDateTime } from "@/lib/utils"
 
 const PAGE_SIZE = 10
 
@@ -166,12 +167,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{company.name}</div>
                         <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
-                          {company.created_at
-                            ? new Date(company.created_at).toLocaleString(undefined, {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })
-                            : "—"}
+                          {formatDateTime(company.created_at)}
                         </div>
                       </div>
                     </div>
@@ -240,12 +236,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                           )}
                         </TableCell>
                         <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
-                          {company.created_at
-                            ? new Date(company.created_at).toLocaleString(undefined, {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })
-                            : "—"}
+                          {formatDateTime(company.created_at)}
                         </TableCell>
                         <TableCell className="w-px whitespace-nowrap text-right">
                           <div className="flex justify-end gap-1">

@@ -13,6 +13,7 @@ import { DeleteCategoryModal } from "./DeleteCategoryModal"
 import { SortableHeader } from "./SortableHeader"
 import { createCategoryAction, updateCategoryAction, deleteCategoryAction } from "@/app/actions/categories"
 import { Pagination } from "@/components/ui/Pagination"
+import { formatDateTime } from "@/lib/utils"
 
 const PAGE_SIZE = 10
 
@@ -166,12 +167,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{category.name}</div>
                         <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
-                          {category.created_at
-                            ? new Date(category.created_at).toLocaleString(undefined, {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })
-                            : "—"}
+                          {formatDateTime(category.created_at)}
                         </div>
                       </div>
                     </div>
@@ -240,12 +236,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                           )}
                         </TableCell>
                         <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
-                          {category.created_at
-                            ? new Date(category.created_at).toLocaleString(undefined, {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })
-                            : "—"}
+                          {formatDateTime(category.created_at)}
                         </TableCell>
                         <TableCell className="w-px whitespace-nowrap text-right">
                           <div className="flex justify-end gap-1">

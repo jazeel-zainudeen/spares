@@ -6,6 +6,7 @@ import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
+import { formatDate } from "@/lib/utils"
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string, company: string, model: string, part: string }> }): Promise<Metadata> {
   try {
@@ -144,7 +145,7 @@ export default async function PartDetailPage({
                       <span>Catalog Date</span>
                     </div>
                     <span className="text-xs font-mono text-muted-foreground">
-                      {new Date(part.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {formatDate(part.created_at)}
                     </span>
                   </div>
                 )}

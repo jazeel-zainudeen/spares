@@ -18,6 +18,7 @@ import { DeletePartModal } from "./DeletePartModal"
 import { SortableHeader } from "./SortableHeader"
 import { createPartAction, updatePartAction, deletePartAction } from "@/app/actions/parts"
 import { Pagination } from "@/components/ui/Pagination"
+import { formatDate, formatDateTime } from "@/lib/utils"
 
 const PAGE_SIZE = 10
 
@@ -301,7 +302,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                           )}
                         </div>
                         <span className="text-[10px] text-muted-foreground/80">
-                          {part.created_at ? new Date(part.created_at).toLocaleDateString() : ""}
+                          {formatDateTime(part.created_at)}
                         </span>
                       </div>
                     </div>
@@ -403,12 +404,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                             <div className="text-[11px] text-muted-foreground">{part.car_models?.car_companies?.name || ""}</div>
                           </TableCell>
                           <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
-                            {part.created_at
-                              ? new Date(part.created_at).toLocaleString(undefined, {
-                                  dateStyle: "short",
-                                  timeStyle: "short",
-                                })
-                              : "—"}
+                            {formatDateTime(part.created_at)}
                           </TableCell>
                           <TableCell className="w-px whitespace-nowrap text-right">
                             <div className="flex justify-end gap-1">
