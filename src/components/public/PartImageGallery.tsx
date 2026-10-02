@@ -2,7 +2,7 @@
 
 import { useState, useRef, MouseEvent, useEffect } from "react"
 import Image from "next/image"
-import { Image as ImageIcon, ChevronLeft, ChevronRight, Star, ZoomIn, Maximize2, X } from "lucide-react"
+import { Image as ImageIcon, ChevronLeft, ChevronRight, ZoomIn, Maximize2, X } from "lucide-react"
 import { Card } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
 
@@ -95,17 +95,11 @@ export function PartImageGallery({ images, title, categoryName }: PartImageGalle
             </div>
           )}
 
-          {/* Top Badges */}
+          {/* Category Badge */}
           <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
             {categoryName && (
               <Badge variant="secondary" className="text-xs backdrop-blur-sm bg-background/85">
                 {categoryName}
-              </Badge>
-            )}
-            {selectedIndex === 0 && images.length > 1 && (
-              <Badge variant="default" className="text-[10px] gap-1 bg-primary text-primary-foreground shadow-xs">
-                <Star className="h-3 w-3 fill-current" />
-                Listing Image
               </Badge>
             )}
           </div>
