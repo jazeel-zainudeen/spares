@@ -1,6 +1,13 @@
 const CACHE_NAME = 'autoparts-pro-v2';
 const OFFLINE_URL = '/offline.html';
 
+if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+  self.addEventListener('install', (event) => event.waitUntil(self.skipWaiting()));
+  self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
+  self.addEventListener('fetch', (event) => event.respondWith(fetch(event.request)));
+  throw new Error('Service worker disabled in local development');
+}
+
 const PRECACHE_ASSETS = [
   '/',
   OFFLINE_URL,

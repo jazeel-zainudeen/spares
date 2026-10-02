@@ -6,6 +6,7 @@ import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
+import { PartShareButton } from "@/components/public/PartShareButton"
 import { formatDate } from "@/lib/utils"
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string, company: string, model: string, part: string }> }): Promise<Metadata> {
@@ -84,14 +85,18 @@ export default async function PartDetailPage({
 
           {/* Details & Specs Card */}
           <div className="space-y-6">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary mb-2">
-                <Factory className="h-3.5 w-3.5" />
-                <span>{part.car_models?.car_companies?.name} {part.car_models?.name}</span>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary mb-2">
+                  <Factory className="h-3.5 w-3.5" />
+                  <span>{part.car_models?.car_companies?.name} {part.car_models?.name}</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                  {part.item}
+                </h1>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-                {part.item}
-              </h1>
+
+              <PartShareButton />
             </div>
 
             <Card>
