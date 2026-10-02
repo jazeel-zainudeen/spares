@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
 import type { ModelRow } from "@/lib/services/models"
 import type { CompanyRow } from "@/lib/services/companies"
+import { Plus } from "lucide-react"
+import { CompanyFormModal } from "./CompanyFormModal"
+import { createCompanyAction } from "@/app/actions/companies"
 
 interface ModelFormModalProps {
   isOpen: boolean
@@ -21,6 +24,7 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
   const [companyId, setCompanyId] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -57,6 +61,12 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
     value: c.id
   }))
 
+  const handleSaveCompany = async (data: any) => {
+    const res = await createCompanyAction(data)
+    if (res.error) throw new Error(res.error)
+    setIsCompanyModalOpen(false)
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Model" : "Add Model"}>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -64,12 +74,25 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
         
         <div className="space-y-2">
           <label className="text-sm font-medium leading-none">Company *</label>
-          <Select 
-            options={[{ label: "Select a company...", value: "" }, ...companyOptions]}
-            value={companyId}
-            onChange={(e) => setCompanyId(e.target.value)}
-            disabled={loading}
-          />
+          <div className="flex items-center gap-2">
+            <Select 
+              options={[{ label: "Select a company...", value: "" }, ...companyOptions]}
+              value={companyId}
+              onChange={(e) => setCompanyId(e.target.value)}
+              disabled={loading}
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setIsCompanyModalOpen(true)}
+              className="h-9 w-9 shrink-0"
+              title="Add New Company"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -91,6 +114,12 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
           </Button>
         </div>
       </form>
+
+      <CompanyFormModal
+        isOpen={isCompanyModalOpen}
+        onClose={() => setIsCompanyModalOpen(false)}
+        onSave={handleSaveCompany}
+      />
     </Modal>
   )
 }

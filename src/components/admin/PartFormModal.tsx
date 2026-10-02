@@ -11,6 +11,13 @@ import type { CategoryRow } from "@/lib/services/categories"
 import type { CompanyRow } from "@/lib/services/companies"
 import type { ModelRow } from "@/lib/services/models"
 import { CloudinaryMultiUpload, ImageItem } from "@/components/ui/CloudinaryMultiUpload"
+import { Plus } from "lucide-react"
+import { CategoryFormModal } from "./CategoryFormModal"
+import { CompanyFormModal } from "./CompanyFormModal"
+import { ModelFormModal } from "./ModelFormModal"
+import { createCategoryAction } from "@/app/actions/categories"
+import { createCompanyAction } from "@/app/actions/companies"
+import { createModelAction } from "@/app/actions/models"
 
 interface PartFormModalProps {
   isOpen: boolean
@@ -36,6 +43,10 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
+  const [isModelModalOpen, setIsModelModalOpen] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -115,6 +126,24 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
   const companyOptions = companies.map(c => ({ label: c.name, value: c.id }))
   const modelOptions = availableModels.map(m => ({ label: m.name, value: m.id }))
 
+  const handleSaveCategory = async (data: any) => {
+    const res = await createCategoryAction(data)
+    if (res.error) throw new Error(res.error)
+    setIsCategoryModalOpen(false)
+  }
+
+  const handleSaveCompany = async (data: any) => {
+    const res = await createCompanyAction(data)
+    if (res.error) throw new Error(res.error)
+    setIsCompanyModalOpen(false)
+  }
+
+  const handleSaveModel = async (data: any) => {
+    const res = await createModelAction(data)
+    if (res.error) throw new Error(res.error)
+    setIsModelModalOpen(false)
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Part" : "Add Part"}>
       <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
@@ -122,33 +151,73 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
         
         <div className="space-y-2">
           <label className="text-sm font-medium leading-none">Category</label>
-          <Select 
-            options={[{ label: "Select Category...", value: "" }, ...categoryOptions]}
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            disabled={loading}
-          />
+          <div className="flex items-center gap-2">
+            <Select 
+              options={[{ label: "Select Category...", value: "" }, ...categoryOptions]}
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              disabled={loading}
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="h-9 w-9 shrink-0"
+              title="Add New Category"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium leading-none">Company</label>
-            <Select 
-              options={[{ label: "Select Company...", value: "" }, ...companyOptions]}
-              value={companyId}
-              onChange={(e) => handleCompanyChange(e.target.value)}
-              disabled={loading}
-            />
+            <div className="flex items-center gap-2">
+              <Select 
+                options={[{ label: "Select Company...", value: "" }, ...companyOptions]}
+                value={companyId}
+                onChange={(e) => handleCompanyChange(e.target.value)}
+                disabled={loading}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setIsCompanyModalOpen(true)}
+                className="h-9 w-9 shrink-0"
+                title="Add New Company"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium leading-none">Model</label>
-            <Select 
-              options={[{ label: "Select Model...", value: "" }, ...modelOptions]}
-              value={modelId}
-              onChange={(e) => setModelId(e.target.value)}
-              disabled={loading || !companyId}
-            />
+            <div className="flex items-center gap-2">
+              <Select 
+                options={[{ label: "Select Model...", value: "" }, ...modelOptions]}
+                value={modelId}
+                onChange={(e) => setModelId(e.target.value)}
+                disabled={loading || !companyId}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setIsModelModalOpen(true)}
+                disabled={!companyId}
+                className="h-9 w-9 shrink-0"
+                title="Add New Model"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -212,6 +281,25 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
           </Button>
         </div>
       </form>
+
+      <CategoryFormModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        onSave={handleSaveCategory}
+      />
+      
+      <CompanyFormModal
+        isOpen={isCompanyModalOpen}
+        onClose={() => setIsCompanyModalOpen(false)}
+        onSave={handleSaveCompany}
+      />
+
+      <ModelFormModal
+        isOpen={isModelModalOpen}
+        onClose={() => setIsModelModalOpen(false)}
+        onSave={handleSaveModel}
+        companies={companies}
+      />
     </Modal>
   )
 }
