@@ -71,34 +71,38 @@ export function Pagination({
 
       <div className="flex items-center gap-1">
         {buildLink ? (
-          <Button
-            variant="outline"
-            size="sm"
-            asChild={currentPage > 1}
-            disabled={currentPage <= 1}
-            className="h-8 px-2 gap-1"
-          >
-            {currentPage > 1 ? (
-              <Link href={buildLink(currentPage - 1)}>
-                <ChevronLeft className="h-3.5 w-3.5" />
+          currentPage > 1 ? (
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="h-8 px-2.5 gap-1.5 whitespace-nowrap shrink-0"
+            >
+              <Link href={buildLink(currentPage - 1)} className="inline-flex items-center gap-1.5">
+                <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
                 <span className="hidden sm:inline">Previous</span>
               </Link>
-            ) : (
-              <span>
-                <ChevronLeft className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Previous</span>
-              </span>
-            )}
-          </Button>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled
+              className="h-8 px-2.5 gap-1.5 whitespace-nowrap shrink-0 opacity-50"
+            >
+              <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
+              <span className="hidden sm:inline">Previous</span>
+            </Button>
+          )
         ) : (
           <Button
             variant="outline"
             size="sm"
             onClick={() => onPageChange?.(currentPage - 1)}
             disabled={currentPage <= 1}
-            className="h-8 px-2 gap-1"
+            className="h-8 px-2.5 gap-1.5 whitespace-nowrap shrink-0"
           >
-            <ChevronLeft className="h-3.5 w-3.5" />
+            <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
             <span className="hidden sm:inline">Previous</span>
           </Button>
         )}
@@ -118,22 +122,25 @@ export function Pagination({
           const isCurrent = p === currentPage
 
           if (buildLink) {
-            return (
+            return isCurrent ? (
               <Button
                 key={p}
-                variant={isCurrent ? "default" : "outline"}
+                variant="default"
                 size="sm"
-                asChild={!isCurrent}
-                className={cn(
-                  "h-8 w-8 p-0 text-xs",
-                  isCurrent && "pointer-events-none"
-                )}
+                disabled
+                className="h-8 w-8 p-0 text-xs pointer-events-none opacity-100"
               >
-                {isCurrent ? (
-                  <span>{p}</span>
-                ) : (
-                  <Link href={buildLink(p as number)}>{p}</Link>
-                )}
+                {p}
+              </Button>
+            ) : (
+              <Button
+                key={p}
+                variant="outline"
+                size="sm"
+                asChild
+                className="h-8 w-8 p-0 text-xs"
+              >
+                <Link href={buildLink(p as number)}>{p}</Link>
               </Button>
             )
           }
@@ -155,35 +162,39 @@ export function Pagination({
         })}
 
         {buildLink ? (
-          <Button
-            variant="outline"
-            size="sm"
-            asChild={currentPage < totalPages}
-            disabled={currentPage >= totalPages}
-            className="h-8 px-2 gap-1"
-          >
-            {currentPage < totalPages ? (
-              <Link href={buildLink(currentPage + 1)}>
+          currentPage < totalPages ? (
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="h-8 px-2.5 gap-1.5 whitespace-nowrap shrink-0"
+            >
+              <Link href={buildLink(currentPage + 1)} className="inline-flex items-center gap-1.5">
                 <span className="hidden sm:inline">Next</span>
-                <ChevronRight className="h-3.5 w-3.5" />
+                <ChevronRight className="h-3.5 w-3.5 shrink-0" />
               </Link>
-            ) : (
-              <span>
-                <span className="hidden sm:inline">Next</span>
-                <ChevronRight className="h-3.5 w-3.5" />
-              </span>
-            )}
-          </Button>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled
+              className="h-8 px-2.5 gap-1.5 whitespace-nowrap shrink-0 opacity-50"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+            </Button>
+          )
         ) : (
           <Button
             variant="outline"
             size="sm"
             onClick={() => onPageChange?.(currentPage + 1)}
             disabled={currentPage >= totalPages}
-            className="h-8 px-2 gap-1"
+            className="h-8 px-2.5 gap-1.5 whitespace-nowrap shrink-0"
           >
             <span className="hidden sm:inline">Next</span>
-            <ChevronRight className="h-3.5 w-3.5" />
+            <ChevronRight className="h-3.5 w-3.5 shrink-0" />
           </Button>
         )}
       </div>
