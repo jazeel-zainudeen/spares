@@ -78,7 +78,7 @@ export function PartShareButton() {
     }
 
     if (platform === "whatsapp") {
-      target = `https://wa.me/?text=${shareText}%20${encodedUrl}`
+      target = `https://api.whatsapp.com/send?text=${shareText}%20${encodedUrl}`
     }
 
     if (platform === "x") {
