@@ -5,6 +5,7 @@ import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
+import { Textarea } from "@/components/ui/Textarea"
 import type { PartRow } from "@/lib/services/parts"
 import { getPartImages, getPartPublicIds } from "@/lib/utils/images"
 import type { CategoryRow } from "@/lib/services/categories"
@@ -283,7 +284,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
         <div className="space-y-2">
           <label className="text-sm font-medium leading-none">Description</label>
-          <Input 
+          <Textarea 
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Item description..."

@@ -16,7 +16,6 @@ interface CategoryFormModalProps {
 
 export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: CategoryFormModalProps) {
   const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
   const [imageUrl, setImageUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -26,11 +25,9 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
     if (isOpen) {
       if (initialData) {
         setName(initialData.name)
-        setDescription(initialData.description || "")
         setImageUrl(initialData.image_url || "")
       } else {
         setName("")
-        setDescription("")
         setImageUrl("")
       }
       setError("")
@@ -56,7 +53,6 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
     try {
       await onSave({
         name,
-        description: description || null,
         image_url: imageUrl || null
       })
       onClose()
@@ -95,17 +91,6 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
             className={fieldErrors.name ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
           />
           {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="description" className="text-sm font-medium">Description</label>
-          <Input 
-            id="description" 
-            value={description} 
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Brief description..."
-            disabled={loading}
-          />
         </div>
 
         <div className="space-y-2">
