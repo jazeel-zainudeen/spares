@@ -1,12 +1,12 @@
-const CACHE_NAME = 'autoparts-pro-v1';
+const CACHE_NAME = 'autoparts-pro-v2';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_ASSETS = [
   '/',
   OFFLINE_URL,
   '/manifest.json',
-  '/favicon.svg',
   '/favicon.ico',
+  '/logo-mark.png',
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/apple-touch-icon.png',
