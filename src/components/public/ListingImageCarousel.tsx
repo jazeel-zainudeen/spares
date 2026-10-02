@@ -47,7 +47,7 @@ export function ListingImageCarousel({
     >
       {/* Main Active Image */}
       {mainImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
+         
         <img
           src={mainImage}
           alt={`${title} - image ${currentIndex + 1}`}

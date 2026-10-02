@@ -149,7 +149,7 @@ export function CloudinaryMultiUpload({ images, onChange, folder }: CloudinaryMu
               }`}
             >
               {/* Thumbnail Image */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img
                 src={item.url}
                 alt={`Photo ${idx + 1}`}

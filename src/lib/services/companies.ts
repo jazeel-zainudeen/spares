@@ -23,7 +23,7 @@ export async function getCompanies(): Promise<(CompanyRow & { model_count?: numb
         model_count: company.car_models?.length ?? 0,
         part_count: company.car_models?.reduce((acc: number, m: any) => acc + (m.parts?.[0]?.count ?? 0), 0) ?? 0,
         car_models: undefined,
-      })) as any
+      })) as (CompanyRow & { model_count?: number; part_count?: number })[]
     },
     ['companies-all-v2'],
     { revalidate: 3600, tags: ['companies', 'models', 'parts'] }
@@ -41,7 +41,7 @@ export async function getCompanyById(id: string): Promise<CompanyRow> {
         .single()
 
       if (error) throw new Error(error.message)
-      return data as any
+      return data as CompanyRow
     },
     ['company-by-id', id],
     { revalidate: 3600, tags: ['companies', `company-${id}`] }
@@ -58,7 +58,7 @@ export async function createCompany(company: CompanyInsert) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data as any
+  return data as CompanyRow
 }
 
 export async function updateCompany(id: string, updates: CompanyUpdate) {
@@ -72,7 +72,7 @@ export async function updateCompany(id: string, updates: CompanyUpdate) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data as any
+  return data as CompanyRow
 }
 
 export async function deleteCompany(id: string) {
@@ -98,5 +98,5 @@ export async function getCompanyBySlug(slug: string) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data as any
+  return data as CompanyRow
 }

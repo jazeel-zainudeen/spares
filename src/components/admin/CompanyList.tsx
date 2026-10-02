@@ -155,7 +155,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                     <div className="flex items-center gap-3 min-w-0">
                       {company.logo_url ? (
                         <div className="flex h-12 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted/40 p-1">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          { }
                           <img src={company.logo_url} alt={company.name} className="h-full w-full object-contain" loading="lazy" decoding="async" />
                         </div>
                       ) : (
@@ -232,7 +232,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                         <TableCell className="w-px whitespace-nowrap text-center">
                           {company.logo_url ? (
                             <div className="mx-auto flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              { }
                               <img src={company.logo_url} alt={company.name} className="h-full object-contain" loading="lazy" decoding="async" />
                             </div>
                           ) : (

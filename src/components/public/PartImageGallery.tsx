@@ -103,7 +103,7 @@ export function PartImageGallery({ images, title, categoryName }: PartImageGalle
                     : "border-border/70 bg-muted/20 opacity-70 hover:opacity-100"
                 }`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                { }
                 <img
                   src={img}
                   alt={`Thumbnail ${idx + 1}`}

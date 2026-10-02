@@ -113,7 +113,7 @@ export default async function ModelsPage({
               <div className="flex items-center gap-3 mb-4 pb-2 border-b border-border/60">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/60 shrink-0">
                   {group.company.logo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
+                     
                     <img
                       src={group.company.logo_url}
                       alt={group.company.name}

@@ -26,7 +26,7 @@ export async function getModels(companyId?: string): Promise<(ModelRow & { part_
         ...model,
         part_count: model.parts?.[0]?.count ?? 0,
         parts: undefined,
-      })) as any
+      })) as (ModelRow & { part_count?: number })[]
     },
     [cacheKey],
     { revalidate: 3600, tags: ['models', 'parts', ...(companyId ? [`models-${companyId}`] : [])] }
@@ -44,7 +44,7 @@ export async function getModelById(id: string): Promise<ModelRow> {
         .single()
 
       if (error) throw new Error(error.message)
-      return data as any
+      return data as ModelRow
     },
     ['model-by-id', id],
     { revalidate: 3600, tags: ['models', `model-${id}`] }
@@ -61,7 +61,7 @@ export async function createModel(model: ModelInsert) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data as any
+  return data as ModelRow
 }
 
 export async function updateModel(id: string, updates: ModelUpdate) {
@@ -75,7 +75,7 @@ export async function updateModel(id: string, updates: ModelUpdate) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data as any
+  return data as ModelRow
 }
 
 export async function deleteModel(id: string) {
@@ -105,7 +105,7 @@ export async function getModelsWithCompany(companySlugOrId?: string) {
     ...model,
     part_count: model.parts?.[0]?.count ?? 0,
     parts: undefined,
-  })) as any[]
+  }))
 }
 
 export async function getModelBySlug(slug: string) {
@@ -117,5 +117,5 @@ export async function getModelBySlug(slug: string) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data as any
+  return data as ModelRow
 }

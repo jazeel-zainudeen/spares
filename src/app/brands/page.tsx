@@ -52,7 +52,7 @@ export default async function BrandsPage() {
               <Card className="h-full overflow-hidden transition-all duration-200 hover:border-primary/40 hover:shadow-md">
                 <div className="aspect-square bg-muted/30 relative flex items-center justify-center p-6 border-b border-border/60">
                   {brand.logo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
+                     
                     <img
                       src={brand.logo_url}
                       alt={brand.name}

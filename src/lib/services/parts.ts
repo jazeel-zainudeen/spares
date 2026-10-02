@@ -8,6 +8,16 @@ export type PartRow = Database['public']['Tables']['parts']['Row']
 export type PartInsert = Database['public']['Tables']['parts']['Insert']
 export type PartUpdate = Database['public']['Tables']['parts']['Update']
 
+export type ExtendedPartInsert = PartInsert & {
+  image_urls?: string[];
+  cloudinary_public_ids?: string[];
+}
+
+export type ExtendedPartUpdate = PartUpdate & {
+  image_urls?: string[];
+  cloudinary_public_ids?: string[];
+}
+
 export async function getParts(modelId?: string, limit: number = 100) {
   const supabase = await createClient()
   let query = supabase.from('parts').select('*, categories(name, slug), car_models(name, car_companies(name))')
@@ -25,7 +35,7 @@ export async function getParts(modelId?: string, limit: number = 100) {
   const { data, error } = await query
 
   if (error) throw new Error(error.message)
-  return data as any
+  return data
 }
 
 export async function getPublicParts(options?: {
@@ -94,7 +104,7 @@ export async function getPublicParts(options?: {
   if (error) throw new Error(error.message)
   
   return {
-    data: (data || []) as any[],
+    data: data || [],
     total: count ?? (data?.length || 0),
     page,
     pageSize: pageSize ?? (count ?? data?.length ?? 0),
@@ -111,17 +121,17 @@ export async function getPartById(id: string) {
     .single()
 
   if (error) throw new Error(error.message)
-  return data as any
+  return data
 }
 
-export async function createPart(part: PartInsert) {
+export async function createPart(part: ExtendedPartInsert) {
   const supabase = await createClient()
 
-  const images = (part as any).image_urls && (part as any).image_urls.length > 0
-    ? (part as any).image_urls
+  const images = part.image_urls && part.image_urls.length > 0
+    ? part.image_urls
     : (part.image_url ? [part.image_url] : [])
-  const publicIds = (part as any).cloudinary_public_ids && (part as any).cloudinary_public_ids.length > 0
-    ? (part as any).cloudinary_public_ids
+  const publicIds = part.cloudinary_public_ids && part.cloudinary_public_ids.length > 0
+    ? part.cloudinary_public_ids
     : (part.cloudinary_public_id ? [part.cloudinary_public_id] : [])
 
   const firstImageUrl = images[0] || part.image_url || null
@@ -152,9 +162,9 @@ export async function createPart(part: PartInsert) {
         ...part,
         image_url: encodedImageUrl,
         cloudinary_public_id: encodedPublicId,
-      }
-      delete (fallbackPayload as any).image_urls
-      delete (fallbackPayload as any).cloudinary_public_ids
+      } as ExtendedPartInsert
+      delete fallbackPayload.image_urls
+      delete fallbackPayload.cloudinary_public_ids
 
       const { data: fbData, error: fbError } = await supabase
         .from('parts')
@@ -164,22 +174,22 @@ export async function createPart(part: PartInsert) {
         .single()
 
       if (fbError) throw new Error(fbError.message)
-      return fbData as any
+      return fbData
     }
     throw new Error(error.message)
   }
 
-  return data as any
+  return data
 }
 
-export async function updatePart(id: string, updates: PartUpdate) {
+export async function updatePart(id: string, updates: ExtendedPartUpdate) {
   const supabase = await createClient()
 
-  const images = (updates as any).image_urls !== undefined
-    ? (updates as any).image_urls
+  const images = updates.image_urls !== undefined
+    ? updates.image_urls
     : (updates.image_url ? [updates.image_url] : [])
-  const publicIds = (updates as any).cloudinary_public_ids !== undefined
-    ? (updates as any).cloudinary_public_ids
+  const publicIds = updates.cloudinary_public_ids !== undefined
+    ? updates.cloudinary_public_ids
     : (updates.cloudinary_public_id ? [updates.cloudinary_public_id] : [])
 
   const firstImageUrl = images ? images[0] || null : updates.image_url || null
@@ -211,9 +221,9 @@ export async function updatePart(id: string, updates: PartUpdate) {
         ...updates,
         image_url: encodedImageUrl,
         cloudinary_public_id: encodedPublicId,
-      }
-      delete (fallbackPayload as any).image_urls
-      delete (fallbackPayload as any).cloudinary_public_ids
+      } as ExtendedPartUpdate
+      delete fallbackPayload.image_urls
+      delete fallbackPayload.cloudinary_public_ids
 
       const { data: fbData, error: fbError } = await supabase
         .from('parts')
@@ -224,12 +234,12 @@ export async function updatePart(id: string, updates: PartUpdate) {
         .single()
 
       if (fbError) throw new Error(fbError.message)
-      return fbData as any
+      return fbData
     }
     throw new Error(error.message)
   }
 
-  return data as any
+  return data
 }
 
 export async function deletePart(id: string) {

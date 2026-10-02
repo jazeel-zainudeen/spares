@@ -91,7 +91,7 @@ export function CloudinaryUpload({ value, publicId, onChange, onRemove, folder }
       {value ? (
         <div className="group relative w-full overflow-hidden rounded-lg border border-border bg-muted/40">
           <div className="relative aspect-video w-full flex items-center justify-center p-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img src={value} alt="Upload preview" className="max-h-full object-contain" loading="lazy" decoding="async" />
 
             {/* Desktop hover overlay */}

@@ -243,7 +243,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                         <div className="flex items-start gap-3 min-w-0">
                           {mainImage ? (
                             <div className="relative flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted/40 p-1">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              { }
                               <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
                               {images.length > 1 && (
                                 <span className="absolute bottom-0.5 right-0.5 bg-black/75 text-[9px] font-semibold text-white px-1 rounded-sm">
@@ -380,7 +380,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
                           <TableCell className="w-px whitespace-nowrap text-center">
                             {mainImage ? (
                               <div className="mx-auto relative flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                { }
                                 <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
                                 {images.length > 1 && (
                                   <span className="absolute bottom-0 right-0 bg-black/80 text-[8px] font-bold text-white px-0.5 rounded-tl-sm">

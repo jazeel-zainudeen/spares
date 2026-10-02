@@ -1,8 +1,7 @@
 import Link from "next/link"
 import { getCategories } from "@/lib/services/categories"
 import { Card, CardContent } from "@/components/ui/Card"
-import { Badge } from "@/components/ui/Badge"
-import { Layers, ChevronRight, Image as ImageIcon } from "lucide-react"
+import { Layers, ChevronRight } from "lucide-react"
 
 export const metadata = {
   title: "Categories - AutoPartsPro Catalog",
@@ -45,7 +44,7 @@ export default async function CategoriesPage() {
               <Card className="h-full overflow-hidden transition-all duration-200 hover:border-primary/40 hover:shadow-sm">
                 <div className="aspect-4/3 bg-muted/40 relative flex items-center justify-center p-3 border-b border-border/60">
                   {category.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
+                     
                     <img
                       src={category.image_url}
                       alt={category.name}

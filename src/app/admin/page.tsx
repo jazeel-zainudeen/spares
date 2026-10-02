@@ -109,7 +109,7 @@ export default async function AdminDashboard() {
                     <div className="flex min-w-0 items-center gap-3">
                       {mainImage ? (
                         <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          { }
                           <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
                         </div>
                       ) : (
