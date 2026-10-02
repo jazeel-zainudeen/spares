@@ -19,22 +19,29 @@ export function CompanyFormModal({ isOpen, onClose, onSave, initialData }: Compa
   const [logoUrl, setLogoUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (isOpen) {
       setName(initialData?.name || "")
       setLogoUrl(initialData?.logo_url || "")
       setError("")
+      setFieldErrors({})
     }
   }, [isOpen, initialData])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name) {
-      setError("Name is required")
+    
+    const errors: Record<string, string> = {}
+    if (!name) errors.name = "Name is required"
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
       return
     }
 
+    setFieldErrors({})
     setLoading(true)
     setError("")
     try {
@@ -49,7 +56,7 @@ export function CompanyFormModal({ isOpen, onClose, onSave, initialData }: Compa
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Company" : "Add Company"}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
 
         <div className="space-y-2">
@@ -58,11 +65,16 @@ export function CompanyFormModal({ isOpen, onClose, onSave, initialData }: Compa
           </label>
           <Input
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value)
+              if (fieldErrors.name) setFieldErrors(prev => ({ ...prev, name: "" }))
+            }}
             placeholder="e.g. Toyota"
             disabled={loading}
             required
+            className={fieldErrors.name ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
           />
+          {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
         </div>
 
         <div className="space-y-2">

@@ -24,23 +24,32 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
   const [companyId, setCompanyId] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
       setName(initialData?.name || "")
       setCompanyId(initialData?.company_id || "")
+      setCompanyId(initialData?.company_id || "")
       setError("")
+      setFieldErrors({})
     }
   }, [isOpen, initialData])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !companyId) {
-      setError("Name and company are required")
+
+    const errors: Record<string, string> = {}
+    if (!companyId) errors.companyId = "Company is required"
+    if (!name) errors.name = "Model Name is required"
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
       return
     }
 
+    setFieldErrors({})
     setLoading(true)
     setError("")
     try {
@@ -69,7 +78,7 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Model" : "Add Model"}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
         
         <div className="space-y-2">
@@ -78,9 +87,12 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
             <Select 
               options={[{ label: "Select a company...", value: "" }, ...companyOptions]}
               value={companyId}
-              onChange={(e) => setCompanyId(e.target.value)}
+              onChange={(e) => {
+                setCompanyId(e.target.value)
+                if (fieldErrors.companyId) setFieldErrors(prev => ({ ...prev, companyId: "" }))
+              }}
               disabled={loading}
-              className="flex-1"
+              className={fieldErrors.companyId ? "flex-1 border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : "flex-1"}
             />
             <Button
               type="button"
@@ -93,16 +105,22 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
               <Plus className="h-4 w-4" />
             </Button>
           </div>
+          {fieldErrors.companyId && <p className="text-xs text-red-500 mt-1">{fieldErrors.companyId}</p>}
         </div>
 
         <div className="space-y-2">
           <label className="text-sm font-medium leading-none">Model Name *</label>
           <Input 
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value)
+              if (fieldErrors.name) setFieldErrors(prev => ({ ...prev, name: "" }))
+            }}
             placeholder="e.g. Corolla"
             disabled={loading}
+            className={fieldErrors.name ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
           />
+          {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
         </div>
 
         <div className="flex justify-end space-x-2 pt-4">

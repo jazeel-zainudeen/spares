@@ -43,6 +43,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
@@ -78,6 +79,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
         setImagesList([])
       }
       setError("")
+      setFieldErrors({})
     }
   }, [isOpen, initialData, models])
 
@@ -86,11 +88,19 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!modelId || !refNumber || !item) {
-      setError("Model, Reference Number, and Item Name are required")
+    
+    const errors: Record<string, string> = {}
+    if (!companyId) errors.companyId = "Company is required"
+    if (!modelId) errors.modelId = "Model is required"
+    if (!refNumber) errors.refNumber = "Ref Number is required"
+    if (!item) errors.item = "Item Name is required"
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
       return
     }
 
+    setFieldErrors({})
     setLoading(true)
     setError("")
     try {
@@ -146,7 +156,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Part" : "Add Part"}>
-      <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+      <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2" noValidate>
         {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
         
         <div className="space-y-2">
@@ -174,14 +184,17 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none">Company</label>
+            <label className="text-sm font-medium leading-none">Company *</label>
             <div className="flex items-center gap-2">
               <Select 
                 options={[{ label: "Select Company...", value: "" }, ...companyOptions]}
                 value={companyId}
-                onChange={(e) => handleCompanyChange(e.target.value)}
+                onChange={(e) => {
+                  handleCompanyChange(e.target.value)
+                  if (fieldErrors.companyId) setFieldErrors(prev => ({ ...prev, companyId: "" }))
+                }}
                 disabled={loading}
-                className="flex-1"
+                className={fieldErrors.companyId ? "flex-1 border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : "flex-1"}
               />
               <Button
                 type="button"
@@ -194,17 +207,21 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
+            {fieldErrors.companyId && <p className="text-xs text-red-500 mt-1">{fieldErrors.companyId}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none">Model</label>
+            <label className="text-sm font-medium leading-none">Model *</label>
             <div className="flex items-center gap-2">
               <Select 
                 options={[{ label: "Select Model...", value: "" }, ...modelOptions]}
                 value={modelId}
-                onChange={(e) => setModelId(e.target.value)}
+                onChange={(e) => {
+                  setModelId(e.target.value)
+                  if (fieldErrors.modelId) setFieldErrors(prev => ({ ...prev, modelId: "" }))
+                }}
                 disabled={loading || !companyId}
-                className="flex-1"
+                className={fieldErrors.modelId ? "flex-1 border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : "flex-1"}
               />
               <Button
                 type="button"
@@ -218,6 +235,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
+            {fieldErrors.modelId && <p className="text-xs text-red-500 mt-1">{fieldErrors.modelId}</p>}
           </div>
         </div>
 
@@ -226,10 +244,15 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
             <label className="text-sm font-medium leading-none">Ref Number *</label>
             <Input 
               value={refNumber}
-              onChange={(e) => setRefNumber(e.target.value)}
+              onChange={(e) => {
+                setRefNumber(e.target.value)
+                if (fieldErrors.refNumber) setFieldErrors(prev => ({ ...prev, refNumber: "" }))
+              }}
               placeholder="e.g. REF-12345"
               disabled={loading}
+              className={fieldErrors.refNumber ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
             />
+            {fieldErrors.refNumber && <p className="text-xs text-red-500 mt-1">{fieldErrors.refNumber}</p>}
           </div>
 
           <div className="space-y-2">
@@ -247,10 +270,15 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
           <label className="text-sm font-medium leading-none">Item Name *</label>
           <Input 
             value={item}
-            onChange={(e) => setItem(e.target.value)}
+            onChange={(e) => {
+              setItem(e.target.value)
+              if (fieldErrors.item) setFieldErrors(prev => ({ ...prev, item: "" }))
+            }}
             placeholder="e.g. Front Brake Pad"
             disabled={loading}
+            className={fieldErrors.item ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
           />
+          {fieldErrors.item && <p className="text-xs text-red-500 mt-1">{fieldErrors.item}</p>}
         </div>
 
         <div className="space-y-2">

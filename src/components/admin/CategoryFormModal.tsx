@@ -20,6 +20,7 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
   const [imageUrl, setImageUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (isOpen) {
@@ -33,11 +34,22 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
         setImageUrl("")
       }
       setError("")
+      setFieldErrors({})
     }
   }, [isOpen, initialData])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const errors: Record<string, string> = {}
+    if (!name) errors.name = "Name is required"
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setFieldErrors({})
     setLoading(true)
     setError("")
 
@@ -61,7 +73,7 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
       onClose={onClose} 
       title={initialData ? 'Edit Category' : 'Add Category'}
     >
-      <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+      <form onSubmit={handleSubmit} className="space-y-4 pt-2" noValidate>
         {error && (
           <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
             {error}
@@ -73,11 +85,16 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
           <Input 
             id="name" 
             value={name} 
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value)
+              if (fieldErrors.name) setFieldErrors(prev => ({ ...prev, name: "" }))
+            }}
             placeholder="e.g. Compressor"
             required 
             disabled={loading}
+            className={fieldErrors.name ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
           />
+          {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
         </div>
 
         <div className="space-y-2">
