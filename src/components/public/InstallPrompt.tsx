@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Download, X } from "lucide-react";
+import { useNotFound } from "@/components/public/NotFoundContext";
 
 export function InstallPrompt() {
+  const { isNotFound } = useNotFound();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showPrompt, setShowPrompt] = useState(false);
 
@@ -54,7 +56,7 @@ export function InstallPrompt() {
     } catch {}
   };
 
-  if (!showPrompt) return null;
+  if (isNotFound || !showPrompt) return null;
 
   return (
     <div className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] inset-x-3 z-50 lg:left-auto lg:right-6 lg:bottom-6 lg:w-96 animate-in fade-in slide-in-from-bottom-5">
@@ -68,7 +70,7 @@ export function InstallPrompt() {
               Install AutoParts Pro
             </h4>
             <p className="text-[11px] text-muted-foreground">
-              Fast access and offline catalog
+              Fast & quick access to parts catalog
             </p>
           </div>
         </div>

@@ -149,9 +149,14 @@ export default async function ModelsPage({
                               <Car className="h-3.5 w-3.5 text-primary" />
                             )}
                           </div>
-                          <h3 className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
-                            {model.name}
-                          </h3>
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                              {model.name}
+                            </h3>
+                            <p className="text-[10px] text-muted-foreground truncate">
+                              {model.part_count ?? 0} {(model.part_count ?? 0) === 1 ? "product" : "products"}
+                            </p>
+                          </div>
                         </div>
                         <ChevronRight className="h-4 w-4 text-muted-foreground/60 shrink-0 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                       </CardContent>

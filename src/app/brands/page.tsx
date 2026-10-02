@@ -69,11 +69,11 @@ export default async function BrandsPage() {
                     {brand.name}
                   </h3>
                   <div className="flex items-center justify-between mt-1.5">
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                      <Car className="h-3 w-3" />
-                      <span>{brand.model_count} {brand.model_count === 1 ? "model" : "models"}</span>
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground truncate">
+                      <Car className="h-3 w-3 shrink-0" />
+                      <span>{brand.model_count} {brand.model_count === 1 ? "model" : "models"} • {brand.part_count ?? 0} {(brand.part_count ?? 0) === 1 ? "product" : "products"}</span>
                     </div>
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                   </div>
                 </CardContent>
               </Card>

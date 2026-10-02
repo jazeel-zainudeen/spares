@@ -9,9 +9,9 @@ import { Badge } from "@/components/ui/Badge"
 import { Layers, Building2, Car, Filter, RotateCcw, X } from "lucide-react"
 
 interface CatalogFiltersProps {
-  categories: Array<{ id: string; name: string; slug: string }>
-  companies: Array<{ id: string; name: string; slug: string }>
-  models: Array<{ id: string; name: string; slug: string; company_id?: string; car_companies?: { slug?: string; name?: string } }>
+  categories: Array<{ id: string; name: string; slug: string; part_count?: number }>
+  companies: Array<{ id: string; name: string; slug: string; part_count?: number }>
+  models: Array<{ id: string; name: string; slug: string; company_id?: string; car_companies?: { slug?: string; name?: string }; part_count?: number }>
   activeCategory?: string
   activeBrand?: string
   activeModel?: string
@@ -217,7 +217,10 @@ export function CatalogFilters({
                 <span>Categories</span>
               </label>
               <MultiSelect
-                options={categories.map((c) => ({ label: c.name, value: c.slug }))}
+                options={categories.map((c) => ({
+                  label: `${c.name} (${c.part_count ?? 0})`,
+                  value: c.slug,
+                }))}
                 value={selectedCategories}
                 onChange={handleCategoryChange}
                 placeholder="Select Categories"
@@ -231,7 +234,10 @@ export function CatalogFilters({
                 <span>Brands / Manufacturers</span>
               </label>
               <MultiSelect
-                options={companies.map((c) => ({ label: c.name, value: c.slug }))}
+                options={companies.map((c) => ({
+                  label: `${c.name} (${c.part_count ?? 0})`,
+                  value: c.slug,
+                }))}
                 value={selectedBrands}
                 onChange={handleBrandChange}
                 placeholder="Select Brands"
@@ -245,7 +251,10 @@ export function CatalogFilters({
                 <span>Vehicle Models</span>
               </label>
               <MultiSelect
-                options={filteredModels.map((m) => ({ label: m.name, value: m.slug }))}
+                options={filteredModels.map((m) => ({
+                  label: `${m.name} (${m.part_count ?? 0})`,
+                  value: m.slug,
+                }))}
                 value={selectedModels}
                 onChange={handleModelChange}
                 placeholder="Select Models"

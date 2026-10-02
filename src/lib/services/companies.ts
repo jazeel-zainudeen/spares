@@ -8,20 +8,25 @@ export type CompanyUpdate = Database['public']['Tables']['car_companies']['Updat
 import { unstable_cache } from 'next/cache'
 import { getPublicClient } from '@/lib/supabase/public'
 
-export async function getCompanies(): Promise<CompanyRow[]> {
+export async function getCompanies(): Promise<(CompanyRow & { model_count?: number; part_count?: number })[]> {
   return unstable_cache(
     async () => {
       const supabase = getPublicClient()
       const { data, error } = await supabase
         .from('car_companies')
-        .select('*')
+        .select('*, car_models(id, parts(count))')
         .order('created_at', { ascending: false })
 
       if (error) throw new Error(error.message)
-      return (data || []) as any
+      return (data || []).map((company: any) => ({
+        ...company,
+        model_count: company.car_models?.length ?? 0,
+        part_count: company.car_models?.reduce((acc: number, m: any) => acc + (m.parts?.[0]?.count ?? 0), 0) ?? 0,
+        car_models: undefined,
+      })) as any
     },
-    ['companies-all'],
-    { revalidate: 3600, tags: ['companies'] }
+    ['companies-all-v2'],
+    { revalidate: 3600, tags: ['companies', 'models', 'parts'] }
   )()
 }
 
@@ -81,22 +86,7 @@ export async function deleteCompany(id: string) {
 }
 
 export async function getCompaniesWithStats() {
-  const supabase = await createClient()
-  const { data: companies, error } = await supabase
-    .from('car_companies')
-    .select('*, car_models(id)')
-    .order('created_at', { ascending: false })
-
-  if (error) throw new Error(error.message)
-
-  // Get part counts per company via models
-  const result = (companies || []).map((company: any) => ({
-    ...company,
-    model_count: company.car_models?.length ?? 0,
-    car_models: undefined,
-  }))
-
-  return result
+  return getCompanies()
 }
 
 export async function getCompanyBySlug(slug: string) {

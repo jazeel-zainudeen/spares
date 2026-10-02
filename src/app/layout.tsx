@@ -4,6 +4,7 @@ import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { RegisterServiceWorker } from "@/components/public/RegisterServiceWorker";
 import { InstallPrompt } from "@/components/public/InstallPrompt";
+import { NotFoundProvider } from "@/components/public/NotFoundContext";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -57,24 +58,26 @@ export default function RootLayout({
         <meta name="apple-touch-fullscreen" content="yes" />
       </head>
       <body className={`${inter.className} min-h-full font-sans flex flex-col selection:bg-primary selection:text-primary-foreground`}>
-        <NextTopLoader
-          color="#2563eb"
-          initialPosition={0.08}
-          crawlSpeed={200}
-          height={3}
-          crawl={true}
-          showSpinner={false}
-          easing="ease"
-          speed={200}
-          shadow="0 0 10px #2563eb,0 0 5px #2563eb"
-        />
-        <RegisterServiceWorker />
-        <main className="flex-1 flex flex-col">
-          {children}
-        </main>
-        <InstallPrompt />
-        <Analytics />
-        <SpeedInsights />
+        <NotFoundProvider>
+          <NextTopLoader
+            color="#2563eb"
+            initialPosition={0.08}
+            crawlSpeed={200}
+            height={3}
+            crawl={true}
+            showSpinner={false}
+            easing="ease"
+            speed={200}
+            shadow="0 0 10px #2563eb,0 0 5px #2563eb"
+          />
+          <RegisterServiceWorker />
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+          <InstallPrompt />
+          <Analytics />
+          <SpeedInsights />
+        </NotFoundProvider>
       </body>
     </html>
   );

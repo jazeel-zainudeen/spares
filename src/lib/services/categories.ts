@@ -8,20 +8,24 @@ export type CategoryUpdate = Database['public']['Tables']['categories']['Update'
 import { unstable_cache } from 'next/cache'
 import { getPublicClient } from '@/lib/supabase/public'
 
-export async function getCategories(): Promise<CategoryRow[]> {
+export async function getCategories(): Promise<(CategoryRow & { part_count?: number })[]> {
   return unstable_cache(
     async () => {
       const supabase = getPublicClient()
       const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select('*, parts(count)')
         .order('created_at', { ascending: false })
       
       if (error) throw error
-      return (data || []) as CategoryRow[]
+      return (data || []).map((cat: any) => ({
+        ...cat,
+        part_count: cat.parts?.[0]?.count ?? 0,
+        parts: undefined,
+      })) as (CategoryRow & { part_count?: number })[]
     },
-    ['categories-all'],
-    { revalidate: 3600, tags: ['categories'] }
+    ['categories-all-v2'],
+    { revalidate: 3600, tags: ['categories', 'parts'] }
   )()
 }
 

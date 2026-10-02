@@ -104,7 +104,13 @@ export function AdvancedSearchBar({
           <Select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            options={[{ label: "All Categories", value: "" }, ...categories.map(c => ({ label: c.name, value: c.slug }))]}
+            options={[
+              { label: "All Categories", value: "" },
+              ...categories.map(c => ({
+                label: `${c.name} (${c.part_count ?? 0})`,
+                value: c.slug
+              }))
+            ]}
             placeholder="All Categories"
           />
 
@@ -114,7 +120,13 @@ export function AdvancedSearchBar({
               setCompany(e.target.value)
               setModel("")
             }}
-            options={[{ label: "All Brands", value: "" }, ...companies.map(c => ({ label: c.name, value: c.slug }))]}
+            options={[
+              { label: "All Brands", value: "" },
+              ...companies.map(c => ({
+                label: `${c.name} (${c.part_count ?? 0})`,
+                value: c.slug
+              }))
+            ]}
             placeholder="All Brands"
           />
 
@@ -122,7 +134,13 @@ export function AdvancedSearchBar({
             value={model}
             onChange={(e) => setModel(e.target.value)}
             disabled={!company || loadingModels}
-            options={[{ label: loadingModels ? "Loading models..." : "All Models", value: "" }, ...availableModels.map(m => ({ label: m.name, value: m.slug }))]}
+            options={[
+              { label: loadingModels ? "Loading models..." : "All Models", value: "" },
+              ...availableModels.map(m => ({
+                label: `${m.name} (${m.part_count ?? 0})`,
+                value: m.slug
+              }))
+            ]}
             placeholder={loadingModels ? "Loading models..." : "All Models"}
           />
         </div>

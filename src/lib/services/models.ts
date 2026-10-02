@@ -8,12 +8,12 @@ export type ModelUpdate = Database['public']['Tables']['car_models']['Update']
 import { unstable_cache } from 'next/cache'
 import { getPublicClient } from '@/lib/supabase/public'
 
-export async function getModels(companyId?: string): Promise<ModelRow[]> {
-  const cacheKey = companyId ? `models-company-${companyId}` : 'models-all'
+export async function getModels(companyId?: string): Promise<(ModelRow & { part_count?: number })[]> {
+  const cacheKey = companyId ? `models-company-${companyId}-v2` : 'models-all-v2'
   return unstable_cache(
     async () => {
       const supabase = getPublicClient()
-      let query = supabase.from('car_models').select('*, car_companies(name, logo_url, slug)')
+      let query = supabase.from('car_models').select('*, parts(count), car_companies(name, logo_url, slug)')
       
       if (companyId) {
         query = query.eq('company_id', companyId)
@@ -22,10 +22,14 @@ export async function getModels(companyId?: string): Promise<ModelRow[]> {
       const { data, error } = await query.order('created_at', { ascending: false })
 
       if (error) throw new Error(error.message)
-      return (data || []) as any
+      return (data || []).map((model: any) => ({
+        ...model,
+        part_count: model.parts?.[0]?.count ?? 0,
+        parts: undefined,
+      })) as any
     },
     [cacheKey],
-    { revalidate: 3600, tags: ['models', ...(companyId ? [`models-${companyId}`] : [])] }
+    { revalidate: 3600, tags: ['models', 'parts', ...(companyId ? [`models-${companyId}`] : [])] }
   )()
 }
 
@@ -84,20 +88,24 @@ export async function deleteModel(id: string) {
   if (error) throw new Error(error.message)
 }
 
-export async function getModelsWithCompany(companySlug?: string) {
-  const supabase = await createClient()
+export async function getModelsWithCompany(companySlugOrId?: string) {
+  const supabase = getPublicClient()
   let query = supabase
     .from('car_models')
-    .select('*, car_companies!inner(name, slug, logo_url)')
+    .select('*, parts(count), car_companies!inner(name, slug, logo_url)')
 
-  if (companySlug) {
-    query = query.eq('car_companies.slug', companySlug)
+  if (companySlugOrId) {
+    query = query.or(`company_id.eq.${companySlugOrId},car_companies.slug.eq.${companySlugOrId}`)
   }
 
   const { data, error } = await query.order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
-  return data as any[]
+  return (data || []).map((model: any) => ({
+    ...model,
+    part_count: model.parts?.[0]?.count ?? 0,
+    parts: undefined,
+  })) as any[]
 }
 
 export async function getModelBySlug(slug: string) {

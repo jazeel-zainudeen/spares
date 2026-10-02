@@ -95,7 +95,7 @@ export default async function CompanyCatalogPage({
                             : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                         }`}
                       >
-                        <span className="truncate">{company.name}</span>
+                        <span className="truncate">{company.name} ({company.part_count ?? 0})</span>
                         <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${isActive ? "opacity-70" : "opacity-40"}`} />
                       </Link>
                     </li>
