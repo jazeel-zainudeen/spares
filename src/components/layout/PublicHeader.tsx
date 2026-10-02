@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Wrench, Layers, Building2, Car, Search, ShieldCheck, Home, Download } from "lucide-react"
+import Image from "next/image"
+import { Layers, Building2, Car, Search, ShieldCheck, Home, Download } from "lucide-react"
 import { useInstallPrompt } from "@/components/public/useInstallPrompt"
 
 export function PublicHeader() {
@@ -28,11 +29,17 @@ export function PublicHeader() {
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs shadow-primary/20 transition-transform group-hover:scale-105">
-            <Wrench className="h-4 w-4 sm:h-5 sm:w-5" />
-          </div>
+          <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-xl transition-transform group-hover:scale-105 sm:h-9 sm:w-9">
+            <Image
+              src="/logo-mark.png"
+              alt=""
+              width={192}
+              height={192}
+              className="h-full w-full object-contain"
+            />
+          </span>
           <span className="font-bold text-base sm:text-lg text-foreground tracking-tight">
-            AutoParts<span className="text-primary">Pro</span>
+            AutoParts <span className="text-primary">Pro</span>
           </span>
         </Link>
 
