@@ -2,10 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Wrench, Layers, Building2, Car, Search, ShieldCheck, Home } from "lucide-react"
+import { Wrench, Layers, Building2, Car, Search, ShieldCheck, Home, Download } from "lucide-react"
+import { useInstallPrompt } from "@/components/public/useInstallPrompt"
 
 export function PublicHeader() {
   const pathname = usePathname()
+  const { canInstall, handleInstall } = useInstallPrompt()
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -54,6 +56,16 @@ export function PublicHeader() {
             )
           })}
 
+          {canInstall && (
+            <button
+              onClick={handleInstall}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary shadow-2xs transition-colors hover:bg-primary hover:text-primary-foreground hover:border-primary ml-1"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>Install App</span>
+            </button>
+          )}
+
           <Link
             href="/admin"
             className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-foreground shadow-2xs backdrop-blur-xs transition-colors hover:bg-accent hover:border-primary/40 hover:text-primary ml-1.5"
@@ -63,8 +75,17 @@ export function PublicHeader() {
           </Link>
         </nav>
 
-        {/* Mobile Quick Admin Link */}
+        {/* Mobile Quick Actions */}
         <div className="flex sm:hidden items-center gap-2">
+          {canInstall && (
+            <button
+              onClick={handleInstall}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/30 bg-primary/5 text-primary shadow-2xs transition-all active:scale-95 hover:bg-primary hover:text-primary-foreground hover:border-primary"
+              title="Install App"
+            >
+              <Download className="h-3.5 w-3.5" />
+            </button>
+          )}
           <Link
             href="/admin"
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1 text-xs font-medium text-foreground shadow-2xs transition-colors"

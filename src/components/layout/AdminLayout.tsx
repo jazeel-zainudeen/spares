@@ -9,10 +9,12 @@ import {
   Settings,
   LogOut,
   Wrench,
-  Tags
+  Tags,
+  Download
 } from "lucide-react"
 import { logout } from "@/app/actions/auth"
 import { cn } from "@/lib/utils"
+import { useInstallPrompt } from "@/components/public/useInstallPrompt"
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
@@ -24,6 +26,7 @@ const navigation = [
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const { canInstall, handleInstall } = useInstallPrompt()
 
   return (
     <div className="min-h-screen bg-muted/30 dark:bg-background flex flex-col lg:flex-row w-full">
@@ -55,7 +58,16 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="border-t border-border/40 p-4">
+        <div className="border-t border-border/40 p-4 space-y-1">
+          {canInstall && (
+            <button
+              onClick={handleInstall}
+              className="w-full group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-primary bg-primary/10 hover:bg-primary/15 transition-colors"
+            >
+              <Download className="mr-3 h-5 w-5 shrink-0 text-primary" />
+              Install App
+            </button>
+          )}
           <form action={logout}>
             <button
               type="submit"
@@ -92,6 +104,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-1.5">
+            {canInstall && (
+              <button
+                onClick={handleInstall}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95"
+                title="Install App"
+              >
+                <Download className="h-3.5 w-3.5" />
+              </button>
+            )}
             <Link
               href="/"
               className="px-2.5 py-1 text-[11px] font-medium rounded-full bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"

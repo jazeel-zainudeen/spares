@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { RegisterServiceWorker } from "@/components/public/RegisterServiceWorker";
-import { InstallPrompt } from "@/components/public/InstallPrompt";
+
 import { NotFoundProvider } from "@/components/public/NotFoundContext";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -74,7 +74,7 @@ export default function RootLayout({
           <main className="flex-1 flex flex-col">
             {children}
           </main>
-          <InstallPrompt />
+
           <Analytics />
           <SpeedInsights />
         </NotFoundProvider>
