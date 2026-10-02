@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo, useDeferredValue } from "react"
+import Image from "next/image"
 import type { PartRow } from "@/lib/services/parts"
 import { getPartImages } from "@/lib/utils/images"
 import type { CategoryRow } from "@/lib/services/categories"
@@ -54,9 +55,11 @@ export function PartList({ initialParts, categories, companies, models }: { init
     setCurrentPage(1)
   }
 
-  const filteredParts = parts.filter(p => {
+  const deferredSearch = useDeferredValue(search)
+
+  const filteredParts = useMemo(() => parts.filter(p => {
     const searchString = `${p.item} ${p.ref_number} ${p.oem_number || ''}`.toLowerCase()
-    const matchesSearch = searchString.includes(search.toLowerCase())
+    const matchesSearch = searchString.includes(deferredSearch.toLowerCase())
 
     let matchesCategory = true
     if (categoryFilter) {
@@ -71,9 +74,9 @@ export function PartList({ initialParts, categories, companies, models }: { init
     const matchesModel = modelFilter ? p.model_id === modelFilter : true
 
     return matchesSearch && matchesCategory && matchesCompany && matchesModel
-  })
+  }), [parts, deferredSearch, categoryFilter, companyFilter, modelFilter, companies])
 
-  const sortedParts = [...filteredParts].sort((a, b) => {
+  const sortedParts = useMemo(() => [...filteredParts].sort((a, b) => {
     let result = 0
     if (sortColumn === "item") {
       result = (a.item || "").localeCompare(b.item || "")
@@ -95,13 +98,13 @@ export function PartList({ initialParts, categories, companies, models }: { init
       result = timeA - timeB
     }
     return sortDirection === "asc" ? result : -result
-  })
+  }), [filteredParts, sortColumn, sortDirection])
 
   const totalPages = Math.ceil(sortedParts.length / PAGE_SIZE)
-  const paginatedParts = sortedParts.slice(
+  const paginatedParts = useMemo(() => sortedParts.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
-  )
+  ), [sortedParts, currentPage])
 
   const handleSearchChange = (val: string) => {
     setSearch(val)
@@ -124,7 +127,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
     setCurrentPage(1)
   }
 
-  const availableModelsForFilter = models.filter(m => companyFilter ? m.company_id === companyFilter : true)
+  const availableModelsForFilter = useMemo(() => models.filter(m => companyFilter ? m.company_id === companyFilter : true), [models, companyFilter])
 
   const handleAdd = () => {
     setEditingPart(null)
@@ -244,8 +247,14 @@ export function PartList({ initialParts, categories, companies, models }: { init
                         <div className="flex items-start gap-3 min-w-0">
                           {mainImage ? (
                             <div className="relative flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted/40 p-1">
-                              { }
-                              <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+                              <Image 
+                                src={mainImage} 
+                                alt={part.item || "Part image"} 
+                                fill
+                                sizes="(max-width: 768px) 64px, 64px"
+                                className="object-contain p-1" 
+                                loading="lazy" 
+                              />
                               {images.length > 1 && (
                                 <span className="absolute bottom-0.5 right-0.5 bg-black/75 text-[9px] font-semibold text-white px-1 rounded-sm">
                                   +{images.length - 1}
@@ -381,8 +390,14 @@ export function PartList({ initialParts, categories, companies, models }: { init
                           <TableCell className="w-px whitespace-nowrap text-center">
                             {mainImage ? (
                               <div className="mx-auto relative flex h-10 w-12 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                                { }
-                                <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+                                <Image 
+                                  src={mainImage} 
+                                  alt={part.item || "Part image"} 
+                                  fill
+                                  sizes="48px"
+                                  className="object-contain p-1" 
+                                  loading="lazy" 
+                                />
                                 {images.length > 1 && (
                                   <span className="absolute bottom-0 right-0 bg-black/80 text-[8px] font-bold text-white px-0.5 rounded-tl-sm">
                                     +{images.length - 1}
