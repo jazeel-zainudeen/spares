@@ -52,9 +52,6 @@ export default async function CategoryPage({
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             {currentCategory.name} Parts
           </h1>
-          {currentCategory.description && (
-            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{currentCategory.description}</p>
-          )}
         </div>
         <SearchBar initialValue={search} />
       </div>
