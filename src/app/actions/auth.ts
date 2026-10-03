@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { trackAction } from '@/lib/tracking'
 
 export async function login(formData: FormData) {
   const email = formData.get('email') as string
@@ -19,14 +20,17 @@ export async function login(formData: FormData) {
   })
 
   if (error) {
+    trackAction(`⚠️ *Failed admin login attempt:* \`${email}\``)
     return { error: error.message }
   }
 
+  trackAction(`🔓 *Admin logged in:* \`${email}\``)
   redirect('/admin')
 }
 
 export async function logout() {
   const supabase = await createClient()
   await supabase.auth.signOut()
+  trackAction(`🔒 *Admin logged out*`)
   redirect('/login')
 }

@@ -14,7 +14,7 @@ export async function trackAction(message: string) {
       return;
     }
 
-    await fetch('https://slack.com/api/chat.postMessage', {
+    const res = await fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -26,6 +26,10 @@ export async function trackAction(message: string) {
         thread_ts: threadTs,
       }),
     });
+    const data = await res.json();
+    if (!data.ok) {
+      console.error('Slack bot failed to track action:', data);
+    }
   } catch (error) {
     console.error('Failed to track action to Slack:', error);
   }

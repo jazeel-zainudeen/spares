@@ -1,4 +1,4 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest, userAgent } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function proxy(request: NextRequest, event: any) {
@@ -10,8 +10,11 @@ export async function proxy(request: NextRequest, event: any) {
   const lastPath = request.cookies.get('last_visited_path')?.value;
   const path = request.nextUrl.pathname;
 
-  // Only track if we have the config and they are visiting a new path
-  if (botToken && channelId && lastPath !== path) {
+  // Ignore unwanted background requests like .well-known, API calls, or files
+  const isUnwantedPath = path.startsWith('/.') || path.startsWith('/_') || path.startsWith('/api') || path.includes('.');
+
+  // Only track if we have the config, they are visiting a new path, and it's a real page
+  if (botToken && channelId && lastPath !== path && !isUnwantedPath) {
     response.cookies.set('last_visited_path', path, { path: '/' });
 
     if (!threadTs) {
@@ -20,7 +23,11 @@ export async function proxy(request: NextRequest, event: any) {
       const geo = request.geo || {};
       const city = geo.city || request.headers.get('x-vercel-ip-city') || 'Unknown City';
       const country = geo.country || request.headers.get('x-vercel-ip-country') || 'Unknown Country';
-      const userAgent = request.headers.get('user-agent') || 'Unknown Device';
+      
+      // Parse the user agent nicely using Next.js helper
+      const { browser, os, device } = userAgent(request);
+      const deviceType = device.type === 'mobile' ? '📱 Mobile' : device.type === 'tablet' ? '💊 Tablet' : '💻 Desktop';
+      const parsedAgent = `${browser.name || 'Unknown Browser'} on ${os.name || 'Unknown OS'} (${deviceType})`;
 
       const isSupabaseLoggedIn = Array.from(request.cookies.getAll()).some(
         (cookie) => cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token')
@@ -31,7 +38,7 @@ export async function proxy(request: NextRequest, event: any) {
 *Location:* ${city}, ${country}
 *Auth:* ${isSupabaseLoggedIn ? 'Authenticated 👤' : 'Guest 🕵️'}
 *IP:* ${ip}
-*Agent:* \`${userAgent}\``;
+*Device:* \`${parsedAgent}\``;
 
       try {
         const res = await fetch('https://slack.com/api/chat.postMessage', {
@@ -49,6 +56,8 @@ export async function proxy(request: NextRequest, event: any) {
         const data = await res.json();
         if (data.ok && data.ts) {
           response.cookies.set('slack_thread_ts', data.ts, { path: '/' });
+        } else {
+          console.error('Slack bot failed to start thread:', data);
         }
       } catch (err) {
         console.error('Slack bot error:', err);
@@ -68,7 +77,9 @@ export async function proxy(request: NextRequest, event: any) {
           text: text,
           thread_ts: threadTs,
         }),
-      }).catch((err) => console.error('Slack thread reply error:', err));
+      }).then(res => res.json()).then(data => {
+        if (!data.ok) console.error('Slack thread reply error:', data)
+      }).catch((err) => console.error('Slack thread reply exception:', err));
 
       if (event && event.waitUntil) {
         event.waitUntil(trackReq);
