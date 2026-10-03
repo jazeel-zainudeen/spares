@@ -19,7 +19,11 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     const [isOpen, setIsOpen] = React.useState(false)
     const [search, setSearch] = React.useState("")
 
-    const filteredOptions = options.filter(opt =>
+    const uniqueOptions = options.filter((opt, i, arr) => 
+      arr.findIndex(o => o.value === opt.value) === i
+    )
+
+    const filteredOptions = uniqueOptions.filter(opt =>
       opt.label.toLowerCase().includes(search.toLowerCase())
     )
 
@@ -44,12 +48,12 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     // Determine label for trigger button
     let displayText = placeholder
     if (value.length === 1) {
-      const found = options.find(o => o.value === value[0])
+      const found = uniqueOptions.find(o => o.value === value[0])
       displayText = found ? found.label : value[0]
     } else if (value.length > 1) {
       const firstTwo = value
         .slice(0, 2)
-        .map(v => options.find(o => o.value === v)?.label || v)
+        .map(v => uniqueOptions.find(o => o.value === v)?.label || v)
         .join(", ")
       displayText = value.length === 2 ? firstTwo : `${value.length} selected (${firstTwo}, ...)`
     }

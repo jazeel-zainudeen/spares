@@ -19,11 +19,15 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     const [isOpen, setIsOpen] = React.useState(false)
     const [search, setSearch] = React.useState("")
 
-    const filteredOptions = options.filter(opt =>
+    const uniqueOptions = options.filter((opt, i, arr) => 
+      arr.findIndex(o => o.value === opt.value) === i
+    )
+
+    const filteredOptions = uniqueOptions.filter(opt =>
       opt.label.toLowerCase().includes(search.toLowerCase())
     )
 
-    const selectedOption = options.find(opt => opt.value === value)
+    const selectedOption = uniqueOptions.find(opt => opt.value === value)
 
     const handleSelect = (val: string) => {
       if (onChange) {
