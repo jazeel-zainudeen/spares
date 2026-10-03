@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
 @theme {
   --color-background: hsl(var(--background));
@@ -32,10 +33,9 @@
   --animate-float: float 6s ease-in-out infinite;
   --animate-glow: glow 2s ease-in-out infinite alternate;
   
-  --animate-dialog-overlay-show: dialog-overlay-show 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  --animate-dialog-overlay-hide: dialog-overlay-hide 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  --animate-dialog-content-show: dialog-content-show 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  --animate-dialog-content-hide: dialog-content-hide 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-fade-in-up: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
 }
 
 @keyframes fade-in-up {
@@ -51,23 +51,6 @@
 @keyframes glow {
   from { box-shadow: 0 0 10px -2px rgba(139, 92, 246, 0.1), 0 0 3px -1px rgba(139, 92, 246, 0.2); }
   to { box-shadow: 0 0 20px 2px rgba(139, 92, 246, 0.3), 0 0 6px 1px rgba(139, 92, 246, 0.4); }
-}
-
-@keyframes dialog-overlay-show {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes dialog-overlay-hide {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-@keyframes dialog-content-show {
-  from { opacity: 0; transform: translateY(2rem) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes dialog-content-hide {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to { opacity: 0; transform: translateY(2rem) scale(0.95); }
 }
 
 

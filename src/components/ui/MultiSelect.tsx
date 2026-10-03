@@ -84,7 +84,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
           <PopoverPrimitive.Content
             align="start"
             sideOffset={6}
-            className="z-50 w-(--radix-popover-trigger-width) min-w-56 overflow-hidden rounded-xl border border-border/80 bg-popover p-1.5 text-popover-foreground shadow-lg shadow-black/5 outline-hidden animate-in fade-in-0 zoom-in-95"
+            className="z-50 w-(--radix-popover-trigger-width) min-w-56 overflow-hidden rounded-xl border border-border/80 bg-popover p-1.5 text-popover-foreground shadow-lg shadow-black/5 outline-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
           >
             <div className="flex items-center rounded-md bg-muted/40 px-2.5 py-1.5 mb-1 border border-border/50">
               <Search className="mr-2 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
