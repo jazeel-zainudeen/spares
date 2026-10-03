@@ -75,7 +75,7 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
                   <p>No recently viewed parts.</p>
                 </div>
               ) : (
-                <div className="space-y-2.5">
+                <div className="flex flex-col gap-3">
                   {recentlyViewed.map(part => (
                     <Link
                       key={part.id}
@@ -103,12 +103,12 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
 
           {/* TAB: SAVED (Folders View) */}
           {activeTab === "saved" && !activeFolderId && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Your Folders</span>
               {folders.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No folders created.</p>
               ) : (
-                <div className="space-y-2">
+                <div className="flex flex-col gap-3">
                   {folders.map(folder => {
                     const count = savedItems.filter(i => i.folderId === folder.id).length
                     return (
@@ -176,7 +176,7 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
                   <p>No items in this folder.</p>
                 </div>
               ) : (
-                <div className="space-y-2.5">
+                <div className="flex flex-col gap-3">
                   {folderItems.map(item => (
                     <div key={item.part.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border/60 bg-card group">
                       <Link

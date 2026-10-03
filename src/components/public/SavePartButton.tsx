@@ -36,7 +36,7 @@ export function SavePartButton({ part, display = "default" }: { part: CompactPar
           variant={savedState ? "default" : (display === "icon" ? "secondary" : "outline")}
           size={display === "icon" ? "icon" : "sm"}
           className={display === "icon" 
-            ? `h-8 w-8 rounded-full shadow-md transition-all duration-300 active:scale-95 ${!savedState && 'bg-background/80 backdrop-blur-sm hover:bg-background'}`
+            ? `h-8 w-8 rounded-full shadow-md transition-all duration-300 active:scale-95 ${!savedState ? 'opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 bg-background/80 backdrop-blur-sm hover:bg-background' : ''}`
             : "gap-2 shrink-0 transition-all duration-300 active:scale-95"}
           aria-label={savedState ? "Saved to List" : "Save Part"}
         >
