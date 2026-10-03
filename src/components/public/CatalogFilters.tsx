@@ -89,7 +89,17 @@ export function CatalogFilters({
 
   const handleModelChange = (slugs: string[]) => {
     setSelectedModels(slugs)
-    updateFilters(selectedCategories, selectedBrands, slugs)
+    // Auto fill brands
+    let newBrands = [...selectedBrands]
+    slugs.forEach(mSlug => {
+      const mod = models.find(m => m.slug === mSlug)
+      const compSlug = mod?.car_companies?.slug || companies.find(c => c.id === mod?.company_id)?.slug
+      if (compSlug && !newBrands.includes(compSlug)) {
+        newBrands.push(compSlug)
+      }
+    })
+    setSelectedBrands(newBrands)
+    updateFilters(selectedCategories, newBrands, slugs)
   }
 
   const removeCategory = (slug: string) => {
@@ -217,13 +227,13 @@ export function CatalogFilters({
                 <span>Categories</span>
               </label>
               <MultiSelect
+                value={selectedCategories}
+                onChange={handleCategoryChange}
                 options={categories.map((c) => ({
                   label: c.name,
                   value: c.slug,
                   count: c.part_count ?? 0
                 }))}
-                value={selectedCategories}
-                onChange={handleCategoryChange}
                 placeholder="Select Categories"
               />
             </div>
@@ -235,13 +245,13 @@ export function CatalogFilters({
                 <span>Brands / Manufacturers</span>
               </label>
               <MultiSelect
+                value={selectedBrands}
+                onChange={handleBrandChange}
                 options={companies.map((c) => ({
                   label: c.name,
                   value: c.slug,
                   count: c.part_count ?? 0
                 }))}
-                value={selectedBrands}
-                onChange={handleBrandChange}
                 placeholder="Select Brands"
               />
             </div>
@@ -253,13 +263,14 @@ export function CatalogFilters({
                 <span>Vehicle Models</span>
               </label>
               <MultiSelect
+                value={selectedModels}
+                onChange={handleModelChange}
                 options={filteredModels.map((m) => ({
                   label: m.name,
                   value: m.slug,
-                  count: m.part_count ?? 0
+                  count: m.part_count ?? 0,
+                  group: m.car_companies?.name || "Other"
                 }))}
-                value={selectedModels}
-                onChange={handleModelChange}
                 placeholder="Select Models"
               />
             </div>

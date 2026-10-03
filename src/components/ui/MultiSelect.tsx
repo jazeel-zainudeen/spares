@@ -116,34 +116,62 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                   No options found.
                 </div>
               ) : (
-                filteredOptions.map((opt) => {
-                  const isChecked = value.includes(opt.value)
-                  return (
-                    <div
-                      key={opt.value}
-                      onClick={() => toggleOption(opt.value)}
-                      className={cn(
-                        "relative flex cursor-pointer select-none items-center rounded-lg py-2 pl-8 pr-3 text-xs outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
-                        isChecked && "bg-accent/80 font-medium text-accent-foreground"
-                      )}
-                    >
-                      <div className={cn(
-                        "absolute left-2.5 flex h-4 w-4 items-center justify-center rounded-sm border border-border transition-colors",
-                        isChecked && "bg-primary border-primary text-primary-foreground"
-                      )}>
-                        {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
-                      </div>
-                      <div className="flex flex-col min-w-0 gap-0.5">
-                        <span className="truncate">{opt.label}</span>
-                        {opt.count !== undefined && (
-                          <span className="text-[10px] text-muted-foreground/70 font-normal leading-none">
-                            {opt.count === 1 ? '1 Part' : `${opt.count} Parts`}
-                          </span>
+                (() => {
+                  const groups: Record<string, typeof filteredOptions> = {}
+                  const ungrouped: typeof filteredOptions = []
+
+                  filteredOptions.forEach(opt => {
+                    if (opt.group) {
+                      if (!groups[opt.group]) groups[opt.group] = []
+                      groups[opt.group].push(opt)
+                    } else {
+                      ungrouped.push(opt)
+                    }
+                  })
+
+                  const renderOption = (opt: typeof filteredOptions[0]) => {
+                    const isChecked = value.includes(opt.value)
+                    return (
+                      <div
+                        key={opt.value}
+                        onClick={() => toggleOption(opt.value)}
+                        className={cn(
+                          "relative flex cursor-pointer select-none items-center rounded-lg py-2 pl-8 pr-3 text-xs outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
+                          isChecked && "bg-accent/80 font-medium text-accent-foreground"
                         )}
+                      >
+                        <div className={cn(
+                          "absolute left-2.5 flex h-4 w-4 items-center justify-center rounded-sm border border-border transition-colors",
+                          isChecked && "bg-primary border-primary text-primary-foreground"
+                        )}>
+                          {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
+                        </div>
+                        <div className="flex flex-col min-w-0 gap-0.5">
+                          <span className="truncate">{opt.label}</span>
+                          {opt.count !== undefined && (
+                            <span className="text-[10px] text-muted-foreground/70 font-normal leading-none">
+                              {opt.count === 1 ? '1 Part' : `${opt.count} Parts`}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )
+                  }
+
+                  return (
+                    <>
+                      {ungrouped.map(renderOption)}
+                      {Object.entries(groups).map(([groupName, opts]) => (
+                        <div key={groupName} className="mt-1 first:mt-0">
+                          <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 bg-muted/20">
+                            {groupName}
+                          </div>
+                          {opts.map(renderOption)}
+                        </div>
+                      ))}
+                    </>
                   )
-                })
+                })()
               )}
             </div>
           </PopoverPrimitive.Content>

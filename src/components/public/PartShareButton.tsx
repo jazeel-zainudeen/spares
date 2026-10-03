@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Check, Copy, Mail, Share2, ArrowUpRight, Link2 } from "lucide-react"
 import { FaWhatsapp, FaXTwitter } from "react-icons/fa6"
 import { Button } from "@/components/ui/Button"
@@ -9,6 +9,25 @@ export function PartShareButton() {
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [shareUrl, setShareUrl] = useState("")
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener("touchstart", handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("touchstart", handleClickOutside)
+    }
+  }, [isOpen])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -93,7 +112,7 @@ export function PartShareButton() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <Button
         type="button"
         variant="outline"

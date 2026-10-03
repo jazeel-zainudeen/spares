@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
-import { Select } from "@/components/ui/Select"
+import { MultiSelect } from "@/components/ui/MultiSelect"
 import { Button } from "@/components/ui/Button"
 import { fetchCategoriesAction } from "@/app/actions/categories"
 import { fetchCompaniesAction } from "@/app/actions/companies"
@@ -17,9 +17,9 @@ export function AdvancedSearchBar({
   initialCompanies?: any[]
 }) {
   const [query, setQuery] = useState("")
-  const [category, setCategory] = useState("")
-  const [company, setCompany] = useState("")
-  const [model, setModel] = useState("")
+  const [category, setCategory] = useState<string[]>([])
+  const [company, setCompany] = useState<string[]>([])
+  const [model, setModel] = useState<string[]>([])
 
   const [categories, setCategories] = useState<any[]>(initialCategories)
   const [companies, setCompanies] = useState<any[]>(initialCompanies)
@@ -41,34 +41,36 @@ export function AdvancedSearchBar({
     }
   }, [initialCategories.length, initialCompanies.length])
 
-  // Load models on-demand only when a company/brand is selected
+  // Load models on-demand
   useEffect(() => {
     setLoadingModels(true)
-    // Pass undefined if company is empty to fetch all models, or pass company to filter
-    fetchModelsAction(company || undefined)
+    fetchModelsAction(undefined)
       .then((res) => {
         if (res.data) setModels(res.data)
       })
       .catch(console.error)
       .finally(() => setLoadingModels(false))
-  }, [company])
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
 
     const params = new URLSearchParams()
     if (query.trim()) params.append('search', query.trim())
-    if (category) params.append('category', category)
-    if (company) params.append('brand', company)
-    if (model) params.append('model', model)
+    if (category.length > 0) params.append('category', category.join(','))
+    if (company.length > 0) params.append('brand', company.join(','))
+    if (model.length > 0) params.append('model', model.join(','))
 
     const queryString = params.toString()
     router.push(`/spare-parts${queryString ? `?${queryString}` : ""}`)
   }
 
   // Filter models based on selected company
-  const availableModels = company
-    ? models.filter(m => m.car_companies?.slug === company || m.company_id === company)
+  const availableModels = company.length > 0
+    ? models.filter(m => {
+        const compSlug = m.car_companies?.slug || m.company_id
+        return compSlug && company.includes(compSlug)
+      })
     : models
 
   return (
@@ -96,11 +98,10 @@ export function AdvancedSearchBar({
 
         {/* Filters */}
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-          <Select
+          <MultiSelect
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={setCategory}
             options={[
-              { label: "All Categories", value: "" },
               ...categories.map(c => ({
                 label: c.name,
                 value: c.slug,
@@ -110,14 +111,21 @@ export function AdvancedSearchBar({
             placeholder="All Categories"
           />
 
-          <Select
+          <MultiSelect
             value={company}
-            onChange={(e) => {
-              setCompany(e.target.value)
-              setModel("")
+            onChange={(val) => {
+              setCompany(val)
+              // Filter out models that don't belong to the selected brands
+              if (val.length > 0) {
+                const validModels = model.filter(mSlug => {
+                  const mod = models.find(m => m.slug === mSlug)
+                  const compSlug = mod?.car_companies?.slug || mod?.company_id
+                  return compSlug && val.includes(compSlug)
+                })
+                setModel(validModels)
+              }
             }}
             options={[
-              { label: "All Brands", value: "" },
               ...companies.map(c => ({
                 label: c.name,
                 value: c.slug,
@@ -127,21 +135,25 @@ export function AdvancedSearchBar({
             placeholder="All Brands"
           />
 
-          <Select
+          <MultiSelect
             value={model}
-            onChange={(e) => {
-              const newModel = e.target.value
-              setModel(newModel)
-              // Auto-fill company if possible
-              if (newModel && !company) {
-                const modelObj = models.find(m => m.slug === newModel)
-                const compSlug = modelObj?.car_companies?.slug || modelObj?.company_id
-                if (compSlug) setCompany(compSlug)
+            onChange={(val) => {
+              setModel(val)
+              // Auto-select brand if not already selected
+              let newCompanies = [...company]
+              val.forEach(mSlug => {
+                const mod = models.find(m => m.slug === mSlug)
+                const compSlug = mod?.car_companies?.slug || mod?.company_id
+                if (compSlug && !newCompanies.includes(compSlug)) {
+                  newCompanies.push(compSlug)
+                }
+              })
+              if (newCompanies.length !== company.length) {
+                setCompany(newCompanies)
               }
             }}
             disabled={loadingModels}
             options={[
-              { label: loadingModels ? "Loading models..." : "All Models", value: "" },
               ...availableModels.map(m => ({
                 label: m.name,
                 value: m.slug,

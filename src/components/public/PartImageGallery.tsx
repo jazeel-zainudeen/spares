@@ -17,7 +17,10 @@ export function PartImageGallery({ images, title, categoryName }: PartImageGalle
   const [isZoomed, setIsZoomed] = useState(false)
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 })
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalZoomed, setIsModalZoomed] = useState(false)
+  const [modalZoomPos, setModalZoomPos] = useState({ x: 50, y: 50 })
   const containerRef = useRef<HTMLDivElement>(null)
+  const modalContainerRef = useRef<HTMLDivElement>(null)
 
   const hasImages = images.length > 0
   const activeImage = hasImages ? images[selectedIndex] || images[0] : null
@@ -55,6 +58,14 @@ export function PartImageGallery({ images, title, categoryName }: PartImageGalle
     const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
     const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100))
     setZoomPos({ x, y })
+  }
+
+  const handleModalMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!modalContainerRef.current) return
+    const rect = modalContainerRef.current.getBoundingClientRect()
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100))
+    setModalZoomPos({ x, y })
   }
 
   return (
@@ -216,14 +227,27 @@ export function PartImageGallery({ images, title, categoryName }: PartImageGalle
 
           {/* Modal Main Image Display */}
           <div
-            className="relative w-full max-w-5xl h-[80vh] flex items-center justify-center"
-            onClick={(e) => e.stopPropagation()}
+            ref={modalContainerRef}
+            className={`relative w-full max-w-5xl h-[80vh] flex items-center justify-center overflow-hidden rounded-lg ${isModalZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              setIsModalZoomed(!isModalZoomed)
+            }}
+            onMouseMove={handleModalMouseMove}
           >
-            <img
-              src={activeImage}
-              alt={`${title} - Expanded Image`}
-              className="max-h-full max-w-full object-contain select-none shadow-2xl rounded-lg"
-            />
+            <div
+              className="relative w-full h-full flex items-center justify-center transition-transform duration-200 ease-out will-change-transform"
+              style={{
+                transformOrigin: `${modalZoomPos.x}% ${modalZoomPos.y}%`,
+                transform: isModalZoomed ? "scale(2.5)" : "scale(1)",
+              }}
+            >
+              <img
+                src={activeImage}
+                alt={`${title} - Expanded Image`}
+                className="max-h-full max-w-full object-contain select-none shadow-2xl rounded-lg pointer-events-none"
+              />
+            </div>
 
             {/* Modal Prev / Next Navigation */}
             {images.length > 1 && (
