@@ -254,11 +254,11 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                         <TableCell className="font-medium">
                           <span className="font-semibold text-foreground"><HighlightText text={model.name} highlight={search} /></span>
                         </TableCell>
-                        <TableCell className="w-px whitespace-nowrap text-center">{model.car_companies?.name || "Unknown"}</TableCell>
-                        <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
+                        <TableCell className="w-12 text-center">{model.car_companies?.name || "Unknown"}</TableCell>
+                        <TableCell className="w-12 whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
                           {formatDateTime(model.created_at)}
                         </TableCell>
-                        <TableCell className="w-px whitespace-nowrap text-right">
+                        <TableCell className="w-16 text-right">
                           <div className="flex justify-end gap-1">
                             <Button
                               variant="ghost"

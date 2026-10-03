@@ -226,7 +226,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                     {paginatedCategories.map(category => (
                       <TableRow key={category.id}>
                         <TableCell className="font-medium"><HighlightText text={category.name} highlight={search} /></TableCell>
-                        <TableCell className="w-px whitespace-nowrap text-center">
+                        <TableCell className="w-12 text-center">
                           {category.image_url ? (
                             <div className="mx-auto flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
                               { }
@@ -236,10 +236,10 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                             <span className="text-xs text-muted-foreground">No image</span>
                           )}
                         </TableCell>
-                        <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
+                        <TableCell className="w-12 whitespace-nowrap text-center text-xs text-muted-foreground font-mono">
                           {formatDateTime(category.created_at)}
                         </TableCell>
-                        <TableCell className="w-px whitespace-nowrap text-right">
+                        <TableCell className="w-16 text-right">
                           <div className="flex justify-end gap-1">
                             <Button
                               variant="ghost"
