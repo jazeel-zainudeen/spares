@@ -7,6 +7,7 @@ import { ListingImageCarousel } from "@/components/public/ListingImageCarousel"
 import { getPartImages } from "@/lib/utils/images"
 import { getPublicPartsAction } from "@/app/actions/parts"
 import { Loader2 } from "lucide-react"
+import { SavePartButton } from "@/components/public/SavePartButton"
 
 export function InfinitePartList({ 
   initialParts, 
@@ -77,13 +78,30 @@ export function InfinitePartList({
           const images = getPartImages(part)
 
           return (
-            <Link key={part.id} href={href} className="group">
-              <Card className="h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-xs">
-                <ListingImageCarousel
-                  images={images}
-                  title={part.item}
-                  categoryName={part.categories?.name || "Auto Part"}
-                />
+            <Card key={part.id} className="relative group h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-xs">
+              <div className="relative">
+                <Link href={href} className="block">
+                  <ListingImageCarousel
+                    images={images}
+                    title={part.item}
+                    categoryName={part.categories?.name || "Auto Part"}
+                  />
+                </Link>
+                <div className="absolute bottom-3 right-3 z-20">
+                  <SavePartButton 
+                    display="icon" 
+                    part={{ 
+                      id: part.id, 
+                      name: part.item, 
+                      categorySlug: catSlug, 
+                      companySlug: compSlug, 
+                      modelSlug: modSlug, 
+                      imageUrl: images[0] 
+                    }} 
+                  />
+                </div>
+              </div>
+              <Link href={href} className="block h-full flex flex-col flex-1">
                 <CardContent className="p-3.5 space-y-2">
                   <div className="text-[11px] font-medium text-primary truncate">
                     {part.car_models?.car_companies?.name} • {part.car_models?.name}
@@ -98,8 +116,8 @@ export function InfinitePartList({
                     )}
                   </div>
                 </CardContent>
-              </Card>
-            </Link>
+              </Link>
+            </Card>
           )
         })}
       </div>

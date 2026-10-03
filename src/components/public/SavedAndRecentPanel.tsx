@@ -75,13 +75,13 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
                   <p>No recently viewed parts.</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {recentlyViewed.map(part => (
                     <Link
                       key={part.id}
                       href={`/spare-parts/${part.categorySlug}/${part.companySlug}/${part.modelSlug || 'model'}/${part.id}`}
                       onClick={onClose}
-                      className="flex items-center gap-3 p-2 rounded-lg border border-border/60 bg-card hover:border-primary/30 hover:shadow-md transition-all group"
+                      className="flex items-center gap-3 p-2.5 rounded-lg border border-border/60 bg-card hover:border-primary/30 hover:shadow-md transition-all group"
                     >
                       <div className="h-12 w-12 shrink-0 rounded-md bg-muted/30 flex items-center justify-center overflow-hidden">
                         {part.imageUrl ? (
@@ -112,22 +112,44 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
                   {folders.map(folder => {
                     const count = savedItems.filter(i => i.folderId === folder.id).length
                     return (
-                      <button
+                      <div
                         key={folder.id}
-                        onClick={() => setActiveFolderId(folder.id)}
-                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border/60 bg-card hover:border-primary/40 hover:shadow-md transition-all group"
+                        className="w-full flex items-center justify-between py-2 pl-3 pr-1.5 rounded-lg border border-border/60 bg-card hover:border-primary/40 hover:shadow-md transition-all group"
                       >
-                        <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => setActiveFolderId(folder.id)}
+                          className="flex items-center gap-3 flex-1 text-left"
+                        >
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                             <Folder className="h-4 w-4" />
                           </div>
-                          <div className="text-left">
+                          <div>
                             <p className="text-sm font-semibold text-foreground">{folder.name}</p>
                             <p className="text-xs text-muted-foreground">{count} item{count !== 1 && 's'}</p>
                           </div>
+                        </button>
+
+                        <div className="flex items-center gap-0.5 shrink-0 ml-2">
+                          {folder.id !== "default" && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteFolder(folder.id);
+                              }}
+                              className="p-2 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              title="Delete Folder"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setActiveFolderId(folder.id)}
+                            className="p-2"
+                          >
+                            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                          </button>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                      </button>
+                      </div>
                     )
                   })}
                 </div>
@@ -154,9 +176,9 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
                   <p>No items in this folder.</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {folderItems.map(item => (
-                    <div key={item.part.id} className="flex items-center gap-3 p-2 rounded-lg border border-border/60 bg-card group">
+                    <div key={item.part.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border/60 bg-card group">
                       <Link
                         href={`/spare-parts/${item.part.categorySlug}/${item.part.companySlug}/${item.part.modelSlug || 'model'}/${item.part.id}`}
                         onClick={onClose}
@@ -177,9 +199,9 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
                         <p className="text-[10px] text-muted-foreground truncate">{item.part.categorySlug} • {item.part.companySlug}</p>
                       </Link>
                       <button
-                        onClick={() => removeSavedItem(item.part.id)}
+                        onClick={() => removeSavedItem(item.part.id, activeFolderId || undefined)}
                         className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                        title="Remove from saved"
+                        title="Remove from folder"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

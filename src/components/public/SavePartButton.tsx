@@ -6,7 +6,7 @@ import { Bookmark, FolderPlus, Check, ChevronDown, Plus } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 
-export function SavePartButton({ part }: { part: CompactPart }) {
+export function SavePartButton({ part, display = "default" }: { part: CompactPart, display?: "default" | "icon" }) {
   const { isSaved, toggleSavedItem, folders, createFolder, savedItems } = useUserCollection()
   const [isOpen, setIsOpen] = useState(false)
   const [newFolderName, setNewFolderName] = useState("")
@@ -33,14 +33,20 @@ export function SavePartButton({ part }: { part: CompactPart }) {
       <PopoverPrimitive.Trigger asChild>
         <Button
           type="button"
-          variant={savedState ? "default" : "outline"}
-          size="sm"
-          className="gap-2 shrink-0 transition-all duration-300 active:scale-95"
+          variant={savedState ? "default" : (display === "icon" ? "secondary" : "outline")}
+          size={display === "icon" ? "icon" : "sm"}
+          className={display === "icon" 
+            ? `h-8 w-8 rounded-full shadow-md transition-all duration-300 active:scale-95 ${!savedState && 'bg-background/80 backdrop-blur-sm hover:bg-background'}`
+            : "gap-2 shrink-0 transition-all duration-300 active:scale-95"}
           aria-label={savedState ? "Saved to List" : "Save Part"}
         >
           <Bookmark className={`h-4 w-4 ${savedState ? "fill-current" : ""}`} />
-          {savedState ? "Saved" : "Save"}
-          <ChevronDown className="h-3 w-3 opacity-70 ml-1" />
+          {display === "default" && (
+            <>
+              {savedState ? "Saved" : "Save"}
+              <ChevronDown className="h-3 w-3 opacity-70 ml-1" />
+            </>
+          )}
         </Button>
       </PopoverPrimitive.Trigger>
 
