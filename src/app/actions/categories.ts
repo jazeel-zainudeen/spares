@@ -4,6 +4,16 @@ import { revalidatePath, updateTag } from 'next/cache'
 import { getCategories, createCategory, updateCategory, deleteCategory, CategoryRow, CategoryInsert, CategoryUpdate } from '@/lib/services/categories'
 import { categorySchema } from '@/lib/validations'
 import { requireAuth } from '@/lib/auth'
+import { v2 as cloudinary } from 'cloudinary'
+import { extractCloudinaryPublicIdFromUrl } from '@/lib/utils/images'
+import { createClient } from '@/lib/supabase/server'
+
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+cloudinary.config({
+  cloud_name: cloudName,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function fetchCategoriesAction(): Promise<{ data?: CategoryRow[], error?: string }> {
   try {
@@ -69,6 +79,17 @@ export async function updateCategoryAction(id: string, data: CategoryUpdate): Pr
 export async function deleteCategoryAction(id: string): Promise<{ error?: string }> {
   try {
     await requireAuth()
+
+    const supabase = await createClient()
+    const { data: category } = await supabase.from('categories').select('image_url').eq('id', id).single()
+
+    if (category?.image_url) {
+      const publicId = extractCloudinaryPublicIdFromUrl(category.image_url)
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {})
+      }
+    }
+
     await deleteCategory(id)
     try { updateTag('categories') } catch {}
     revalidatePath('/admin/categories')

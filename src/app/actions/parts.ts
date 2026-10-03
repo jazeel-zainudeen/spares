@@ -56,6 +56,8 @@ export async function updatePartAction(id: string, updates: PartUpdate): Promise
 
 export async function deletePartAction(id: string, cloudinaryPublicId?: string | string[] | null): Promise<{ error?: string }> {
   try {
+    await requireAuth()
+
     // If the part has images, delete them from Cloudinary first
     if (cloudinaryPublicId) {
       const publicIds = Array.isArray(cloudinaryPublicId)
@@ -71,7 +73,6 @@ export async function deletePartAction(id: string, cloudinaryPublicId?: string |
       }
     }
 
-    await requireAuth()
     await deletePart(id)
     revalidatePath('/admin/parts')
     return {}

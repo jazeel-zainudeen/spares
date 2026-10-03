@@ -5,6 +5,16 @@ import { revalidatePath, updateTag } from 'next/cache'
 import { getCompanies, createCompany, updateCompany, deleteCompany, CompanyRow, CompanyInsert, CompanyUpdate } from '@/lib/services/companies'
 import { getModels } from '@/lib/services/models'
 import { companySchema } from '@/lib/validations'
+import { v2 as cloudinary } from 'cloudinary'
+import { extractCloudinaryPublicIdFromUrl } from '@/lib/utils/images'
+import { createClient } from '@/lib/supabase/server'
+
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+cloudinary.config({
+  cloud_name: cloudName,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function fetchCompaniesAction(): Promise<{ data?: CompanyRow[], error?: string }> {
   try {
@@ -75,6 +85,17 @@ export async function deleteCompanyAction(id: string): Promise<{ error?: string 
     }
 
     await requireAuth()
+
+    const supabase = await createClient()
+    const { data: company } = await supabase.from('car_companies').select('logo_url').eq('id', id).single()
+
+    if (company?.logo_url) {
+      const publicId = extractCloudinaryPublicIdFromUrl(company.logo_url)
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {})
+      }
+    }
+
     await deleteCompany(id)
     try { updateTag('companies') } catch {}
     revalidatePath('/admin/companies')

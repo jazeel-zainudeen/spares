@@ -33,3 +33,24 @@ export function getPartPublicIds(part?: { cloudinary_public_id?: string | null; 
   }
   return [part.cloudinary_public_id]
 }
+
+export function extractCloudinaryPublicIdFromUrl(url: string | null | undefined): string | null {
+  if (!url || !url.includes('res.cloudinary.com')) return null;
+  try {
+    const parts = url.split('/upload/');
+    if (parts.length !== 2) return null;
+    const pathParts = parts[1].split('/');
+    // Remove the version (e.g., v1234567890) if it exists
+    if (pathParts[0].match(/^v\d+$/)) {
+      pathParts.shift();
+    }
+    const publicIdWithExtension = pathParts.join('/');
+    const lastDotIndex = publicIdWithExtension.lastIndexOf('.');
+    if (lastDotIndex !== -1) {
+      return publicIdWithExtension.substring(0, lastDotIndex);
+    }
+    return publicIdWithExtension;
+  } catch (e) {
+    return null;
+  }
+}
