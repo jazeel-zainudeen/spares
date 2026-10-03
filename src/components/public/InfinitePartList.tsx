@@ -8,6 +8,7 @@ import { getPartImages } from "@/lib/utils/images"
 import { getPublicPartsAction } from "@/app/actions/parts"
 import { Loader2 } from "lucide-react"
 import { SavePartButton } from "@/components/public/SavePartButton"
+import { HighlightText } from "@/components/ui/HighlightText"
 
 export function InfinitePartList({ 
   initialParts, 
@@ -107,12 +108,16 @@ export function InfinitePartList({
                     {part.car_models?.car_companies?.name} • {part.car_models?.name}
                   </div>
                   <h3 className="font-semibold text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors text-foreground">
-                    {part.item}
+                    <HighlightText text={part.item} highlight={fetchParams?.search || ""} />
                   </h3>
                   <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] text-muted-foreground font-mono">
-                    <span className="rounded-sm bg-muted px-1.5 py-0.5">REF: {part.ref_number}</span>
+                    <span className="rounded-sm bg-muted px-1.5 py-0.5">
+                      REF: <HighlightText text={part.ref_number || ""} highlight={fetchParams?.search || ""} />
+                    </span>
                     {part.oem_number && (
-                      <span className="rounded-sm bg-muted px-1.5 py-0.5">OEM: {part.oem_number}</span>
+                      <span className="rounded-sm bg-muted px-1.5 py-0.5">
+                        OEM: <HighlightText text={part.oem_number} highlight={fetchParams?.search || ""} />
+                      </span>
                     )}
                   </div>
                 </CardContent>

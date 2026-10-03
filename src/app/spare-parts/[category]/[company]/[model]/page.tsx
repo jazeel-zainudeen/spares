@@ -10,6 +10,7 @@ import { ChevronRight, ArrowLeft, Car } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
 import { Pagination } from "@/components/ui/Pagination"
+import { HighlightText } from "@/components/ui/HighlightText"
 
 const PAGE_SIZE = 12
 
@@ -151,12 +152,16 @@ export default async function ModelCatalogPage({
                             {currentCompany.name} • {currentModel.name}
                           </div>
                           <h3 className="font-semibold text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors text-foreground">
-                            {part.item}
+                            <HighlightText text={part.item} highlight={search} />
                           </h3>
                           <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] text-muted-foreground font-mono">
-                            <span className="rounded-sm bg-muted px-1.5 py-0.5">REF: {part.ref_number}</span>
+                            <span className="rounded-sm bg-muted px-1.5 py-0.5">
+                              REF: <HighlightText text={part.ref_number || ""} highlight={search} />
+                            </span>
                             {part.oem_number && (
-                              <span className="rounded-sm bg-muted px-1.5 py-0.5">OEM: {part.oem_number}</span>
+                              <span className="rounded-sm bg-muted px-1.5 py-0.5">
+                                OEM: <HighlightText text={part.oem_number} highlight={search} />
+                              </span>
                             )}
                           </div>
                         </CardContent>
