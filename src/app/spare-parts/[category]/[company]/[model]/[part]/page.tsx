@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { PartShareButton } from "@/components/public/PartShareButton";
 import { SavePartButton } from "@/components/public/SavePartButton";
 import { TrackPartView } from "@/components/public/TrackPartView";
+import { CopyableText } from "@/components/ui/CopyableText";
 import { formatDate } from "@/lib/utils";
 
 export async function generateMetadata({
@@ -184,7 +185,7 @@ export default async function PartDetailPage({
                     <span>Catalog Reference</span>
                   </div>
                   <span className="font-mono font-bold text-sm text-foreground bg-muted px-2 py-0.5 rounded-sm">
-                    {part.ref_number}
+                    <CopyableText text={part.ref_number} />
                   </span>
                 </div>
 
@@ -195,7 +196,7 @@ export default async function PartDetailPage({
                       <span>Factory OEM Number</span>
                     </div>
                     <span className="font-mono font-bold text-sm text-foreground bg-muted px-2 py-0.5 rounded-sm">
-                      {part.oem_number}
+                      <CopyableText text={part.oem_number} />
                     </span>
                   </div>
                 )}
