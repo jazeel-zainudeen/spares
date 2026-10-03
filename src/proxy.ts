@@ -12,9 +12,12 @@ export async function proxy(request: NextRequest, event: any) {
 
   // Ignore unwanted background requests like .well-known, API calls, or files
   const isUnwantedPath = path.startsWith('/.') || path.startsWith('/_') || path.startsWith('/api') || path.includes('.');
+  
+  // Ignore Next.js background prefetching
+  const isPrefetch = request.headers.get('next-router-prefetch') === '1' || request.headers.get('purpose') === 'prefetch';
 
   // Only track if we have the config, they are visiting a new path, and it's a real page
-  if (botToken && channelId && lastPath !== path && !isUnwantedPath) {
+  if (botToken && channelId && lastPath !== path && !isUnwantedPath && !isPrefetch) {
     response.cookies.set('last_visited_path', path, { path: '/' });
 
     if (!threadTs) {
