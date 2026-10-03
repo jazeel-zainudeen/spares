@@ -17,9 +17,9 @@ export default async function Home() {
     <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-background text-foreground pb-16 sm:pb-0">
       {/* Background Decorative Gradients & Mesh (clean, premium feel) */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-[-35%] left-1/2 h-150 w-225 -translate-x-1/2 rounded-full bg-linear-to-b from-primary/15 via-primary/5 to-transparent blur-3xl" />
-        <div className="absolute top-1/3 left-[-10%] h-87.5 w-112.5 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-10 right-[-10%] h-100 w-125 rounded-full bg-sky-500/5 blur-3xl" />
+        <div className="absolute left-1/2 top-[-35%] h-[32rem] w-[120vw] max-w-[62rem] -translate-x-1/2 rounded-full bg-linear-to-b from-primary/15 via-primary/5 to-transparent blur-3xl sm:h-[38rem]" />
+        <div className="absolute left-[-10%] top-1/3 h-72 w-[85vw] max-w-[28rem] rounded-full bg-primary/5 blur-3xl sm:h-80 sm:w-96" />
+        <div className="absolute bottom-10 right-[-8%] h-72 w-[85vw] max-w-[30rem] rounded-full bg-sky-500/5 blur-3xl sm:h-96 sm:w-[28rem]" />
         {/* Subtle dot matrix pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-size-[24px_24px] opacity-60" />
       </div>

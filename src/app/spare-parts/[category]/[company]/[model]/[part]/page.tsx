@@ -96,17 +96,17 @@ export default async function PartDetailPage({
           {/* Details & Specs Card */}
           <div className="space-y-6">
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0 flex-1">
                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary mb-2">
                   <Factory className="h-3.5 w-3.5" />
                   <span>{part.car_models?.car_companies?.name} {part.car_models?.name}</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                <h1 className="break-words text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground [overflow-wrap:anywhere]">
                   {part.item}
                 </h1>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 <SavePartButton part={{
                   id: part.id,
                   name: part.item,
