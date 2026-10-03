@@ -67,7 +67,6 @@ export interface Database {
           company_id: string
           name: string
           slug: string
-          image_url: string | null
           created_at: string
           updated_at: string
         }
@@ -76,7 +75,6 @@ export interface Database {
           company_id: string
           name: string
           slug: string
-          image_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -85,7 +83,6 @@ export interface Database {
           company_id?: string
           name?: string
           slug?: string
-          image_url?: string | null
           created_at?: string
           updated_at?: string
         }
