@@ -7,7 +7,7 @@ import { ListingImageCarousel } from "@/components/public/ListingImageCarousel"
 import { ChevronRight, Layers, ArrowLeft } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
-import { Pagination } from "@/components/ui/Pagination"
+import { InfinitePartList } from "@/components/public/InfinitePartList"
 
 const PAGE_SIZE = 12
 
@@ -110,7 +110,7 @@ export default async function CategoryPage({
               {search ? `Search in ${currentCategory.name} for "${search}"` : `${currentCategory.name} Inventory`}
             </h2>
             <Badge variant="secondary" className="text-xs font-normal">
-              {parts.length} {parts.length === 1 ? "item" : "items"}
+              {total} {total === 1 ? "item" : "items"} found
             </Badge>
           </div>
 
@@ -122,51 +122,15 @@ export default async function CategoryPage({
             </Card>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {parts.map((part: any) => {
-                  const companySlug = part.car_models?.car_companies?.slug || "unknown"
-                  const modelSlug = part.car_models?.slug || "model"
-                  const href = `/spare-parts/${resolvedParams.category}/${companySlug}/${modelSlug}/${part.id}`
-                  const images = getPartImages(part)
-
-                  return (
-                    <Link key={part.id} href={href} className="group">
-                      <Card className="h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-xs">
-                        <ListingImageCarousel
-                          images={images}
-                          title={part.item}
-                        />
-                        <CardContent className="p-3.5 space-y-2">
-                          <div className="text-[11px] font-medium text-primary truncate">
-                            {part.car_models?.car_companies?.name} • {part.car_models?.name}
-                          </div>
-                          <h3 className="font-semibold text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors text-foreground">
-                            {part.item}
-                          </h3>
-                          <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] text-muted-foreground font-mono">
-                            <span className="rounded-sm bg-muted px-1.5 py-0.5">REF: {part.ref_number}</span>
-                            {part.oem_number && (
-                              <span className="rounded-sm bg-muted px-1.5 py-0.5">OEM: {part.oem_number}</span>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  )
-                })}
-              </div>
-
-              <Pagination
-                currentPage={page}
+              <InfinitePartList
+                initialParts={parts}
+                initialPage={page}
                 totalPages={totalPages}
-                totalItems={total}
-                pageSize={PAGE_SIZE}
-                buildLink={(p) => {
-                  const params = new URLSearchParams()
-                  if (search) params.set("search", search)
-                  if (p > 1) params.set("page", String(p))
-                  const query = params.toString()
-                  return `/spare-parts/${resolvedParams.category}${query ? `?${query}` : ""}`
+                categorySlug={resolvedParams.category}
+                fetchParams={{
+                  categorySlug: resolvedParams.category,
+                  search: search || undefined,
+                  pageSize: PAGE_SIZE,
                 }}
               />
             </>

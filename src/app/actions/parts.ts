@@ -103,3 +103,13 @@ export async function deleteCloudinaryImageAction(publicId: string): Promise<{ e
     return { error: err.message || 'Failed to delete image' }
   }
 }
+
+export async function getPublicPartsAction(options?: any) {
+  const { getPublicParts } = await import('@/lib/services/parts')
+  try {
+    const data = await getPublicParts(options)
+    return { data }
+  } catch (err: any) {
+    return { error: err.message || 'Failed to fetch parts' }
+  }
+}
