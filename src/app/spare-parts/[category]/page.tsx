@@ -39,26 +39,30 @@ export default async function CategoryPage({
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-8">
-      {/* Top Header / Breadcrumb / Search */}
-      <div className="mb-8 space-y-4 max-w-3xl">
+      {/* Top Header / Breadcrumb */}
+      <div className="mb-4 max-w-3xl">
         <Link
           href="/spare-parts"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>All Categories</span>
         </Link>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            {currentCategory.name} Parts
-          </h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+          {currentCategory.name} Parts
+        </h1>
+      </div>
+
+      {/* Sticky Search Bar */}
+      <div className="sticky top-[57px] sm:top-[65px] z-30 bg-background/95 backdrop-blur-xl py-2 sm:py-3 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-border/40 mb-3 sm:mb-6">
+        <div className="max-w-3xl">
+          <SearchBar initialValue={search} />
         </div>
-        <SearchBar initialValue={search} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Categories Sidebar */}
-        <aside className="hidden lg:block space-y-6">
+        <aside className="hidden lg:block space-y-6 sticky top-[160px] self-start max-h-[calc(100vh-180px)] overflow-y-auto pr-2 pb-4">
           <Card>
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-center gap-2 font-semibold text-sm mb-3 text-foreground">

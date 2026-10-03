@@ -45,15 +45,19 @@ export default async function CatalogPage({
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-8">
-      {/* Top Header / Search */}
-      <div className="mb-8 space-y-4 max-w-3xl">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Spare Parts Catalog</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Browse all available vehicle parts, cross-references, and compatible models
-          </p>
+      {/* Top Header */}
+      <div className="mb-4 max-w-3xl">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Spare Parts Catalog</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Browse all available vehicle parts, cross-references, and compatible models
+        </p>
+      </div>
+
+      {/* Sticky Search Bar */}
+      <div className="sticky top-[57px] sm:top-[65px] z-30 bg-background/95 backdrop-blur-xl py-2 sm:py-3 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-border/40 mb-3 sm:mb-6">
+        <div className="max-w-3xl">
+          <SearchBar initialValue={search} />
         </div>
-        <SearchBar initialValue={search} />
       </div>
 
       {/* Mobile Filters view */}
@@ -71,7 +75,7 @@ export default async function CatalogPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Desktop Sidebar Filters */}
-        <aside className="hidden lg:block space-y-6">
+        <aside className="hidden lg:block space-y-6 sticky top-[160px] self-start max-h-[calc(100vh-180px)] overflow-y-auto pr-2 pb-4">
           <CatalogFilters
             categories={categories}
             companies={companies}
