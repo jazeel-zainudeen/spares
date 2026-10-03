@@ -160,158 +160,160 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Part" : "Add Part"}>
-      <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2" noValidate>
-        {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
+      <form onSubmit={handleSubmit} className="flex max-h-[70vh] min-h-0 flex-col" noValidate>
+        <div className="min-h-0 space-y-4 overflow-y-auto pr-2 pb-4">
+          {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
         
-        <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Category</label>
-          <div className="flex items-center gap-2">
-            <Select 
-              options={[{ label: "Select Category...", value: "" }, ...categoryOptions]}
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              disabled={loading}
-              className="flex-1"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => setIsCategoryModalOpen(true)}
-              className="h-9 w-9 shrink-0"
-              title="Add New Category"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none">Company *</label>
+            <label className="text-sm font-medium leading-none">Category</label>
             <div className="flex items-center gap-2">
-              <Select 
-                options={[{ label: "Select Company...", value: "" }, ...companyOptions]}
-                value={companyId}
-                onChange={(e) => {
-                  handleCompanyChange(e.target.value)
-                  if (fieldErrors.companyId) setFieldErrors(prev => ({ ...prev, companyId: "" }))
-                }}
+              <Select
+                options={[{ label: "Select Category...", value: "" }, ...categoryOptions]}
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
                 disabled={loading}
-                className={fieldErrors.companyId ? "flex-1 border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : "flex-1"}
+                className="flex-1"
               />
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={() => setIsCompanyModalOpen(true)}
+                onClick={() => setIsCategoryModalOpen(true)}
                 className="h-9 w-9 shrink-0"
-                title="Add New Company"
+                title="Add New Category"
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            {fieldErrors.companyId && <p className="text-xs text-red-500 mt-1">{fieldErrors.companyId}</p>}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium leading-none">Model *</label>
-            <div className="flex items-center gap-2">
-              <Select 
-                options={[{ label: "Select Model...", value: "" }, ...modelOptions]}
-                value={modelId}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Company *</label>
+              <div className="flex items-center gap-2">
+                <Select
+                  options={[{ label: "Select Company...", value: "" }, ...companyOptions]}
+                  value={companyId}
+                  onChange={(e) => {
+                    handleCompanyChange(e.target.value)
+                    if (fieldErrors.companyId) setFieldErrors(prev => ({ ...prev, companyId: "" }))
+                  }}
+                  disabled={loading}
+                  className={fieldErrors.companyId ? "flex-1 border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : "flex-1"}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsCompanyModalOpen(true)}
+                  className="h-9 w-9 shrink-0"
+                  title="Add New Company"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              {fieldErrors.companyId && <p className="text-xs text-red-500 mt-1">{fieldErrors.companyId}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Model *</label>
+              <div className="flex items-center gap-2">
+                <Select
+                  options={[{ label: "Select Model...", value: "" }, ...modelOptions]}
+                  value={modelId}
+                  onChange={(e) => {
+                    const newModelId = e.target.value
+                    setModelId(newModelId)
+                    if (fieldErrors.modelId) setFieldErrors(prev => ({ ...prev, modelId: "" }))
+
+                    // Auto-fill company if a model is selected and company is empty
+                    if (newModelId && !companyId) {
+                      const modelObj = models.find(m => m.id === newModelId)
+                      if (modelObj?.company_id) setCompanyId(modelObj.company_id)
+                    }
+                  }}
+                  disabled={loading}
+                  className={fieldErrors.modelId ? "flex-1 border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : "flex-1"}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsModelModalOpen(true)}
+                  disabled={loading}
+                  className="h-9 w-9 shrink-0"
+                  title="Add New Model"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              {fieldErrors.modelId && <p className="text-xs text-red-500 mt-1">{fieldErrors.modelId}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Ref Number *</label>
+              <Input
+                value={refNumber}
                 onChange={(e) => {
-                  const newModelId = e.target.value
-                  setModelId(newModelId)
-                  if (fieldErrors.modelId) setFieldErrors(prev => ({ ...prev, modelId: "" }))
-                  
-                  // Auto-fill company if a model is selected and company is empty
-                  if (newModelId && !companyId) {
-                    const modelObj = models.find(m => m.id === newModelId)
-                    if (modelObj?.company_id) setCompanyId(modelObj.company_id)
-                  }
+                  setRefNumber(e.target.value)
+                  if (fieldErrors.refNumber) setFieldErrors(prev => ({ ...prev, refNumber: "" }))
                 }}
+                placeholder="e.g. REF-12345"
                 disabled={loading}
-                className={fieldErrors.modelId ? "flex-1 border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : "flex-1"}
+                className={fieldErrors.refNumber ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => setIsModelModalOpen(true)}
-                disabled={loading}
-                className="h-9 w-9 shrink-0"
-                title="Add New Model"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+              {fieldErrors.refNumber && <p className="text-xs text-red-500 mt-1">{fieldErrors.refNumber}</p>}
             </div>
-            {fieldErrors.modelId && <p className="text-xs text-red-500 mt-1">{fieldErrors.modelId}</p>}
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">OEM Number</label>
+              <Input
+                value={oemNumber}
+                onChange={(e) => setOemNumber(e.target.value)}
+                placeholder="e.g. OEM-67890"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none">Ref Number *</label>
+            <label className="text-sm font-medium leading-none">Item Name *</label>
             <Input 
-              value={refNumber}
+              value={item}
               onChange={(e) => {
-                setRefNumber(e.target.value)
-                if (fieldErrors.refNumber) setFieldErrors(prev => ({ ...prev, refNumber: "" }))
+                setItem(e.target.value)
+                if (fieldErrors.item) setFieldErrors(prev => ({ ...prev, item: "" }))
               }}
-              placeholder="e.g. REF-12345"
+              placeholder="e.g. Front Brake Pad"
               disabled={loading}
-              className={fieldErrors.refNumber ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
+              className={fieldErrors.item ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
             />
-            {fieldErrors.refNumber && <p className="text-xs text-red-500 mt-1">{fieldErrors.refNumber}</p>}
+            {fieldErrors.item && <p className="text-xs text-red-500 mt-1">{fieldErrors.item}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none">OEM Number</label>
-            <Input 
-              value={oemNumber}
-              onChange={(e) => setOemNumber(e.target.value)}
-              placeholder="e.g. OEM-67890"
+            <label className="text-sm font-medium leading-none">Description</label>
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Item description..."
               disabled={loading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none">Part Images</label>
+            <CloudinaryMultiUpload
+              images={imagesList}
+              folder={`spare-parts/${companyId || "general"}/${modelId || "general"}`}
+              onChange={(newImages) => setImagesList(newImages)}
             />
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Item Name *</label>
-          <Input 
-            value={item}
-            onChange={(e) => {
-              setItem(e.target.value)
-              if (fieldErrors.item) setFieldErrors(prev => ({ ...prev, item: "" }))
-            }}
-            placeholder="e.g. Front Brake Pad"
-            disabled={loading}
-            className={fieldErrors.item ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : ""}
-          />
-          {fieldErrors.item && <p className="text-xs text-red-500 mt-1">{fieldErrors.item}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Description</label>
-          <Textarea 
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Item description..."
-            disabled={loading}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Part Images</label>
-          <CloudinaryMultiUpload 
-            images={imagesList}
-            folder={`spare-parts/${companyId || "general"}/${modelId || "general"}`}
-            onChange={(newImages) => setImagesList(newImages)}
-          />
-        </div>
-
-        <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background/95 backdrop-blur py-2">
+        <div className="flex shrink-0 justify-end space-x-2 border-t bg-background/95 py-3">
           <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
