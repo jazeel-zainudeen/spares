@@ -7,6 +7,8 @@ import { Metadata } from "next"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { PartShareButton } from "@/components/public/PartShareButton"
+import { SavePartButton } from "@/components/public/SavePartButton"
+import { TrackPartView } from "@/components/public/TrackPartView"
 import { formatDate } from "@/lib/utils"
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string, company: string, model: string, part: string }> }): Promise<Metadata> {
@@ -47,6 +49,14 @@ export default async function PartDetailPage({
 
     return (
       <div className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
+        <TrackPartView part={{
+          id: part.id,
+          name: part.item,
+          categorySlug: catSlug,
+          companySlug: compSlug,
+          modelSlug: modSlug,
+          imageUrl: getPartImages(part)[0] || undefined
+        }} />
         {/* Navigation Breadcrumb */}
         <div className="mb-6 space-y-3">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
@@ -96,7 +106,17 @@ export default async function PartDetailPage({
                 </h1>
               </div>
 
-              <PartShareButton />
+              <div className="flex items-center gap-2">
+                <SavePartButton part={{
+                  id: part.id,
+                  name: part.item,
+                  categorySlug: catSlug,
+                  companySlug: compSlug,
+                  modelSlug: modSlug,
+                  imageUrl: getPartImages(part)[0] || undefined
+                }} />
+                <PartShareButton />
+              </div>
             </div>
 
             <Card>

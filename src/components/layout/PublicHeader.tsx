@@ -5,10 +5,14 @@ import { usePathname } from "next/navigation"
 import Image from "next/image"
 import { Layers, Building2, Car, Search, ShieldCheck, Home, Download } from "lucide-react"
 import { useInstallPrompt } from "@/components/public/useInstallPrompt"
+import { useState } from "react"
+import { SavedAndRecentPanel } from "@/components/public/SavedAndRecentPanel"
+import { Bookmark } from "lucide-react"
 
 export function PublicHeader() {
   const pathname = usePathname()
   const { canInstall, handleInstall } = useInstallPrompt()
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -73,6 +77,15 @@ export function PublicHeader() {
             </button>
           )}
 
+          <button
+            onClick={() => setIsPanelOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-foreground shadow-2xs backdrop-blur-xs transition-colors hover:bg-accent hover:border-primary/40 hover:text-primary ml-1.5"
+            aria-label="Saved and Recent Parts"
+          >
+            <Bookmark className="h-3.5 w-3.5" />
+            <span>Saved</span>
+          </button>
+
           <Link
             href="/admin"
             className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-foreground shadow-2xs backdrop-blur-xs transition-colors hover:bg-accent hover:border-primary/40 hover:text-primary ml-1.5"
@@ -93,6 +106,13 @@ export function PublicHeader() {
               <Download className="h-3.5 w-3.5" />
             </button>
           )}
+          <button
+            onClick={() => setIsPanelOpen(true)}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card/90 text-foreground shadow-2xs transition-all active:scale-95 hover:bg-accent hover:text-primary"
+            title="Saved & Recent"
+          >
+            <Bookmark className="h-3.5 w-3.5" />
+          </button>
           <Link
             href="/admin"
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1 text-xs font-medium text-foreground shadow-2xs transition-colors"
@@ -102,6 +122,7 @@ export function PublicHeader() {
           </Link>
         </div>
       </div>
+      <SavedAndRecentPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
     </header>
   )
 }

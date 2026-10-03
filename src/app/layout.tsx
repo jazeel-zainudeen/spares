@@ -5,6 +5,7 @@ import "./globals.css";
 import { RegisterServiceWorker } from "@/components/public/RegisterServiceWorker";
 
 import { NotFoundProvider } from "@/components/public/NotFoundContext";
+import { UserCollectionProvider } from "@/contexts/UserCollectionContext";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -91,24 +92,26 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} min-h-full font-sans flex flex-col selection:bg-primary selection:text-primary-foreground`}>
         <NotFoundProvider>
-          <NextTopLoader
-            color="#2563eb"
-            initialPosition={0.08}
-            crawlSpeed={200}
-            height={3}
-            crawl={true}
-            showSpinner={false}
-            easing="ease"
-            speed={200}
-            shadow="0 0 10px #2563eb,0 0 5px #2563eb"
-          />
-          <RegisterServiceWorker />
-          <main className="flex-1 flex flex-col">
-            {children}
-          </main>
+          <UserCollectionProvider>
+            <NextTopLoader
+              color="#2563eb"
+              initialPosition={0.08}
+              crawlSpeed={200}
+              height={3}
+              crawl={true}
+              showSpinner={false}
+              easing="ease"
+              speed={200}
+              shadow="0 0 10px #2563eb,0 0 5px #2563eb"
+            />
+            <RegisterServiceWorker />
+            <main className="flex-1 flex flex-col">
+              {children}
+            </main>
 
-          <Analytics />
-          <SpeedInsights />
+            <Analytics />
+            <SpeedInsights />
+          </UserCollectionProvider>
         </NotFoundProvider>
       </body>
     </html>
