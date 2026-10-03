@@ -117,7 +117,7 @@ export function PartImageGallery({ images, title, categoryName }: PartImageGalle
 
           {/* Hover zoom hint / Fullscreen action */}
           {hasImages && (
-            <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
               <button
                 type="button"
                 onClick={(e) => {
@@ -135,7 +135,7 @@ export function PartImageGallery({ images, title, categoryName }: PartImageGalle
 
           {/* Zoom guide badge (bottom left) */}
           {hasImages && !isZoomed && (
-            <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[11px] text-muted-foreground bg-background/85 backdrop-blur-xs px-2.5 py-1 rounded-md border border-border/40 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[11px] text-muted-foreground bg-background/85 backdrop-blur-xs px-2.5 py-1 rounded-md border border-border/40 pointer-events-none md:opacity-0 md:group-hover:opacity-100 transition-opacity">
               <ZoomIn className="h-3.5 w-3.5 text-primary" />
               <span>Hover to zoom • Click to expand</span>
             </div>

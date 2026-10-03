@@ -136,7 +136,7 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
                                 e.stopPropagation();
                                 deleteFolder(folder.id);
                               }}
-                              className="p-2 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              className="p-2 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
                               title="Delete Folder"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -200,7 +200,7 @@ export function SavedAndRecentPanel({ isOpen, onClose }: { isOpen: boolean; onCl
                       </Link>
                       <button
                         onClick={() => removeSavedItem(item.part.id, activeFolderId || undefined)}
-                        className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                        className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
                         title="Remove from folder"
                       >
                         <Trash2 className="h-4 w-4" />
