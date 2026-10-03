@@ -24,6 +24,31 @@ export function ListingImageCarousel({
   const hasMultiple = images.length > 1
   const mainImage = images[currentIndex] || images[0]
 
+  const touchStartX = useRef<number | null>(null)
+  const touchEndX = useRef<number | null>(null)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX
+    touchEndX.current = null
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return
+    const distance = touchStartX.current - touchEndX.current
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+    
+    if (isLeftSwipe && hasMultiple) {
+      setCurrentIndex((prev) => (prev + 1) % images.length)
+    } else if (isRightSwipe && hasMultiple) {
+      setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)
+    }
+  }
+
   useEffect(() => {
     if (isHovered && hasMultiple) {
       intervalRef.current = setInterval(() => {
@@ -41,9 +66,12 @@ export function ListingImageCarousel({
 
   return (
     <div
-      className={`${aspectRatio} bg-muted/40 relative flex items-center justify-center p-3 border-b border-border/60 overflow-hidden select-none`}
+      className={`${aspectRatio} bg-muted/40 relative flex items-center justify-center p-3 border-b border-border/60 overflow-hidden select-none touch-pan-y`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Main Active Image */}
       {mainImage ? (
