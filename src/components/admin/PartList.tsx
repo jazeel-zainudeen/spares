@@ -21,6 +21,7 @@ import { SortableHeader } from "./SortableHeader"
 import { createPartAction, updatePartAction, deletePartAction } from "@/app/actions/parts"
 import { Pagination } from "@/components/ui/Pagination"
 import { formatDate, formatDateTime } from "@/lib/utils"
+import { HighlightText } from "@/components/ui/HighlightText"
 
 const PAGE_SIZE = 10
 
@@ -270,11 +271,11 @@ export function PartList({ initialParts, categories, companies, models }: { init
                             <div className="font-semibold text-sm text-foreground line-clamp-1">
                               {part.categories?.slug && part.car_models?.car_companies?.slug && part.car_models?.slug ? (
                                 <Link href={`/spare-parts/${part.categories.slug}/${part.car_models.car_companies.slug}/${part.car_models.slug}/${part.id}`} target="_blank" className="group flex items-center gap-1.5 hover:text-primary transition-colors w-fit">
-                                  <span className="group-hover:underline truncate">{part.item}</span>
+                                  <span className="group-hover:underline truncate"><HighlightText text={part.item} highlight={deferredSearch} /></span>
                                   <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                                 </Link>
                               ) : (
-                                part.item
+                                <HighlightText text={part.item} highlight={deferredSearch} />
                               )}
                             </div>
                             <div className="text-xs text-primary font-medium truncate mt-0.5">
@@ -311,11 +312,11 @@ export function PartList({ initialParts, categories, companies, models }: { init
                       <div className="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-border/60 text-[11px] font-mono text-muted-foreground">
                         <div className="flex items-center gap-1.5">
                           <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
-                            REF: {part.ref_number}
+                            REF: <HighlightText text={part.ref_number || ""} highlight={deferredSearch} />
                           </span>
                           {part.oem_number && (
                             <span className="rounded-md bg-muted/70 px-2 py-0.5 font-medium text-foreground/80">
-                              OEM: {part.oem_number}
+                              OEM: <HighlightText text={part.oem_number} highlight={deferredSearch} />
                             </span>
                           )}
                         </div>
@@ -422,15 +423,15 @@ export function PartList({ initialParts, categories, companies, models }: { init
                           <TableCell className="font-medium text-foreground">
                             {part.categories?.slug && part.car_models?.car_companies?.slug && part.car_models?.slug ? (
                               <Link href={`/spare-parts/${part.categories.slug}/${part.car_models.car_companies.slug}/${part.car_models.slug}/${part.id}`} target="_blank" className="group flex items-center gap-1.5 hover:text-primary transition-colors w-fit">
-                                <span className="group-hover:underline truncate">{part.item}</span>
+                                <span className="group-hover:underline truncate"><HighlightText text={part.item} highlight={deferredSearch} /></span>
                                 <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                               </Link>
                             ) : (
-                              part.item
+                              <HighlightText text={part.item} highlight={deferredSearch} />
                             )}
                           </TableCell>
-                          <TableCell className="w-px whitespace-nowrap text-center font-mono text-xs text-muted-foreground">{part.ref_number}</TableCell>
-                          <TableCell className="w-px whitespace-nowrap text-center font-mono text-xs text-muted-foreground">{part.oem_number || "—"}</TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-center font-mono text-xs text-muted-foreground"><HighlightText text={part.ref_number || ""} highlight={deferredSearch} /></TableCell>
+                          <TableCell className="w-px whitespace-nowrap text-center font-mono text-xs text-muted-foreground">{part.oem_number ? <HighlightText text={part.oem_number} highlight={deferredSearch} /> : "—"}</TableCell>
                           <TableCell className="w-px whitespace-nowrap text-center text-muted-foreground">{part.categories?.name || "—"}</TableCell>
                           <TableCell className="w-px whitespace-nowrap text-center">
                             <div className="text-xs font-medium text-foreground">{part.car_models?.name || "Unknown"}</div>

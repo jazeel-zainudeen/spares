@@ -4,6 +4,7 @@ import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { ChevronDown, Search, Check, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { HighlightText } from "@/components/ui/HighlightText"
 
 export interface MultiSelectProps {
   options: { value: string; label: string; count?: number; group?: string }[]
@@ -147,7 +148,9 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                           {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
                         </div>
                         <div className="flex flex-col min-w-0 gap-0.5">
-                          <span className="truncate">{opt.label}</span>
+                          <span className="truncate">
+                            <HighlightText text={opt.label} highlight={search} />
+                          </span>
                           {opt.count !== undefined && (
                             <span className="text-[10px] text-muted-foreground/70 font-normal leading-none">
                               {opt.count === 1 ? '1 Part' : `${opt.count} Parts`}

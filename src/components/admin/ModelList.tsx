@@ -16,6 +16,7 @@ import { SortableHeader } from "./SortableHeader"
 import { createModelAction, updateModelAction, deleteModelAction } from "@/app/actions/models"
 import { Pagination } from "@/components/ui/Pagination"
 import { formatDateTime } from "@/lib/utils"
+import { HighlightText } from "@/components/ui/HighlightText"
 
 const PAGE_SIZE = 10
 
@@ -183,7 +184,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                     className="flex items-center justify-between rounded-xl border border-border/80 bg-card p-3 shadow-2xs transition-all"
                   >
                     <div className="min-w-0">
-                      <div className="font-semibold text-sm text-foreground truncate">{model.name}</div>
+                      <div className="font-semibold text-sm text-foreground truncate"><HighlightText text={model.name} highlight={search} /></div>
                       <div className="text-xs text-primary font-medium truncate mt-0.5">{model.car_companies?.name || "Unknown"}</div>
                       <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
                         {formatDateTime(model.created_at)}
@@ -251,7 +252,7 @@ export function ModelList({ initialModels, companies }: { initialModels: any[], 
                     {paginatedModels.map(model => (
                       <TableRow key={model.id}>
                         <TableCell className="font-medium">
-                          <span className="font-semibold text-foreground">{model.name}</span>
+                          <span className="font-semibold text-foreground"><HighlightText text={model.name} highlight={search} /></span>
                         </TableCell>
                         <TableCell className="w-px whitespace-nowrap text-center">{model.car_companies?.name || "Unknown"}</TableCell>
                         <TableCell className="w-px whitespace-nowrap text-center text-xs text-muted-foreground font-mono">

@@ -14,6 +14,7 @@ import { SortableHeader } from "./SortableHeader"
 import { createCategoryAction, updateCategoryAction, deleteCategoryAction } from "@/app/actions/categories"
 import { Pagination } from "@/components/ui/Pagination"
 import { formatDateTime } from "@/lib/utils"
+import { HighlightText } from "@/components/ui/HighlightText"
 
 const PAGE_SIZE = 10
 
@@ -165,7 +166,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="font-semibold text-sm text-foreground truncate">{category.name}</div>
+                        <div className="font-semibold text-sm text-foreground truncate"><HighlightText text={category.name} highlight={search} /></div>
                         <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
                           {formatDateTime(category.created_at)}
                         </div>
@@ -224,7 +225,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
                   <TableBody>
                     {paginatedCategories.map(category => (
                       <TableRow key={category.id}>
-                        <TableCell className="font-medium">{category.name}</TableCell>
+                        <TableCell className="font-medium"><HighlightText text={category.name} highlight={search} /></TableCell>
                         <TableCell className="w-px whitespace-nowrap text-center">
                           {category.image_url ? (
                             <div className="mx-auto flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">

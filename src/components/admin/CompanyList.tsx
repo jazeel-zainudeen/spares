@@ -14,6 +14,7 @@ import { SortableHeader } from "./SortableHeader"
 import { createCompanyAction, updateCompanyAction, deleteCompanyAction } from "@/app/actions/companies"
 import { Pagination } from "@/components/ui/Pagination"
 import { formatDateTime } from "@/lib/utils"
+import { HighlightText } from "@/components/ui/HighlightText"
 
 const PAGE_SIZE = 10
 
@@ -165,7 +166,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="font-semibold text-sm text-foreground truncate">{company.name}</div>
+                        <div className="font-semibold text-sm text-foreground truncate"><HighlightText text={company.name} highlight={search} /></div>
                         <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
                           {formatDateTime(company.created_at)}
                         </div>
@@ -224,7 +225,7 @@ export function CompanyList({ initialCompanies }: { initialCompanies: CompanyRow
                   <TableBody>
                     {paginatedCompanies.map(company => (
                       <TableRow key={company.id}>
-                        <TableCell className="font-medium">{company.name}</TableCell>
+                        <TableCell className="font-medium"><HighlightText text={company.name} highlight={search} /></TableCell>
                         <TableCell className="w-px whitespace-nowrap text-center">
                           {company.logo_url ? (
                             <div className="mx-auto flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
