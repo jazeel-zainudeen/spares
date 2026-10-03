@@ -22,9 +22,9 @@ export function SavePartButton({ part, display = "default" }: { part: CompactPar
     toggleSavedItem(part, folderId)
     
     if (!wasSaved) {
-      trackAction(`💾 *Saved to list (${folder?.name || 'folder'}):* \`${part.title || part.name || part.id}\``)
+      trackAction(`💾 *Saved to list (${folder?.name || 'folder'}):* \`${(part as any).item || part.name || part.id}\``)
     } else {
-      trackAction(`🗑️ *Removed from list (${folder?.name || 'folder'}):* \`${part.title || part.name || part.id}\``)
+      trackAction(`🗑️ *Removed from list (${folder?.name || 'folder'}):* \`${(part as any).item || part.name || part.id}\``)
     }
   }
 

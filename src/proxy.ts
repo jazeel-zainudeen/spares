@@ -22,10 +22,9 @@ export async function proxy(request: NextRequest, event: any) {
 
     if (!threadTs) {
       // First visit: send main message and await response to get thread_ts
-      const ip = request.ip || request.headers.get('x-real-ip') || 'Unknown IP';
-      const geo = request.geo || {};
-      const city = geo.city || request.headers.get('x-vercel-ip-city') || 'Unknown City';
-      const country = geo.country || request.headers.get('x-vercel-ip-country') || 'Unknown Country';
+      const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'Unknown IP';
+      const city = request.headers.get('x-vercel-ip-city') || 'Unknown City';
+      const country = request.headers.get('x-vercel-ip-country') || 'Unknown Country';
       
       // Parse the user agent nicely using Next.js helper
       const { browser, os, device } = userAgent(request);
