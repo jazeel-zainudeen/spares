@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
+import { trackAction } from "@/lib/tracking"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
 import type { ModelRow } from "@/lib/services/models"
@@ -57,6 +58,7 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
         name,
         company_id: companyId,
       })
+      trackAction(`🚗 *Admin ${initialData ? 'updated' : 'created'} model:* \`${name}\``)
       onClose()
     } catch (err: any) {
       setError(err.message || "Something went wrong")

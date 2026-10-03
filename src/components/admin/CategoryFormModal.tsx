@@ -5,6 +5,7 @@ import type { CategoryRow } from "@/lib/services/categories"
 import { Modal } from "@/components/ui/Modal"
 import { Input } from "@/components/ui/Input"
 import { Button } from "@/components/ui/Button"
+import { trackAction } from "@/lib/tracking"
 import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload"
 
 interface CategoryFormModalProps {
@@ -55,6 +56,7 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
         name,
         image_url: imageUrl || null
       })
+      trackAction(`📂 *Admin ${initialData ? 'updated' : 'created'} category:* \`${name}\``)
       onClose()
     } catch (err: any) {
       setError(err.message || "An error occurred")

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
+import { trackAction } from "@/lib/tracking"
 import { Input } from "@/components/ui/Input"
 import { CloudinaryUpload } from "@/components/ui/CloudinaryUpload"
 import type { CompanyRow } from "@/lib/services/companies"
@@ -46,6 +47,7 @@ export function CompanyFormModal({ isOpen, onClose, onSave, initialData }: Compa
     setError("")
     try {
       await onSave({ name, logo_url: logoUrl || null })
+      trackAction(`🏢 *Admin ${initialData ? 'updated' : 'created'} company:* \`${name}\``)
       onClose()
     } catch (err: any) {
       setError(err.message || "Something went wrong")

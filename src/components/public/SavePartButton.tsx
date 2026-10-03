@@ -5,6 +5,7 @@ import { useUserCollection, CompactPart } from "@/contexts/UserCollectionContext
 import { Bookmark, FolderPlus, Check, ChevronDown, Plus } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
+import { trackAction } from "@/lib/tracking"
 
 export function SavePartButton({ part, display = "default" }: { part: CompactPart, display?: "default" | "icon" }) {
   const { isSaved, toggleSavedItem, folders, createFolder, savedItems } = useUserCollection()
@@ -15,8 +16,16 @@ export function SavePartButton({ part, display = "default" }: { part: CompactPar
   const savedState = isSaved(part.id)
 
   const handleToggle = (folderId: string) => {
+    const wasSaved = isSaved(part.id, folderId)
+    const folder = folders.find(f => f.id === folderId)
+    
     toggleSavedItem(part, folderId)
-    // Removed setIsOpen(false) to allow multiple selections
+    
+    if (!wasSaved) {
+      trackAction(`💾 *Saved to list (${folder?.name || 'folder'}):* \`${part.title || part.name || part.id}\``)
+    } else {
+      trackAction(`🗑️ *Removed from list (${folder?.name || 'folder'}):* \`${part.title || part.name || part.id}\``)
+    }
   }
 
   const handleCreateFolder = (e: React.FormEvent) => {

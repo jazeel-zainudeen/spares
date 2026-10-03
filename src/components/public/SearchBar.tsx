@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
 import { Button } from "@/components/ui/Button"
+import { trackAction } from "@/lib/tracking"
 
 export function SearchBar({ initialValue = "" }: { initialValue?: string }) {
   const [query, setQuery] = useState(initialValue)
@@ -12,6 +13,7 @@ export function SearchBar({ initialValue = "" }: { initialValue?: string }) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
+      trackAction(`🔍 *Searched for:* \`${query.trim()}\``);
       router.push(`/spare-parts?search=${encodeURIComponent(query.trim())}`)
     } else {
       router.push(`/spare-parts`)

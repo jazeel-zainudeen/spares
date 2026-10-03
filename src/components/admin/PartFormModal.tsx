@@ -8,8 +8,10 @@ import { Select } from "@/components/ui/Select"
 import { Textarea } from "@/components/ui/Textarea"
 import type { PartRow } from "@/lib/services/parts"
 import { getPartImages, getPartPublicIds } from "@/lib/utils/images"
+import { trackAction } from "@/lib/tracking"
 import type { CategoryRow } from "@/lib/services/categories"
 import type { CompanyRow } from "@/lib/services/companies"
+
 import type { ModelRow } from "@/lib/services/models"
 import { CloudinaryMultiUpload, ImageItem } from "@/components/ui/CloudinaryMultiUpload"
 import { Plus } from "lucide-react"
@@ -120,6 +122,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
         image_urls: imageUrls,
         cloudinary_public_ids: cloudinaryPublicIds,
       })
+      trackAction(`🛠️ *Admin ${initialData ? 'updated' : 'created'} part:* \`${item}\` (Ref: ${refNumber})`)
       onClose()
     } catch (err: any) {
       setError(err.message || "Something went wrong")

@@ -5,6 +5,7 @@ import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
 import type { PartRow } from "@/lib/services/parts"
 import { getPartPublicIds } from "@/lib/utils/images"
+import { trackAction } from "@/lib/tracking"
 
 interface DeletePartModalProps {
   isOpen: boolean
@@ -25,6 +26,7 @@ export function DeletePartModal({ isOpen, onClose, onConfirm, part }: DeletePart
     setError("")
     try {
       await onConfirm(part.id, publicIds)
+      trackAction(`🗑️ *Admin deleted part:* \`${part.item}\` (ID: ${part.id})`)
       onClose()
     } catch (err: any) {
       setError(err.message || "Failed to delete part")
