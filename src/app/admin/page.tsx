@@ -8,6 +8,55 @@ import { formatDate } from "@/lib/utils"
 
 export const revalidate = 60
 
+async function RecentPartsList() {
+  const supabase = await createClient()
+  const { data: recentParts } = await supabase.from('parts')
+    .select('id, item, ref_number, created_at, image_url, car_models(name, car_companies(name))')
+    .order('created_at', { ascending: false })
+    .limit(6)
+
+  return (
+    <CardContent>
+      {recentParts && recentParts.length > 0 ? (
+        <div className="flex flex-col divide-y divide-border">
+          {recentParts.map((part: any) => {
+            const images = getPartImages(part)
+            const mainImage = images[0]
+            return (
+              <div key={part.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                <div className="flex min-w-0 items-center gap-3">
+                  {mainImage ? (
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
+                      <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+                    </div>
+                  ) : (
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border bg-muted/30">
+                      <Settings2 className="h-5 w-5 text-muted-foreground/60" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">{part.item}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {part.car_models?.car_companies?.name} {part.car_models?.name} • <span className="font-mono">{part.ref_number}</span>
+                    </p>
+                  </div>
+                </div>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {formatDate(part.created_at)}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <div className="py-8 text-center text-sm text-muted-foreground">No parts added yet.</div>
+      )}
+    </CardContent>
+  )
+}
+
+import { Suspense } from "react"
+
 export default async function AdminDashboard() {
   const supabase = await createClient()
 
@@ -15,17 +64,12 @@ export default async function AdminDashboard() {
     { count: categoriesCount },
     { count: companiesCount },
     { count: modelsCount },
-    { count: partsCount },
-    { data: recentParts }
+    { count: partsCount }
   ] = await Promise.all([
     supabase.from('categories').select('*', { count: 'exact', head: true }),
     supabase.from('car_companies').select('*', { count: 'exact', head: true }),
     supabase.from('car_models').select('*', { count: 'exact', head: true }),
-    supabase.from('parts').select('*', { count: 'exact', head: true }),
-    supabase.from('parts')
-      .select('id, item, ref_number, created_at, image_url, car_models(name, car_companies(name))')
-      .order('created_at', { ascending: false })
-      .limit(6)
+    supabase.from('parts').select('*', { count: 'exact', head: true })
   ])
 
   const stats = [
@@ -99,43 +143,9 @@ export default async function AdminDashboard() {
             </Link>
           </Button>
         </CardHeader>
-        <CardContent>
-          {recentParts && recentParts.length > 0 ? (
-            <div className="flex flex-col divide-y divide-border">
-              {recentParts.map((part: any) => {
-                const images = getPartImages(part)
-                const mainImage = images[0]
-                return (
-                  <div key={part.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-                    <div className="flex min-w-0 items-center gap-3">
-                      {mainImage ? (
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                          { }
-                          <img src={mainImage} alt={part.item} className="h-full w-full object-contain" loading="lazy" decoding="async" />
-                        </div>
-                      ) : (
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border bg-muted/30">
-                          <Settings2 className="h-5 w-5 text-muted-foreground/60" />
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-foreground">{part.item}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {part.car_models?.car_companies?.name} {part.car_models?.name} • <span className="font-mono">{part.ref_number}</span>
-                        </p>
-                      </div>
-                    </div>
-                    <span className="shrink-0 text-xs text-muted-foreground">
-                      {formatDate(part.created_at)}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <div className="py-8 text-center text-sm text-muted-foreground">No parts added yet.</div>
-          )}
-        </CardContent>
+        <Suspense fallback={<CardContent><div className="py-8 text-center text-sm text-muted-foreground">Loading recent parts...</div></CardContent>}>
+          <RecentPartsList />
+        </Suspense>
       </Card>
     </div>
   )

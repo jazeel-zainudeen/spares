@@ -220,7 +220,6 @@ export function PartList({ initialParts, categories, companies, models }: { init
                 options={[{ label: "All Models", value: "" }, ...modelOptions]}
                 value={modelFilter}
                 onChange={(e) => handleModelFilterChange(e.target.value)}
-                disabled={!companyFilter && availableModelsForFilter.length > 50}
                 placeholder="All Models"
               />
             </div>

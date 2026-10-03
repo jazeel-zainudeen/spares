@@ -218,8 +218,9 @@ export function CatalogFilters({
               </label>
               <MultiSelect
                 options={categories.map((c) => ({
-                  label: `${c.name} (${c.part_count ?? 0})`,
+                  label: c.name,
                   value: c.slug,
+                  count: c.part_count ?? 0
                 }))}
                 value={selectedCategories}
                 onChange={handleCategoryChange}
@@ -235,8 +236,9 @@ export function CatalogFilters({
               </label>
               <MultiSelect
                 options={companies.map((c) => ({
-                  label: `${c.name} (${c.part_count ?? 0})`,
+                  label: c.name,
                   value: c.slug,
+                  count: c.part_count ?? 0
                 }))}
                 value={selectedBrands}
                 onChange={handleBrandChange}
@@ -252,8 +254,9 @@ export function CatalogFilters({
               </label>
               <MultiSelect
                 options={filteredModels.map((m) => ({
-                  label: `${m.name} (${m.part_count ?? 0})`,
+                  label: m.name,
                   value: m.slug,
+                  count: m.part_count ?? 0
                 }))}
                 value={selectedModels}
                 onChange={handleModelChange}

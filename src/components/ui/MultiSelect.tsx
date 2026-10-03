@@ -6,7 +6,7 @@ import { ChevronDown, Search, Check, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export interface MultiSelectProps {
-  options: { value: string; label: string }[]
+  options: { value: string; label: string; count?: number; group?: string }[]
   value?: string[]
   onChange?: (selected: string[]) => void
   disabled?: boolean
@@ -133,7 +133,14 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                       )}>
                         {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
                       </div>
-                      <span className="truncate">{opt.label}</span>
+                      <div className="flex flex-col min-w-0 gap-0.5">
+                        <span className="truncate">{opt.label}</span>
+                        {opt.count !== undefined && (
+                          <span className="text-[10px] text-muted-foreground/70 font-normal leading-none">
+                            {opt.count === 1 ? '1 Part' : `${opt.count} Parts`}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )
                 })

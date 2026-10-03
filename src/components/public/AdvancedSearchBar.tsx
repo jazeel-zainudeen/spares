@@ -43,14 +43,9 @@ export function AdvancedSearchBar({
 
   // Load models on-demand only when a company/brand is selected
   useEffect(() => {
-    if (!company) {
-      setModels([])
-      setModel("")
-      return
-    }
-
     setLoadingModels(true)
-    fetchModelsAction(company)
+    // Pass undefined if company is empty to fetch all models, or pass company to filter
+    fetchModelsAction(company || undefined)
       .then((res) => {
         if (res.data) setModels(res.data)
       })
@@ -107,8 +102,9 @@ export function AdvancedSearchBar({
             options={[
               { label: "All Categories", value: "" },
               ...categories.map(c => ({
-                label: `${c.name} (${c.part_count ?? 0})`,
-                value: c.slug
+                label: c.name,
+                value: c.slug,
+                count: c.part_count ?? 0
               }))
             ]}
             placeholder="All Categories"
@@ -123,8 +119,9 @@ export function AdvancedSearchBar({
             options={[
               { label: "All Brands", value: "" },
               ...companies.map(c => ({
-                label: `${c.name} (${c.part_count ?? 0})`,
-                value: c.slug
+                label: c.name,
+                value: c.slug,
+                count: c.part_count ?? 0
               }))
             ]}
             placeholder="All Brands"
@@ -132,13 +129,24 @@ export function AdvancedSearchBar({
 
           <Select
             value={model}
-            onChange={(e) => setModel(e.target.value)}
-            disabled={!company || loadingModels}
+            onChange={(e) => {
+              const newModel = e.target.value
+              setModel(newModel)
+              // Auto-fill company if possible
+              if (newModel && !company) {
+                const modelObj = models.find(m => m.slug === newModel)
+                const compSlug = modelObj?.car_companies?.slug || modelObj?.company_id
+                if (compSlug) setCompany(compSlug)
+              }
+            }}
+            disabled={loadingModels}
             options={[
               { label: loadingModels ? "Loading models..." : "All Models", value: "" },
               ...availableModels.map(m => ({
-                label: `${m.name} (${m.part_count ?? 0})`,
-                value: m.slug
+                label: m.name,
+                value: m.slug,
+                count: m.part_count ?? 0,
+                group: m.car_companies?.name || "Other"
               }))
             ]}
             placeholder={loadingModels ? "Loading models..." : "All Models"}

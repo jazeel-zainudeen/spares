@@ -85,7 +85,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
   }, [isOpen, initialData, models])
 
   // Dependent dropdown models
-  const availableModels = models.filter(m => m.company_id === companyId)
+  const availableModels = companyId ? models.filter(m => m.company_id === companyId) : models
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -218,10 +218,17 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
                 options={[{ label: "Select Model...", value: "" }, ...modelOptions]}
                 value={modelId}
                 onChange={(e) => {
-                  setModelId(e.target.value)
+                  const newModelId = e.target.value
+                  setModelId(newModelId)
                   if (fieldErrors.modelId) setFieldErrors(prev => ({ ...prev, modelId: "" }))
+                  
+                  // Auto-fill company if a model is selected and company is empty
+                  if (newModelId && !companyId) {
+                    const modelObj = models.find(m => m.id === newModelId)
+                    if (modelObj?.company_id) setCompanyId(modelObj.company_id)
+                  }
                 }}
-                disabled={loading || !companyId}
+                disabled={loading}
                 className={fieldErrors.modelId ? "flex-1 border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20" : "flex-1"}
               />
               <Button
@@ -229,7 +236,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
                 variant="outline"
                 size="icon"
                 onClick={() => setIsModelModalOpen(true)}
-                disabled={!companyId}
+                disabled={loading}
                 className="h-9 w-9 shrink-0"
                 title="Add New Model"
               >
