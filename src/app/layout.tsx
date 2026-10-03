@@ -7,6 +7,7 @@ import { NotFoundProvider } from "@/components/public/NotFoundContext";
 import { UserCollectionProvider } from "@/contexts/UserCollectionContext";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SessionEndTracker } from "@/components/public/SessionEndTracker";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -103,6 +104,7 @@ export default function RootLayout({
               shadow="0 0 10px #2563eb,0 0 5px #2563eb"
             />
             <RegisterServiceWorker />
+            <SessionEndTracker />
             <main className="flex-1 flex flex-col">
               {children}
             </main>
