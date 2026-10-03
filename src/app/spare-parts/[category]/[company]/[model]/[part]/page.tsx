@@ -1,86 +1,138 @@
-import Link from "next/link"
-import { getPartById, getPartImages } from "@/lib/services/parts"
-import { PartImageGallery } from "@/components/public/PartImageGallery"
-import { ArrowLeft, CheckCircle2, Factory, Hash, FileText, Layers, Calendar, Car } from "lucide-react"
-import { notFound } from "next/navigation"
-import { Metadata } from "next"
-import { Card, CardContent } from "@/components/ui/Card"
-import { Button } from "@/components/ui/Button"
-import { PartShareButton } from "@/components/public/PartShareButton"
-import { SavePartButton } from "@/components/public/SavePartButton"
-import { TrackPartView } from "@/components/public/TrackPartView"
-import { formatDate } from "@/lib/utils"
+import Link from "next/link";
+import { getPartById, getPartImages } from "@/lib/services/parts";
+import { PartImageGallery } from "@/components/public/PartImageGallery";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Factory,
+  Hash,
+  FileText,
+  Layers,
+  Calendar,
+  Car,
+} from "lucide-react";
+import { notFound } from "next/navigation";
+import { Metadata } from "next";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { PartShareButton } from "@/components/public/PartShareButton";
+import { SavePartButton } from "@/components/public/SavePartButton";
+import { TrackPartView } from "@/components/public/TrackPartView";
+import { formatDate } from "@/lib/utils";
 
-export async function generateMetadata({ params }: { params: Promise<{ category: string, company: string, model: string, part: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{
+    category: string;
+    company: string;
+    model: string;
+    part: string;
+  }>;
+}): Promise<Metadata> {
   try {
-    const resolvedParams = await params
-    const part: any = await getPartById(resolvedParams.part)
-    const images = getPartImages(part)
+    const resolvedParams = await params;
+    const part: any = await getPartById(resolvedParams.part);
+    const images = getPartImages(part);
     return {
-      title: `${part.item} - ${part.car_models?.car_companies?.name || ''} ${part.car_models?.name || ''} | AutoPartsPro`,
-      description: part.description || `Buy ${part.item} for ${part.car_models?.car_companies?.name || ''} ${part.car_models?.name || ''}. Reference: ${part.ref_number}`,
+      title: `${part.item} - ${part.car_models?.car_companies?.name || ""} ${part.car_models?.name || ""} | AutoPartsPro`,
+      description:
+        part.description ||
+        `Buy ${part.item} for ${part.car_models?.car_companies?.name || ""} ${part.car_models?.name || ""}. Reference: ${part.ref_number}`,
       openGraph: {
         images: images.length > 0 ? images : [],
-      }
-    }
+      },
+    };
   } catch (e) {
-    return { title: 'Part Not Found' }
+    return { title: "Part Not Found" };
   }
 }
 
 export default async function PartDetailPage({
   params,
 }: {
-  params: Promise<{ category: string, company: string, model: string, part: string }>
+  params: Promise<{
+    category: string;
+    company: string;
+    model: string;
+    part: string;
+  }>;
 }) {
   try {
-    const resolvedParams = await params
-    const part: any = await getPartById(resolvedParams.part)
+    const resolvedParams = await params;
+    const part: any = await getPartById(resolvedParams.part);
 
-    const catSlug = part.categories?.slug || "uncategorized"
-    const compSlug = part.car_models?.car_companies?.slug || "unknown"
-    const modSlug = part.car_models?.slug || "model"
+    const catSlug = part.categories?.slug || "uncategorized";
+    const compSlug = part.car_models?.car_companies?.slug || "unknown";
+    const modSlug = part.car_models?.slug || "model";
 
-    if (modSlug !== resolvedParams.model || compSlug !== resolvedParams.company || catSlug !== resolvedParams.category) {
-      notFound()
+    if (
+      modSlug !== resolvedParams.model ||
+      compSlug !== resolvedParams.company ||
+      catSlug !== resolvedParams.category
+    ) {
+      notFound();
     }
 
-    const catalogFilterUrl = `/spare-parts?brand=${resolvedParams.company}&model=${resolvedParams.model}`
+    const catalogFilterUrl = `/spare-parts?brand=${resolvedParams.company}&model=${resolvedParams.model}`;
 
     return (
       <div className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
-        <TrackPartView part={{
-          id: part.id,
-          name: part.item,
-          categorySlug: catSlug,
-          companySlug: compSlug,
-          modelSlug: modSlug,
-          imageUrl: getPartImages(part)[0] || undefined
-        }} />
+        <TrackPartView
+          part={{
+            id: part.id,
+            name: part.item,
+            categorySlug: catSlug,
+            companySlug: compSlug,
+            modelSlug: modSlug,
+            imageUrl: getPartImages(part)[0] || undefined,
+          }}
+        />
         {/* Navigation Breadcrumb */}
         <div className="mb-6 space-y-3">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
-            <Link href="/spare-parts" className="hover:text-foreground transition-colors">Catalog</Link>
-            <span>/</span>
-            <Link href={`/spare-parts?category=${resolvedParams.category}`} className="hover:text-foreground transition-colors">
-              {part.categories?.name || 'Category'}
+            <Link
+              href="/spare-parts"
+              className="hover:text-foreground transition-colors"
+            >
+              Catalog
             </Link>
             <span>/</span>
-            <Link href={`/spare-parts?brand=${resolvedParams.company}`} className="hover:text-foreground transition-colors">
-              {part.car_models?.car_companies?.name || 'Brand'}
+            <Link
+              href={`/spare-parts?category=${resolvedParams.category}`}
+              className="hover:text-foreground transition-colors"
+            >
+              {part.categories?.name || "Category"}
             </Link>
             <span>/</span>
-            <Link href={catalogFilterUrl} className="hover:text-foreground transition-colors">
-              {part.car_models?.name || 'Model'}
+            <Link
+              href={`/spare-parts?brand=${resolvedParams.company}`}
+              className="hover:text-foreground transition-colors"
+            >
+              {part.car_models?.car_companies?.name || "Brand"}
             </Link>
             <span>/</span>
-            <span className="text-foreground font-medium truncate max-w-50">{part.item}</span>
+            <Link
+              href={catalogFilterUrl}
+              className="hover:text-foreground transition-colors"
+            >
+              {part.car_models?.name || "Model"}
+            </Link>
+            <span>/</span>
+            <span className="text-foreground font-medium truncate max-w-50">
+              {part.item}
+            </span>
           </div>
 
-          <Button variant="ghost" size="sm" asChild className="gap-1.5 -ml-2 text-xs text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="gap-1.5 -ml-2 text-xs text-muted-foreground hover:text-foreground"
+          >
             <Link href={catalogFilterUrl}>
               <ArrowLeft className="h-3.5 w-3.5" />
-              Back to {part.car_models?.name || 'Catalog'} Parts
+              Back to {part.car_models?.name || "Catalog"} Parts
             </Link>
           </Button>
         </div>
@@ -95,26 +147,31 @@ export default async function PartDetailPage({
 
           {/* Details & Specs Card */}
           <div className="space-y-6">
-            <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
+            <div className="flex flex-col items-start gap-3">
               <div className="min-w-0 flex-1">
                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary mb-2">
                   <Factory className="h-3.5 w-3.5" />
-                  <span>{part.car_models?.car_companies?.name} {part.car_models?.name}</span>
+                  <span>
+                    {part.car_models?.car_companies?.name}{" "}
+                    {part.car_models?.name}
+                  </span>
                 </div>
                 <h1 className="break-words text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground [overflow-wrap:anywhere]">
                   {part.item}
                 </h1>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2 self-end sm:self-auto">
-                <SavePartButton part={{
-                  id: part.id,
-                  name: part.item,
-                  categorySlug: catSlug,
-                  companySlug: compSlug,
-                  modelSlug: modSlug,
-                  imageUrl: getPartImages(part)[0] || undefined
-                }} />
+              <div className="flex shrink-0 items-center gap-2 self-end">
+                <SavePartButton
+                  part={{
+                    id: part.id,
+                    name: part.item,
+                    categorySlug: catSlug,
+                    companySlug: compSlug,
+                    modelSlug: modSlug,
+                    imageUrl: getPartImages(part)[0] || undefined,
+                  }}
+                />
                 <PartShareButton />
               </div>
             </div>
@@ -149,7 +206,7 @@ export default async function PartDetailPage({
                     <span>Component Category</span>
                   </div>
                   <span className="text-xs font-semibold text-foreground">
-                    {part.categories?.name || 'General Auto Part'}
+                    {part.categories?.name || "General Auto Part"}
                   </span>
                 </div>
 
@@ -159,7 +216,8 @@ export default async function PartDetailPage({
                     <span>Compatibility</span>
                   </div>
                   <span className="text-xs font-medium text-foreground">
-                    {part.car_models?.car_companies?.name} {part.car_models?.name}
+                    {part.car_models?.car_companies?.name}{" "}
+                    {part.car_models?.name}
                   </span>
                 </div>
 
@@ -193,8 +251,8 @@ export default async function PartDetailPage({
           </div>
         </div>
       </div>
-    )
+    );
   } catch (e) {
-    notFound()
+    notFound();
   }
 }

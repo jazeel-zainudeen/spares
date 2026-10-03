@@ -20,7 +20,7 @@ export type ExtendedPartUpdate = PartUpdate & {
 
 export async function getParts(modelId?: string, limit: number = 100) {
   const supabase = await createClient()
-  let query = supabase.from('parts').select('*, categories(name, slug), car_models(name, car_companies(name))')
+  let query = supabase.from('parts').select('*, categories(name, slug), car_models(name, slug, car_companies(name, slug))')
   
   if (modelId) {
     query = query.eq('model_id', modelId)

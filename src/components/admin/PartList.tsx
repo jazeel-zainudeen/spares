@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useDeferredValue } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import type { PartRow } from "@/lib/services/parts"
 import { getPartImages } from "@/lib/utils/images"
 import type { CategoryRow } from "@/lib/services/categories"
@@ -13,7 +14,7 @@ import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
-import { Search, Plus, Edit, Trash2, Image as ImageIcon, ArrowUpDown } from "lucide-react"
+import { Search, Plus, Edit, Trash2, Image as ImageIcon, ArrowUpDown, ExternalLink } from "lucide-react"
 import { PartFormModal } from "./PartFormModal"
 import { DeletePartModal } from "./DeletePartModal"
 import { SortableHeader } from "./SortableHeader"
@@ -266,7 +267,16 @@ export function PartList({ initialParts, categories, companies, models }: { init
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <div className="font-semibold text-sm text-foreground line-clamp-1">{part.item}</div>
+                            <div className="font-semibold text-sm text-foreground line-clamp-1">
+                              {part.categories?.slug && part.car_models?.car_companies?.slug && part.car_models?.slug ? (
+                                <Link href={`/spare-parts/${part.categories.slug}/${part.car_models.car_companies.slug}/${part.car_models.slug}/${part.id}`} target="_blank" className="group flex items-center gap-1.5 hover:text-primary transition-colors w-fit">
+                                  <span className="group-hover:underline truncate">{part.item}</span>
+                                  <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                                </Link>
+                              ) : (
+                                part.item
+                              )}
+                            </div>
                             <div className="text-xs text-primary font-medium truncate mt-0.5">
                               {part.car_models?.car_companies?.name} {part.car_models?.name}
                             </div>
@@ -409,7 +419,16 @@ export function PartList({ initialParts, categories, companies, models }: { init
                               </div>
                             )}
                           </TableCell>
-                          <TableCell className="font-medium text-foreground">{part.item}</TableCell>
+                          <TableCell className="font-medium text-foreground">
+                            {part.categories?.slug && part.car_models?.car_companies?.slug && part.car_models?.slug ? (
+                              <Link href={`/spare-parts/${part.categories.slug}/${part.car_models.car_companies.slug}/${part.car_models.slug}/${part.id}`} target="_blank" className="group flex items-center gap-1.5 hover:text-primary transition-colors w-fit">
+                                <span className="group-hover:underline truncate">{part.item}</span>
+                                <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                              </Link>
+                            ) : (
+                              part.item
+                            )}
+                          </TableCell>
                           <TableCell className="w-px whitespace-nowrap text-center font-mono text-xs text-muted-foreground">{part.ref_number}</TableCell>
                           <TableCell className="w-px whitespace-nowrap text-center font-mono text-xs text-muted-foreground">{part.oem_number || "—"}</TableCell>
                           <TableCell className="w-px whitespace-nowrap text-center text-muted-foreground">{part.categories?.name || "—"}</TableCell>
