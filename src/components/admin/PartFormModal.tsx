@@ -161,7 +161,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Part" : "Add Part"}>
       <form onSubmit={handleSubmit} className="flex max-h-[70vh] min-h-0 flex-col" noValidate>
-        <div className="min-h-0 space-y-4 overflow-y-auto pr-2 pb-4">
+        <div className="min-h-0 space-y-4 overflow-y-auto custom-scrollbar pr-2 pb-4">
           {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
         
           <div className="space-y-2">
