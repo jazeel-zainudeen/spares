@@ -87,7 +87,8 @@ export async function deleteCompanyAction(id: string): Promise<{ error?: string 
     await requireAuth()
 
     const supabase = await createClient()
-    const { data: company } = await supabase.from('car_companies').select('logo_url').eq('id', id).single()
+    const { data } = await supabase.from('car_companies').select('logo_url').eq('id', id).single()
+    const company = data as CompanyRow | null
 
     if (company?.logo_url) {
       const publicId = extractCloudinaryPublicIdFromUrl(company.logo_url)

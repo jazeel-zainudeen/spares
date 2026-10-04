@@ -81,7 +81,8 @@ export async function deleteCategoryAction(id: string): Promise<{ error?: string
     await requireAuth()
 
     const supabase = await createClient()
-    const { data: category } = await supabase.from('categories').select('image_url').eq('id', id).single()
+    const { data } = await supabase.from('categories').select('image_url').eq('id', id).single()
+    const category = data as CategoryRow | null
 
     if (category?.image_url) {
       const publicId = extractCloudinaryPublicIdFromUrl(category.image_url)
