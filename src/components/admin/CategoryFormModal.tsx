@@ -79,7 +79,7 @@ export function CategoryFormModal({ isOpen, onClose, onSave, initialData }: Cate
         )}
 
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium">Name *</label>
+          <label htmlFor="name" className="text-sm font-medium">Name <span className="text-red-500">*</span></label>
           <Input 
             id="name" 
             value={name} 

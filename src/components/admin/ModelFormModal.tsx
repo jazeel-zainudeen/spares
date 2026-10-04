@@ -84,7 +84,7 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
         {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
         
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Company *</label>
+          <label className="text-sm font-medium leading-none">Company <span className="text-red-500">*</span></label>
           <div className="flex items-center gap-2">
             <Select 
               options={[{ label: "Select a company...", value: "" }, ...companyOptions]}
@@ -111,7 +111,7 @@ export function ModelFormModal({ isOpen, onClose, onSave, initialData, companies
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none">Model Name *</label>
+          <label className="text-sm font-medium leading-none">Model Name <span className="text-red-500">*</span></label>
           <Input 
             value={name}
             onChange={(e) => {

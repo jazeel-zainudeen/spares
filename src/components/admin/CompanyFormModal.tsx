@@ -63,7 +63,7 @@ export function CompanyFormModal({ isOpen, onClose, onSave, initialData }: Compa
 
         <div className="space-y-2">
           <label className="text-sm font-medium leading-none">
-            Company Name *
+            Company Name <span className="text-red-500">*</span>
           </label>
           <Input
             value={name}

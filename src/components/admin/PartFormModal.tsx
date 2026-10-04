@@ -189,7 +189,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Company *</label>
+              <label className="text-sm font-medium leading-none">Company <span className="text-red-500">*</span></label>
               <div className="flex items-center gap-2">
                 <Select
                   options={[{ label: "Select Company...", value: "" }, ...companyOptions]}
@@ -216,7 +216,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Model *</label>
+              <label className="text-sm font-medium leading-none">Model <span className="text-red-500">*</span></label>
               <div className="flex items-center gap-2">
                 <Select
                   options={[{ label: "Select Model...", value: "" }, ...modelOptions]}
@@ -253,7 +253,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Ref Number *</label>
+              <label className="text-sm font-medium leading-none">Ref Number <span className="text-red-500">*</span></label>
               <Input
                 value={refNumber}
                 onChange={(e) => {
@@ -279,7 +279,7 @@ export function PartFormModal({ isOpen, onClose, onSave, initialData, categories
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none">Item Name *</label>
+            <label className="text-sm font-medium leading-none">Item Name <span className="text-red-500">*</span></label>
             <Input 
               value={item}
               onChange={(e) => {
