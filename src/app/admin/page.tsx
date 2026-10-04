@@ -110,19 +110,25 @@ export default async function AdminDashboard() {
         <p className="text-sm text-muted-foreground">Overview of your spare parts catalog and system activity.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
             <Link key={stat.title} href={stat.href}>
-              <Card className="transition-colors hover:border-primary/50 hover:bg-accent/20">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-                  <Icon className="h-4 w-4 text-primary" />
+              <Card className="h-full transition-colors hover:border-primary/50 hover:bg-accent/20">
+                <CardHeader className="flex flex-row items-start sm:items-center justify-between gap-2 p-4 pb-2 sm:p-6 sm:pb-2">
+                  <CardTitle className="text-xs font-medium text-muted-foreground sm:text-sm line-clamp-2 sm:line-clamp-1">
+                    {stat.title}
+                  </CardTitle>
+                  <div className="rounded-md bg-primary/10 p-1 sm:p-2">
+                    <Icon className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" />
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                  <p className="text-xs text-muted-foreground">{stat.desc}</p>
+                <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+                  <div className="text-xl font-bold text-foreground sm:text-2xl">{stat.value}</div>
+                  <p className="mt-1 text-[10px] text-muted-foreground sm:text-xs line-clamp-2 sm:line-clamp-1">
+                    {stat.desc}
+                  </p>
                 </CardContent>
               </Card>
             </Link>
