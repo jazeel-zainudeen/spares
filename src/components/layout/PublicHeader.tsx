@@ -1,25 +1,33 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import Image from "next/image"
-import { Layers, Building2, Car, Search, ShieldCheck, Home, Download } from "lucide-react"
-import { useInstallPrompt } from "@/components/public/useInstallPrompt"
-import { useState } from "react"
-import { SavedAndRecentPanel } from "@/components/public/SavedAndRecentPanel"
-import { Bookmark } from "lucide-react"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
+import {
+  Layers,
+  Building2,
+  Car,
+  Search,
+  ShieldCheck,
+  Home,
+  Download,
+} from "lucide-react";
+import { useInstallPrompt } from "@/components/public/useInstallPrompt";
+import { useState } from "react";
+import { SavedAndRecentPanel } from "@/components/public/SavedAndRecentPanel";
+import { Bookmark } from "lucide-react";
 
 export function PublicHeader() {
-  const pathname = usePathname()
-  const { canInstall, handleInstall } = useInstallPrompt()
-  const [isPanelOpen, setIsPanelOpen] = useState(false)
+  const pathname = usePathname();
+  const { canInstall, handleInstall } = useInstallPrompt();
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const isActive = (path: string) => {
     if (path === "/") {
-      return pathname === "/"
+      return pathname === "/";
     }
-    return pathname.startsWith(path)
-  }
+    return pathname.startsWith(path);
+  };
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
@@ -27,11 +35,11 @@ export function PublicHeader() {
     { label: "Brands", href: "/brands", icon: Building2 },
     { label: "Models", href: "/models", icon: Car },
     { label: "Catalog", href: "/spare-parts", icon: Search },
-  ]
+  ];
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/80 bg-background/80 backdrop-blur-xl">
-      <div className="container mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-30 sm:border-b sm:border-border/80 bg-background/80 backdrop-blur-xl">
+      <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
           <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-xl transition-transform group-hover:scale-105 sm:h-9 sm:w-9">
             <Image
@@ -48,9 +56,12 @@ export function PublicHeader() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden sm:flex items-center gap-1 lg:gap-1.5" aria-label="Main Navigation">
+        <nav
+          className="hidden lg:flex items-center gap-1 lg:gap-1.5"
+          aria-label="Main Navigation"
+        >
           {navItems.map((item) => {
-            const active = isActive(item.href)
+            const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
@@ -64,7 +75,7 @@ export function PublicHeader() {
                 {item.icon && <item.icon className="h-3.5 w-3.5" />}
                 <span>{item.label}</span>
               </Link>
-            )
+            );
           })}
 
           {canInstall && (
@@ -96,7 +107,7 @@ export function PublicHeader() {
         </nav>
 
         {/* Mobile Quick Actions */}
-        <div className="flex sm:hidden items-center gap-2">
+        <div className="flex lg:hidden items-center gap-2">
           {canInstall && (
             <button
               onClick={handleInstall}
@@ -122,7 +133,10 @@ export function PublicHeader() {
           </Link>
         </div>
       </div>
-      <SavedAndRecentPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
+      <SavedAndRecentPanel
+        isOpen={isPanelOpen}
+        onClose={() => setIsPanelOpen(false)}
+      />
     </header>
-  )
+  );
 }

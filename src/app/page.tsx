@@ -14,7 +14,7 @@ export default async function Home() {
   ]);
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-background text-foreground pb-16 sm:pb-0">
+    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-background text-foreground pb-16 lg:pb-0">
       {/* Background Decorative Gradients & Mesh (clean, premium feel) */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute left-1/2 top-[-35%] h-[32rem] w-[120vw] max-w-[62rem] -translate-x-1/2 rounded-full bg-linear-to-b from-primary/15 via-primary/5 to-transparent blur-3xl sm:h-[38rem]" />
@@ -35,11 +35,13 @@ export default async function Home() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-foreground">
-            Search Spare Parts with <span className="text-primary">OEM Precision</span>
+            Search Spare Parts with{" "}
+            <span className="text-primary">OEM Precision</span>
           </h1>
 
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Find verified replacement parts by reference serial, manufacturer OEM code, car brand, and model compatibility.
+            Find verified replacement parts by reference serial, manufacturer
+            OEM code, car brand, and model compatibility.
           </p>
         </div>
 
@@ -47,7 +49,10 @@ export default async function Home() {
         <div className="w-full">
           <Card className="border-border/80 bg-card/85 shadow-xl shadow-black/5 backdrop-blur-md transition-all hover:border-primary/30">
             <div className="p-4 sm:p-6">
-              <AdvancedSearchBar initialCategories={categories} initialCompanies={companies} />
+              <AdvancedSearchBar
+                initialCategories={categories}
+                initialCompanies={companies}
+              />
             </div>
           </Card>
         </div>
@@ -70,15 +75,22 @@ export default async function Home() {
       </main>
 
       {/* Clean minimal footer */}
-      <footer className="w-full py-5 px-6 border-t border-border/50 text-center sm:flex sm:items-center sm:justify-between text-xs text-muted-foreground z-10">
+      <footer className="w-full py-5 px-6 border-t border-border/50 text-center lg:flex lg:items-center lg:justify-between text-xs text-muted-foreground z-10">
         <div>
-          © {new Date().getFullYear()} AutoPartsPro. Precision Automotive Catalog.
+          © {new Date().getFullYear()} AutoPartsPro. Precision Automotive
+          Catalog.
         </div>
         <div className="mt-2 sm:mt-0 flex items-center justify-center gap-4">
-          <Link href="/spare-parts" className="hover:text-foreground transition-colors">
+          <Link
+            href="/spare-parts"
+            className="hover:text-foreground transition-colors"
+          >
             All Parts
           </Link>
-          <Link href="/admin" className="hover:text-foreground transition-colors">
+          <Link
+            href="/admin"
+            className="hover:text-foreground transition-colors"
+          >
             Admin
           </Link>
         </div>
