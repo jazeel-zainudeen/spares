@@ -188,7 +188,7 @@ export function CloudinaryMultiUpload({
               />
 
               {/* Top-Left Badge */}
-              <div className="absolute top-1.5 left-1.5 z-10 pointer-events-none">
+              <div className="absolute top-1.5 left-1.5 z-30 pointer-events-none">
                 {isMain ? (
                   <Badge
                     variant="default"
@@ -206,7 +206,7 @@ export function CloudinaryMultiUpload({
 
               {/* Clean Hover Controls Overlay */}
               <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs md:opacity-0 transition-opacity duration-200 md:group-hover:opacity-100 flex flex-col items-center justify-center gap-2 p-2 z-20">
-                <div className="flex items-center gap-1.5">
+                <div className="hidden sm:flex items-center gap-1.5">
                   {!isMain && (
                     <button
                       type="button"
