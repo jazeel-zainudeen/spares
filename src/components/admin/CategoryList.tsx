@@ -116,7 +116,7 @@ export function CategoryList({ initialCategories }: { initialCategories: Categor
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Categories</h1>
           <p className="text-sm text-muted-foreground">Manage spare part categories and visual assets</p>
         </div>
-        <Button onClick={handleAdd} className="gap-2 self-start sm:self-auto">
+        <Button onClick={handleAdd} className="gap-2 ml-auto sm:ml-0 sm:self-auto">
           <Plus className="h-4 w-4" />
           Add Category
         </Button>

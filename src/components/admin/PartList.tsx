@@ -183,7 +183,7 @@ export function PartList({ initialParts, categories, companies, models }: { init
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Spare Parts</h1>
           <p className="text-sm text-muted-foreground">Manage catalog items, reference numbers, and specs</p>
         </div>
-        <Button onClick={handleAdd} className="gap-2 self-start sm:self-auto">
+        <Button onClick={handleAdd} className="gap-2 ml-auto sm:ml-0 sm:self-auto">
           <Plus className="h-4 w-4" />
           Add Part
         </Button>
