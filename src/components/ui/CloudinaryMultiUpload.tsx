@@ -9,12 +9,15 @@ import {
   ArrowLeft,
   ArrowRight,
   Plus,
+  Eye,
+  X,
 } from "lucide-react";
 import {
   getCloudinarySignature,
   deleteCloudinaryImageAction,
 } from "@/app/actions/parts";
 import { Badge } from "@/components/ui/Badge";
+import { Dialog, DialogContent, DialogTitle, DialogHeader } from "@/components/ui/Dialog"
 
 export interface ImageItem {
   url: string;
@@ -35,6 +38,7 @@ export function CloudinaryMultiUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
   const [error, setError] = useState("");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -240,6 +244,16 @@ export function CloudinaryMultiUpload({
 
                   <button
                     type="button"
+                    onClick={() => setPreviewImage(item.url)}
+                    disabled={isUploading}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-500/80 text-white hover:bg-sky-500 transition-all"
+                    title="Preview Photo"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => handleRemove(idx)}
                     disabled={isUploading}
                     className="flex h-7 w-7 items-center justify-center rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-all"
@@ -286,6 +300,38 @@ export function CloudinaryMultiUpload({
           )}
         </label>
       </div>
+
+      <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
+        <DialogContent 
+          className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] max-w-4xl w-[90vw] bg-transparent border-none p-0 shadow-none [&>button.absolute]:hidden"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>Image Preview</DialogTitle>
+          </DialogHeader>
+          <div 
+            className="relative w-full h-[80vh] flex items-center justify-center p-4 cursor-zoom-out"
+            onClick={() => setPreviewImage(null)}
+          >
+            {previewImage && (
+              <div className="relative min-w-[200px] min-h-[200px] max-w-full max-h-full flex items-center justify-center cursor-default" onClick={(e) => e.stopPropagation()}>
+                <img 
+                  src={previewImage} 
+                  alt="Full Preview" 
+                  className="max-w-full max-h-full object-contain rounded-md shadow-2xl"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPreviewImage(null)}
+                  className="absolute -right-3 -top-3 rounded-full bg-background/90 backdrop-blur-sm p-1.5 text-foreground shadow-md border border-border/50 z-50 transition-all hover:scale-110 hover:bg-background"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
